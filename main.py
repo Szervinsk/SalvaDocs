@@ -1,4 +1,4 @@
-from app.extract_PDF import processar_pdfs
+from utils.extract_PDF import processar_pdfs
 # from app.refina import resume_texto
 
 if __name__ == '__main__':
