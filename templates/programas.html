@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisa Documentos Jobs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+    <div class="messages">
+    <h5 style="color: white; margin: 0;">Dados copiados!</h5>
+    </div>
+
+
+  <div class="container">
+    <div class="section-top">
+      <h2>Analisador de Programas de Integridade!</h2>
+    </div>
+
+    <div class="section-down">
+      <div class="sections" style="width: 500px;">
+        <form id="formulario" enctype="multipart/form-data">
+            <label for="arquivo" id="dropzone">
+                <span id="arquivo-nome" class="arquivo-nome">Clique ou arraste um PDF aqui</span>
+            </label>
+            <input type="file" name="arquivo" id="arquivo" accept="application/pdf" hidden />
+            <input type="hidden" name="servico" value="programas" />
+            <button type="submit">Analisar</button>
+        </form>
+
+
+      </div>
+
+      <div class="sections">
+        <h2 id="textContent">Os dados aparecerão aqui!</h2>
+
+        <div id="loading" class="loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Carregando dados...</p>
+        </div>
+
+        <div id="resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const input = document.getElementById('arquivo');
+    const spanNome = document.getElementById('arquivo-nome');
+
+    // Atualiza nome ao escolher arquivo normalmente
+    input.addEventListener('change', function () {
+        const nome = this.files[0]?.name || "Clique ou arraste um PDF aqui";
+        spanNome.textContent = nome;
+    });
+
+    // Animação visual ao arrastar sobre a caixa
+    ['dragenter', 'dragover'].forEach(event => {
+        dropzone.addEventListener(event, e => {
+            e.preventDefault();
+            dropzone.classList.add('hover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(event => {
+        dropzone.addEventListener(event, e => {
+            e.preventDefault();
+            dropzone.classList.remove('hover');
+        });
+    });
+
+    // Ao soltar arquivo sobre a caixa
+    dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        if (e.dataTransfer.files.length) {
+            const file = e.dataTransfer.files[0];
+            if (file.type === 'application/pdf') {
+                input.files = e.dataTransfer.files; // atribui ao input
+                spanNome.textContent = file.name;
+            } else {
+                spanNome.textContent = "Apenas arquivos PDF são aceitos";
+            }
+        }
+    });
+
+    
+    document.getElementById('formulario').onsubmit = async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      const arquivo = document.getElementById('arquivo').files[0];
+
+      if (!arquivo) return alert("Selecione um arquivo!");
+
+      formData.append('arquivo', arquivo);
+      formData.append('servico', 'programas');
+
+      // Mostrar loading
+      document.getElementById('loading').style.display = 'flex';
+
+      const res = await fetch('/analisar', {
+        method: 'POST',
+        body: formData
+      });
+
+      const dados = await res.json();
+
+      // Esconder loading
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('textContent').style.display = 'none';
+
+      const div = document.getElementById('resultado');
+      div.innerHTML = '';
+
+      const tabela = document.createElement('table');
+      tabela.classList.add('resultado-tabela');
+
+      for (const campo in dados) {
+        const linha = document.createElement('tr');
+
+        const th = document.createElement('th');
+        th.textContent = campo;
+
+        const td = document.createElement('td');
+        td.textContent = Array.isArray(dados[campo]) ? dados[campo].join(', ') : dados[campo];
+
+        td.onclick = () => {
+        navigator.clipboard.writeText(td.textContent);
+
+        td.style.color = '#3498db'
+
+        setTimeout(() => {
+            td.style.color = 'black';
+        }, 2000);
+        };
+
+
+        linha.appendChild(th);
+        linha.appendChild(td);
+        tabela.appendChild(linha);
+      }
+
+      div.appendChild(tabela);
+    };
+  </script>
+</body>
+</html>
