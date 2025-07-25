@@ -1,0 +1,222 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2f2f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+#title {
+  font-size: 64px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.section-top {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+#titles_camp {
+  flex: 1;
+  min-width: 300px;
+}
+
+#activity_camp {
+  flex: 1;
+  min-width: 300px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+#iniciar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#selectype {
+  margin-bottom: 20px;
+}
+
+select.form-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#dropzone {
+  padding: 40px;
+  border: 2px dashed #bbb;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #888;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+#dropzone.hover {
+  border-color: #3498db;
+  background-color: #f0f8ff;
+}
+
+.arquivo-nome {
+  font-style: italic;
+  font-size: 16px;
+}
+
+button {
+  padding: 12px;
+  background-color: #474747;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #3498db;
+}
+
+#activity_camp_table {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  width: 100%;
+  min-height: 400px;
+}
+
+#activity_camp_table h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#voltar {
+  margin-top: 20px;
+  background-color: #888;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#voltar:hover {
+  background-color: #3498db;
+}
+
+#modal_info {
+  display: none; 
+  position: absolute;
+  top: 230px;  /* Ajuste conforme o layout */
+  right: 250px; /* Ajuste conforme o layout */
+  max-width: 320px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  font-size: 16px;
+  color: #333;
+  z-index: 9999;
+}
+
+
+.resultado-tabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.resultado-tabela th,
+.resultado-tabela td {
+  background-color: #f9f9f9;
+  padding: 16px 20px;
+  border: none;
+  text-align: left;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+}
+
+.resultado-tabela th {
+  background-color: #eeeeee;
+  font-weight: 600;
+  color: #444;
+  width: 30%;
+}
+
+.resultado-tabela td {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+.resultado-tabela td:hover {
+  background-color: #dceeff;
+  color: #0a53be;
+}
+
+@media (max-width: 768px) {
+  .resultado-tabela th,
+  .resultado-tabela td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0;
+  }
+
+  .resultado-tabela tr {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .section-top {
+    flex-direction: column;
+  }
+
+  #title {
+    font-size: 48px;
+  }
+
+  #titles_camp,
+  #activity_camp {
+    width: 100%;
+  }
+}

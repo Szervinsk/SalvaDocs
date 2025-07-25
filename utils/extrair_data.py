@@ -22,6 +22,10 @@ def extrair_dados(texto):
     # Contrato
     m = re.search(r'contrato\s*n[º°]?\s*(\d+/\d{4})', texto, re.IGNORECASE)
     dados['contrato'] = m.group(1) if m else 'Não informado'
+    
+    # Decisão
+    m = re.search(r'Decisão\s*n[º°]?\s*(\d+/\d{4})', texto, re.IGNORECASE)
+    dados['decisao'] = m.group(1) if m else 'Não informado'
 
     # Valor
     m = re.search(r'R\$[\s]*[\d\.,]+', texto, re.IGNORECASE)

@@ -56,6 +56,7 @@ def refina_programas(dados):
     if dados.get('empresa') and dados.get('contrato'):
         resposta['empresa'] = dados['empresa']
         resposta['contrato'] = 'CT nº ' + dados['contrato']
+        resposta['decisao'] = dados['decisao']
         resposta['titulo'] = f"Análise do Programa de Integridade da empresa {dados['empresa']}, referente ao Contrato nº {dados['contrato']}."
     else:
         resposta['titulo'] = "Análise de Programa de Integridade"
@@ -72,13 +73,13 @@ def refina_programas(dados):
 
     # Processos SEI/Despachos
     sei = dados.get('sei') or ([dados['nup']] if dados.get('nup') else ['Não informado'])
-    resposta['Nº do processo SEI'] = sei[0] if isinstance(sei, list) and len(sei) > 0 else sei
+    resposta['SEI'] = sei[0] if isinstance(sei, list) and len(sei) > 0 else sei
     
     despacho = dados.get('despacho') or ([dados['gdoc']] if dados.get('gdoc') else ['Não informado'])
-    resposta['Nº do Despacho'] = despacho[0] if isinstance(despacho, list) and len(despacho) > 0 else despacho
+    resposta['despacho'] = despacho[0] if isinstance(despacho, list) and len(despacho) > 0 else despacho
 
     # Resumo (se existir)
     if dados.get('resumo'):
-        resposta['resumo'] = dados['resumo']
+        resposta['resumo'] = f"Reduza a um parágrafo o seguinte texto: {dados['resumo']}"
 
     return resposta

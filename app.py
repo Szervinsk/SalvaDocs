@@ -23,6 +23,10 @@ TIPOS_SERVICO = {
 def home():
     return render_template('index.html')
 
+@app.route('/index2')
+def home2():
+    return render_template('index2.html')
+
 @app.route('/programas-de-integridade', methods=['GET'])
 def programa_de_integridade():
     return render_template(TIPOS_SERVICO['programas']['template'])
