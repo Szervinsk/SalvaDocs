@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f2f2f4;
+  background-color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,6 +33,7 @@ body {
 #titles_camp {
   flex: 1;
   min-width: 300px;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 #activity_camp {
@@ -124,12 +125,33 @@ button:hover {
   margin-bottom: 20px;
 }
 
-#voltar {
+.resultado-botoes {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
   margin-top: 20px;
+}
+
+.btn-download {
+  background-color: #2c3e50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-download:hover {
+  background-color: #3498db;
+}
+
+#voltar {
   background-color: #888;
   color: white;
-  border: none;
   padding: 12px 20px;
+  border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -139,11 +161,13 @@ button:hover {
   background-color: #3498db;
 }
 
+
+
 #modal_info {
-  display: none; 
+  display: none;
   position: absolute;
-  top: 230px;  /* Ajuste conforme o layout */
-  right: 250px; /* Ajuste conforme o layout */
+  top: 230px;
+  right: 250px;
   max-width: 320px;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -154,7 +178,6 @@ button:hover {
   color: #333;
   z-index: 9999;
 }
-
 
 .resultado-tabela {
   width: 100%;

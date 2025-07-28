@@ -2,6 +2,8 @@ def refina_dados(dados, tipo_servico=None):
     """Função principal que refina os dados conforme o tipo de serviço"""
     if tipo_servico == 'parecer':
         return refina_parecer(dados)
+    elif tipo_servico == 'despachos':
+        return refina_despacho(dados)
     else:  # programas de integridade por padrão
         return refina_programas(dados)
 
@@ -38,7 +40,7 @@ def refina_parecer(dados):
     
     # Processa Despacho/GDOC (tratados como a mesma coisa)
     referencia = dados.get('despacho') or dados.get('gdoc', ['Não informado'])
-    resposta['Número de Referência'] = referencia[0] if isinstance(referencia, list) and len(referencia) > 0 else referencia
+    resposta['gdoc'] = referencia[0] if isinstance(referencia, list) and len(referencia) > 0 else referencia
     
     # Extrai apenas o primeiro parágrafo após "Histórico" se existir
     if dados.get('historico_inicial'):
@@ -81,5 +83,29 @@ def refina_programas(dados):
     # Resumo (se existir)
     if dados.get('resumo'):
         resposta['resumo'] = f"Reduza a um parágrafo o seguinte texto: {dados['resumo']}"
+
+    return resposta
+
+def refina_despacho(dados):
+    """Refina dados para documentos do tipo Despacho"""
+    resposta = {}
+
+    # Título e identificação
+    resposta['Gdoc'] = f"{dados.get('despacho', 'Não informado')}"
+    resposta['data'] = dados.get('data', 'Não informado')
+    resposta['assunto'] = dados.get('assunto', 'Não informado')
+    resposta['documento_principal'] = dados.get('documento_principal', 'Não informado')
+
+    # Identificadores
+    sei = dados.get('sei')
+    resposta['SEI'] = sei[0] if isinstance(sei, list) and sei else sei or 'Não informado'
+
+    # Corpo do despacho como resumo
+    if dados.get('corpo_despacho'):
+        resposta['resumo'] = f"""A seguir está um texto de despacho administrativo que deve ser resumido em um único parágrafo claro, objetivo e formal. Em seguida, gere um título sugestivo para o despacho, mencionando o documento principal citado nele. Texto para resumir: {dados['corpo_despacho']}"""
+
+    # Destinatário
+    if dados.get('destinatario'):
+        resposta['destinatario'] = dados['destinatario']
 
     return resposta

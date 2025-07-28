@@ -1,4 +1,6 @@
 venv/
 .venv/
+.uploads/
+uploads/
 
 __pycache__

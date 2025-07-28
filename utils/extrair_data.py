@@ -117,3 +117,48 @@ def extrair_parecer(texto):
     dados['tipo_documento'] = tipo
 
     return dados
+
+import re
+
+def extrair_despacho(texto):
+    dados = {}
+
+    # 1. Data (última do documento)
+    # 1. Data (após "Brasília" ou "Brasília-DF")
+    m = re.search(r'Brasília(?:-DF)?(?:,)?\s*(\d{1,2}\s+de\s+[a-zç]+\s+de\s+\d{4})', texto, re.IGNORECASE)
+    dados['data'] = m.group(1).strip() if m else 'Não informado'
+
+
+    # 2. Destinatário (pode estar como "Para: ..." ou "À ... ,")
+    m = re.search(r'(?:Para|À)\s*[:\-]?\s*(.+?)[,;\n]', texto, re.IGNORECASE)
+    dados['destinatario'] = m.group(1).strip() if m else 'Não informado'
+
+    # 3. Corpo do despacho: trecho após "Assunto: ...,", "À ... ," ou "Para: ...", até "Atenciosamente", "Brasília" ou parágrafo final
+    m = re.search(
+        r'(?:Assunto\s*[:\-]?\s*.+?|(?:Para|À)\s*[:\-]?\s*.+?)[,;\n]+\s*(.*?)(?:\n+Atenciosamente|\n+Brasília|\n\n)',
+        texto,
+        re.DOTALL | re.IGNORECASE
+    )
+    dados['corpo_despacho'] = m.group(1).strip().replace('\n', ' ') if m else 'Não informado'
+
+    # 4. Número SEI ou NUP
+    m = re.search(r'\b(?:SEI|NUP)\s*(\d{5}-\d{8}/\d{4}-\d{2})', texto)
+    dados['sei'] = m.group(1) if m else 'Não informado'
+
+    # 5. Número do despacho
+    m = re.search(r'\b(?:GDOC|Doc. Id.)\s*n[º°]?\s*(\d+/\d{4}|\d+)', texto, re.IGNORECASE)
+    dados['despacho'] = m.group(1) if m else 'Não informado'
+
+    # 6. Assunto
+    m = re.search(r'Assunto\s*[:\-]?\s*(.+?)(?:\n|$)', texto, re.IGNORECASE)
+    dados['assunto'] = m.group(1).strip() if m else 'Não informado'
+
+    # 7. Documento principal + número (ex: Decisão nº 2331/2025)
+    doc_match = re.search(
+        r'(Decisão|Decreto|Lei|Portaria)\s*n[º°]?\s*\d+/\d{4}',
+        texto,
+        re.IGNORECASE
+    )
+    dados['documento_principal'] = doc_match.group(0) if doc_match else 'Não informado'
+
+    return dados

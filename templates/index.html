@@ -1,32 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Home</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles2.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <title>SalvaDocs</title>
 </head>
 
 <body>
   <div class="container">
     <div class="section-top">
-      <h1>SalvaDocs</h1>
-      <h2>Analisador de documentos do trabalho para facilitar o salvamento</h2>
-
-      <div class="section-down" style="justify-content: center; gap: 20px; margin-top: 20px;">
-        <a href="/programas-de-integridade" class="links">
-          Acesse Programas de Integridade
-        </a>
-        <a href="/parecer" class="links">
-          Acesse Parecer
-        </a>
+      <div id="titles_camp">
+        <img src="{{ url_for('static', filename='file.png') }}" alt="Logo SalvaDocs" id="logo" style="width: 30%;" />
+        <h1 id="title">SalvaDocs</h1>
+        <h2>Seu aliado inteligente que facilitará a organização de arquivos dentro da sua unidade operacional!</h2>
+        <h5 style="font-weight: 200;">Desenvolvido por Matheus Ribeiro Szervinsk</h5>
       </div>
 
-      <h5 style="font-weight: 200;"> Desenvolvido por Matheus Ribeiro Szervinsk </h5>
-    </div>
-  </div>
-</body>
+      <div id="modal_info">
+        <h4>
+          Escolha o tipo de arquivo que deseja analisar e arraste seu documento para o campo de extração!
+        </h4>
+      </div>
 
+      <!-- Área de envio -->
+      <div id="activity_camp">
+        <div id="iniciar">
+          <h3>Iniciar atividades</h3>
+          <i class="bi bi-info-circle" id="info"></i>
+        </div>
+        <hr />
+        <div id="selectype">
+          <select class="form-select" id="tipo-servico" aria-label="Selecione um tipo">
+            <option selected disabled>Escolha o tipo de documento</option>
+            <option value="parecer">Parecer</option>
+            <option value="programas">Programas de Integridade</option>
+            <option value="despachos">Despachos</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <hr />
+        <form id="formulario" enctype="multipart/form-data">
+          <label for="arquivo" id="dropzone">
+            <span id="arquivo-nome" class="arquivo-nome">Clique ou arraste um PDF aqui</span>
+          </label>
+          <input type="file" name="arquivo" id="arquivo" accept="application/pdf" hidden />
+          <input type="hidden" name="servico" id="servico" />
+          <button type="submit">Analisar</button>
+        </form>
+      </div>
+
+      <!-- Área do resultado -->
+      <div id="activity_camp_table" style="display: none;">
+        <h3>Resultado da Análise</h3>
+        <div id="resultado"></div>
+        <br>
+        <div class="resultado-botoes">
+          <a id="btn-download" href="#" class="btn-download" style="display: none;" download>Baixar documento</a>
+          <button id="voltar">Analisar outro arquivo</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const infoIcon = document.getElementById("info");
+      const modal = document.getElementById("modal_info");
+
+      modal.style.display = "none";
+      infoIcon.addEventListener("mouseenter", () => modal.style.display = "block");
+      modal.addEventListener("mouseenter", () => modal.style.display = "block");
+      infoIcon.addEventListener("mouseleave", () => {
+        setTimeout(() => {
+          if (!modal.matches(':hover')) modal.style.display = "none";
+        }, 200);
+      });
+      modal.addEventListener("mouseleave", () => modal.style.display = "none");
+
+      const dropzone = document.getElementById('dropzone');
+      const input = document.getElementById('arquivo');
+      const spanNome = document.getElementById('arquivo-nome');
+      const selectServico = document.getElementById('tipo-servico');
+      const hiddenServico = document.getElementById('servico');
+
+      selectServico.addEventListener("change", () => {
+        hiddenServico.value = selectServico.value;
+      });
+
+      input.addEventListener('change', () => {
+        const nome = input.files[0]?.name || "Clique ou arraste um PDF aqui";
+        spanNome.textContent = nome;
+      });
+
+      ['dragenter', 'dragover'].forEach(event => {
+        dropzone.addEventListener(event, e => {
+          e.preventDefault();
+          dropzone.classList.add('hover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(event => {
+        dropzone.addEventListener(event, e => {
+          e.preventDefault();
+          dropzone.classList.remove('hover');
+        });
+      });
+
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        if (e.dataTransfer.files.length) {
+          const file = e.dataTransfer.files[0];
+          if (file.type === 'application/pdf') {
+            input.files = e.dataTransfer.files;
+            spanNome.textContent = file.name;
+          } else {
+            spanNome.textContent = "Apenas arquivos PDF são aceitos";
+          }
+        }
+      });
+
+      const tituloCamp = document.getElementById('titles_camp');
+
+      document.getElementById('formulario').onsubmit = async function (e) {
+        e.preventDefault();
+
+        const arquivo = input.files[0];
+        if (!arquivo) return alert("Selecione um arquivo!");
+        if (!hiddenServico.value) return alert("Selecione o tipo de documento!");
+
+        const formData = new FormData();
+        formData.append('arquivo', arquivo);
+        formData.append('servico', hiddenServico.value);
+
+        const res = await fetch('/analisar', {
+          method: 'POST',
+          body: formData
+        });
+
+        const dados = await res.json();
+
+        document.getElementById('activity_camp').style.display = 'none';
+        document.getElementById('activity_camp_table').style.display = 'block';
+
+        tituloCamp.style.display = 'none';
+        tituloCamp.style.visibility = 'hidden';
+        tituloCamp.style.opacity = '0';
+
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML = '';
+
+        const tabela = document.createElement('table');
+        tabela.classList.add('resultado-tabela');
+
+        for (const campo in dados) {
+          const linha = document.createElement('tr');
+
+          const th = document.createElement('th');
+          th.textContent = campo;
+
+          const td = document.createElement('td');
+          td.textContent = Array.isArray(dados[campo]) ? dados[campo].join(', ') : dados[campo];
+
+          td.onclick = () => {
+            navigator.clipboard.writeText(td.textContent);
+            td.style.color = '#3498db';
+            setTimeout(() => td.style.color = 'black', 2000);
+          };
+
+          linha.appendChild(th);
+          linha.appendChild(td);
+          tabela.appendChild(linha);
+        }
+
+        resultadoDiv.appendChild(tabela);
+
+        // Atualiza botão de download
+        if (dados.download_url) {
+          const btnDownload = document.getElementById('btn-download');
+          btnDownload.href = dados.download_url;
+          btnDownload.style.display = 'inline-block';
+        }
+
+
+
+        document.getElementById('voltar').addEventListener('click', () => {
+          document.getElementById('activity_camp_table').style.display = 'none';
+          document.getElementById('activity_camp').style.display = 'block';
+          document.getElementById('formulario').reset();
+          tituloCamp.style.visibility = 'visible';
+          tituloCamp.style.opacity = '1';
+          tituloCamp.style.display = 'block';
+          spanNome.textContent = "Clique ou arraste um PDF aqui";
+        });
+      };
+
+    </script>
+</body>
 
 </html>
