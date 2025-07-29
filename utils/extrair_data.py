@@ -52,8 +52,8 @@ def extrair_parecer(texto):
     dados = {}
 
     # 1. Data (última do documento)
-    datas = re.findall(r'\d{1,2}\s+de\s+[a-zç]+\s+de\s+\d{4}', texto, re.IGNORECASE)
-    dados['data'] = datas[-1] if datas else 'Não informado'
+    m = re.search(r'Brasília(?:-DF)?(?:,)?\s*(\d{1,2}\s+de\s+[a-zç]+\s+de\s+\d{4})', texto, re.IGNORECASE)
+    dados['data'] = m.group(1).strip() if m else 'Não informado'
 
     # 2. Número do parecer
     m = re.search(r'PARECER\s*(?:n[º°]?\s*)?([\d/]+-[A-Z]+)?', texto, re.IGNORECASE)
@@ -63,23 +63,42 @@ def extrair_parecer(texto):
     m = re.search(r'INTERESSADO\(S\):\s*(.+?)(?:\n|$)', texto, re.IGNORECASE)
     dados['interessados'] = m.group(1).strip() if m else 'Não informado'
 
-    # # 4. Histórico inicial
-    # historico = re.search(r'(?:1\.\s*)?Histórico\s*\n+(.*?)(?:\n{2,}|Por último|Seguindo o rito|2\.\s*Análise)', 
-    #                      texto, re.DOTALL | re.IGNORECASE)
-    # dados['historico_inicial'] = historico.group(1).strip().replace('\n', ' ') if historico else 'Não informado'
+    # 1. Histórico (até 7 linhas ou fim do primeiro parágrafo)
+    historico_match = re.search(
+        r'(?:1\.\s*)?Histórico\s*\n+(.*?)(?:\n{2,}|\n+Por último|\n+Seguindo o rito|\n+2\.\s*Análise)', 
+        texto, re.DOTALL | re.IGNORECASE
+    )
 
-    # 5. Conclusão
-    conclusao = re.search(r'(?:3\.\s*)?Conclusão\s*\n+(.*?)(?:\n+Brasília|\n+\d{1,2}\s+de\s+[a-zç]+|\n+À)', 
-                          texto, re.DOTALL | re.IGNORECASE)
-    dados['conclusao'] = conclusao.group(1).strip().replace('\n', ' ') if conclusao else 'Não informado'
+    if historico_match:
+        historico_texto = historico_match.group(1).strip()
+        linhas = historico_texto.split('\n')
+        historico_resumo = '\n'.join(linhas[:7])
+        dados['historico_inicial'] = historico_resumo.replace('\n', ' ').strip()
+    else:
+        dados['historico_inicial'] = 'Não informado'
+
+    texto_para_conclusao = re.sub(
+    r'Identificador do item arquivístico.*?horário oficial de.*?\n+', 
+    '', texto, flags=re.DOTALL | re.IGNORECASE
+    )
+
+    # 3. Conclusão (até Brasília ou Atenciosamente)
+    conclusao_match = re.search(
+        r'(?:3\.\s*)?Conclusão\s*\n+(.*?)(?:\n+Brasília|\n+Atenciosamente)',
+        texto_para_conclusao, re.DOTALL | re.IGNORECASE
+    )
+
+    dados['conclusao'] = (
+        conclusao_match.group(1).strip().replace('\n', ' ') 
+        if conclusao_match else 'Não informado'
+    )
+
+    # 3. Resumo final com ambos
+    dados['resumo'] = f"{dados['historico_inicial']}.{dados['conclusao']}"
 
     # 6. Despachos
     despachos = re.findall(r'(?:Despacho|id\.)\s*\(?(\d+)\)?', texto, re.IGNORECASE)
     dados['despacho'] = list(set(despachos)) if despachos else ['Não informado']
-
-    # 7. SEIs
-    seis = re.findall(r'\bSEI\s*(\d{5}-\d{8}/\d{4}-\d{2})', texto)
-    dados['sei'] = list(set(seis)) if seis else ['Não informado']
 
     # 8. Código da política/norma/regimento
     politicas = re.findall(r'\b(?:PL|NR|RG|ND)[\.-]?[A-Z]{0,3}[-\w]+', texto)
@@ -99,11 +118,11 @@ def extrair_parecer(texto):
     dados['nome_documento'] = assunto if assunto else 'Não informado'
 
     # 10. Referência NUP
-    m = re.search(r'NUP\s+(\d{5}-\d{8}/\d{4}-\d{2})', texto)
-    dados['nup'] = m.group(1) if m else 'Não informado'
+    m = re.search(r'\b(?:SEI|NUP)\s*(\d{5}-\d{8}/\d{4}-\d{2})', texto)
+    dados['sei'] = m.group(1) if m else 'Não informado'
 
     # 11. GDOC
-    m = re.search(r'GDOC\s*[nº°]?\s*(\d+)', texto, re.IGNORECASE)
+    m = re.search(r'\b(?:GDOC|Doc. Id.)\s*n[º°]?\s*(\d+/\d{4}|\d+)', texto, re.IGNORECASE)
     dados['gdoc'] = m.group(1) if m else 'Não informado'
 
     # 12. Tipo de documento (Política, Norma, Regimento)

@@ -26,7 +26,7 @@ def refina_parecer(dados):
     resposta['parecer'] = dados.get('parecer', 'Não informado')
     
     # Adiciona informações específicas
-    campos = ['interessados', 'conclusao', 'tipo_documento', 'codigo_documento', 'nome_documento']
+    campos = ['interessados', 'tipo_documento', 'codigo_documento', 'nome_documento']
     
     for campo in campos:
         if dados.get(campo):
@@ -35,17 +35,17 @@ def refina_parecer(dados):
             resposta[nome_campo] = dados[campo]
     
     # Processa NUP/SEI (tratados como a mesma coisa)
-    identificador = dados.get('nup') or dados.get('sei', ['Não informado'])
-    resposta['Número do Processo'] = identificador[0] if isinstance(identificador, list) and len(identificador) > 0 else identificador
+    identificador = dados.get('sei') or dados.get('sei', ['Não informado'])
+    resposta['SEI'] = identificador[0] if isinstance(identificador, list) and len(identificador) > 0 else identificador
     
     # Processa Despacho/GDOC (tratados como a mesma coisa)
-    referencia = dados.get('despacho') or dados.get('gdoc', ['Não informado'])
+    referencia = dados.get('gdoc') or dados.get('gdoc', ['Não informado'])
     resposta['gdoc'] = referencia[0] if isinstance(referencia, list) and len(referencia) > 0 else referencia
     
     # Extrai apenas o primeiro parágrafo após "Histórico" se existir
-    if dados.get('historico_inicial'):
+    if dados.get('resumo'):
         # Pega apenas o primeiro parágrafo (até a primeira quebra de linha dupla)
-        historico_resumido = dados['historico_inicial'].split('\n\n')[0]
+        historico_resumido = f'A seguir está um texto de parecer administrativo que deve ser resumido em um único parágrafo claro, objetivo e formal. Texto a resumir: {dados['resumo'].split('\n\n')[0]}'
         resposta['Contexto'] = historico_resumido.strip()
     
     return resposta

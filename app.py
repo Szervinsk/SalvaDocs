@@ -56,7 +56,7 @@ def analisar():
             nome_final = f"Despacho {nome_base.replace('/', '-').replace('\\', '-')}.pdf"
 
         elif servico == 'parecer':
-            nome_base = resultado.get('Gdoc') or resultado.get('parecer') or 'Parecer'
+            nome_base = resultado.get('gdoc') or resultado.get('gdoc') or 'Parecer'
             nome_final = f"Parecer {nome_base.replace('/', '-').replace('\\', '-')}.pdf"
 
         elif servico == 'programas':
