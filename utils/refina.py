@@ -55,11 +55,16 @@ def refina_programas(dados):
     resposta = {}
 
     # Título adaptativo
-    if dados.get('empresa') and dados.get('contrato'):
+    if dados.get('empresa') and dados.get('contrato') != 'Não informado':
         resposta['empresa'] = dados['empresa']
         resposta['contrato'] = 'CT nº ' + dados['contrato']
         resposta['decisao'] = dados['decisao']
         resposta['titulo'] = f"Análise do Programa de Integridade da empresa {dados['empresa']}, referente ao Contrato nº {dados['contrato']}."
+    elif dados.get('empresa') and dados.get('arp') != 'Não informado':
+        resposta['empresa'] = dados['empresa']
+        resposta['arp'] = 'ARP nº ' + dados['arp']
+        resposta['decisao'] = dados['decisao']
+        resposta['titulo'] = f"Análise do Programa de Integridade da empresa {dados['empresa']}, referente à ARP nº {dados['arp']}."
     else:
         resposta['titulo'] = "Análise de Programa de Integridade"
     

@@ -23,6 +23,10 @@ def extrair_dados(texto):
     m = re.search(r'contrato\s*n[º°]?\s*(\d+/\d{4})', texto, re.IGNORECASE)
     dados['contrato'] = m.group(1) if m else 'Não informado'
     
+    # ARP (Ata de Registro de Preços)
+    m = re.search(r'(?:ARP|Ata de Registro de Preços)\s*n[º°]?\s*(\d+/\d{4})', texto, re.IGNORECASE)
+    dados['arp'] = m.group(1) if m else 'Não informado'
+    
     # Decisão
     m = re.search(r'Decisão\s*n[º°]?\s*(\d+/\d{4})', texto, re.IGNORECASE)
     dados['decisao'] = m.group(1) if m else 'Não informado'
@@ -165,7 +169,7 @@ def extrair_despacho(texto):
     dados['sei'] = m.group(1) if m else 'Não informado'
 
     # 5. Número do despacho
-    m = re.search(r'\b(?:GDOC|Doc. Id.)\s*n[º°]?\s*(\d+/\d{4}|\d+)', texto, re.IGNORECASE)
+    m = re.search(r'\b(?:GDOC|Doc\. Id\.|Doc\. SEI(?:/GDF)?)\s*(?:n[º°]?\s*)?(\d{6,}|\d+/\d{4})', texto, re.IGNORECASE)
     dados['despacho'] = m.group(1) if m else 'Não informado'
 
     # 6. Assunto
@@ -174,7 +178,7 @@ def extrair_despacho(texto):
 
     # 7. Documento principal + número (ex: Decisão nº 2331/2025)
     doc_match = re.search(
-        r'(Decisão|Decreto|Lei|Portaria)\s*n[º°]?\s*\d+/\d{4}',
+        r'(Decisão|Decreto|Lei|Portaria|Relatório de Auditoria|Nota de Auditoria|Despacho Singular)\s*n[º°]?\s*\d+/\d{4}',
         texto,
         re.IGNORECASE
     )

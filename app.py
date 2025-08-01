@@ -60,8 +60,8 @@ def analisar():
             nome_final = f"Parecer {nome_base.replace('/', '-').replace('\\', '-')}.pdf"
 
         elif servico == 'programas':
-            nome_base = resultado.get('contrato') or 'Programa'
-            nome_final = f"Programa {nome_base.replace('/', '-').replace('\\', '-')}.pdf"
+            nome_base = resultado.get('empresa') or 'Programa'
+            nome_final = f"{nome_base.replace('/', '-').replace('\\', '-')}.pdf"
 
         else:
             nome_final = "Documento.pdf"
