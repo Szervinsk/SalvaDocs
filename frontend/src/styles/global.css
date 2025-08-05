@@ -1,0 +1,96 @@
+:root {
+  --font-family: "Open Sans", sans-serif;
+  --primary-color-grey: #313131;
+  --second-color-blue: #597DFF;
+  --deep-wall-color: #F2F2F4;
+  --deep-wall-color2: #F5F5F5;
+  --border-color: #C1C1C1;
+  --white:#fff;
+}
+
+body {
+  padding: 10px;
+  font-family: var(--font-family);
+  background-color: var(--deep-wall-color);
+  color: var(--primary-color-grey);
+  display: flex;
+  align-items: center;
+}
+
+.background {
+    width: 95%;
+    max-height: 920px;
+    border: var(--border-color) 2px;
+    border-radius: 20px;
+    background-color: var(--white);
+}
+
+.flex-top-down {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-left-right {
+    display: flex;
+    flex-direction: row;
+}
+
+/* css do componente navbar */
+
+.navbar {
+  display: flex;
+  width: 256px;
+  height: 920px;
+  padding: 20px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+}
+
+.navbar h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.navbar h2 {
+    font-size: 14px;
+    margin: 0;
+}
+
+.businessCard {
+    min-height: 24px;
+    width: 100%;
+    margin-bottom: 40px;
+    align-items: center;
+}
+
+.icon-pen {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    border-radius: 10px;
+    margin-right: 10px;
+    background-color: var(--second-color-blue);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+/* searchbar css */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  padding-left: 30px; /* espaço para o ícone */
+}
+
+.icon-search {
+  position: absolute;
+  left: 10px;
+  cursor: pointer;
+}
