@@ -3,7 +3,7 @@ import Logo from "../assets/pen.svg";
 
 function Navbar({ userReferences }) {
   function searchIt() {
-    alert("opa");
+    alert("searching");
   }
 
   return (
