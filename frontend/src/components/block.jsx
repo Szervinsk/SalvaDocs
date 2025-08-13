@@ -1,12 +1,6 @@
 import AnalisarArquivos from "./analisa-arquivos";
-import FoldersAction from "./folders-action";
 
-function Block({ path, types, pastas, atualizarCaminho }) {
-  const ultimoItem = path[path.length - 1];
-  const root = path[0];
-  console.log("Types no block:", types);
-  console.log("Path no block:", path);
-
+function Block({ path, types }) {
   return (
     <div className="background">
       <div className="action-bar">
@@ -16,15 +10,10 @@ function Block({ path, types, pastas, atualizarCaminho }) {
       </div>
 
       <div className="middle-area">
-        {root === "Pastas" && (
-          <FoldersAction pastas={pastas} atualizarCaminho={atualizarCaminho} />
-        )}
-
-        {ultimoItem === "Obter Dados" && <AnalisarArquivos />}
-
-        {/* <div className="status-bar">
-          <button className="Status-btn">Salvar modificações</button>
-        </div> */}
+        <AnalisarArquivos />
+      </div>
+      <div className="status-bar">
+        <button className="Status-btn">Salvar modificações</button>
       </div>
     </div>
   );
