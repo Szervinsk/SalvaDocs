@@ -5,57 +5,50 @@ import UrlText from "./components/url";
 import { useState } from "react";
 
 function Abas() {
-  const [path, setPath] = useState([]); // começa vazio
-  const [rootFolder, setRootFolder] = useState(null);
+  // Agora path é um objeto, cada chave é uma "raiz" ou seção
+  const [paths, setPaths] = useState({});
 
-    const tabs = [
+  const tags = [
     { id: 1, text: "Pastas" },
     { id: 2, text: "Obter Dados" },
     { id: 3, text: "Sua Conta" },
   ];
 
-  const pastas = [{ id: 1, text: "Despachos" },
+  const pastas = [
+    { id: 1, text: "Despachos" },
     { id: 2, text: "Pareceres" },
-    { id: 3, text: "Programas de Integridade" },]
+    { id: 3, text: "Programas de Integridade" },
+  ];
 
+  // Atualiza o path para uma raiz específica (ex: "Pastas")
   const atualizarCaminho = (novoItem, root) => {
     if (!root) return;
 
-    if (novoItem == null) {
-      // Clicou apenas na raiz
-      setRootFolder(root);
-      setPath([root]);
-      return;
-    }
+    setPaths((prev) => {
+      const atual = prev[root] || [root];
 
-    if (!rootFolder || rootFolder !== root) {
-      // nova raiz
-      setRootFolder(root);
-      setPath([root, novoItem]);
-    } else {
-      // mesma raiz
-      setPath((prev) => {
-        if (prev[prev.length - 1] === novoItem) return prev;
-        return [...prev, novoItem];
-      });
-    }
+      if (novoItem == null) {
+        // Resetar para raiz apenas
+        return { ...prev, [root]: [root] };
+      }
+
+      if (atual[atual.length - 1] === novoItem) {
+        return prev; // sem mudança
+      }
+
+      return { ...prev, [root]: [...atual, novoItem] };
+    });
   };
 
-  const voltarUmNivel = () => {
-    setPath((prev) => {
-      if (prev.length > 0) {
-        const novo = prev.slice(0, -1);
-        if (novo.length === 0) {
-          // caminho zerado
-          setRootFolder(null);
-          return [];
-        }
-        if (novo.length === 1) {
-          setRootFolder(novo[0]);
-        }
-        return novo;
-      }
-      return prev;
+  // Voltar um nível em uma raiz específica
+  const voltarUmNivel = (root) => {
+    setPaths((prev) => {
+      const atual = prev[root];
+      if (!atual || atual.length <= 1) return prev;
+
+      const novoPath = atual.slice(0, -1);
+
+      return { ...prev, [root]: novoPath };
     });
   };
 
@@ -64,12 +57,18 @@ function Abas() {
       <UrlText />
       <div className="main-container-little">
         <Navbar
-          types={tabs}
+          tags={tags}
           userReferences={{ empresa: "Empresa", funcao: "estagiário" }}
           onSelecionarCaminho={atualizarCaminho}
-          onVoltar={voltarUmNivel}
+          onVoltar={(root) => voltarUmNivel(root)}
         />
-        <ActionBlock path={path} types={tabs} pastas={pastas}/>
+        <ActionBlock
+          paths={paths}
+          types={tags}
+          pastas={pastas}
+          atualizarCaminho={atualizarCaminho}
+          voltarUmNivel={voltarUmNivel}
+        />
       </div>
     </div>
   );

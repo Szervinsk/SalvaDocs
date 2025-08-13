@@ -175,17 +175,18 @@ h3 {
   flex: 1;
   display: flex;
   flex-direction: row;
-  border-left: 2px solid var(--border-color);
-  border-right: 2px solid var(--border-color);
+  border-top: 2px solid var(--border-color);
   border-bottom: 2px solid var(--border-color);
   background-color: var(--deep-wall-color2);
   overflow: hidden; /* previne overflow */
+  width: 100%;
 }
 
 /* Sidebar Pastas */
 .Pastas {
-  width: 270px;
+  width: 15%;
   min-height: 100%;
+  z-index: 2;
   background: var(--white);
   border-right: 1px solid var(--border-color);
   border-bottom-left-radius: 10px;
@@ -202,17 +203,37 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  width: 100%;
   padding-bottom: 5px;
+}
+
+hr {
+  width: 100%;
+  color: var(--border-color);
+  margin: 10px 0 20px 0;
 }
 
 /* Cabeçalho da pasta */
 .folder {
-  cursor: pointer;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 5px 0;
-  display: flex;
   width: 100%;
+  min-height: 32px;
+  align-items: center;
+  margin: auto;
+  justify-content: space-between;
+  display: flex;
+  cursor: pointer;
+  gap: 20px;
+  transition: 0.3s ease-in;
+}
+
+.folder:hover {
+  color: var(--second-color-blue);
+}
+
+.folders {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 50%; 
 }
 
 /* Texto e ícone pasta */
@@ -273,7 +294,7 @@ h3 {
   border-radius: 5px;
   background: var(--second-color-blue);
   z-index: 1;
-}
+} 
 
 /* Background block usado em telas secundárias */
 .background-block {
@@ -288,12 +309,13 @@ h3 {
 }
 
 /* Analisador de arquivos */
-.AnalisaArquivos {
+.AnalisaArquivos , .AnalisaPastas{
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  width: 100%;
 }
 
 /* Botões dos modelos */
@@ -346,7 +368,19 @@ h3 {
   align-items: center;
 }
 
-.big-folder {
+.slide-folder {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 20px;
+  height: 50px;
+  border-top: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tags {
   width: 100%;
   min-height: 32px;
   align-items: center;
@@ -354,16 +388,11 @@ h3 {
   justify-content: space-between;
   display: flex;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  gap: 20px;
+  transition: 0.3s ease-in;
 }
 
-.big-folder:hover {
-  background-color: var(--second-color-blue);
-  color: var(--white);
-  border-radius: 10px;
-}
-
-.folder:hover {
+.tags:hover {
   color: var(--second-color-blue);
 }
 
