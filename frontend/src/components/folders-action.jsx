@@ -32,7 +32,7 @@ function FoldersAction({ pastas, atualizarCaminho }) {
   return (
     <motion.div
       className={`Pastas ${reduzido ? "reduzido" : ""}`}
-      animate={{ width: reduzido ? 60 : 320 }}
+      animate={{ width: reduzido ? 80 : 320 , alignItems: 'center' }}
       transition={{ duration: 0.3 }}
     >
       {/* Logo e nome */}

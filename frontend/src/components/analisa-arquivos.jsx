@@ -2,59 +2,42 @@ import { useState } from "react";
 import { LuFileSearch } from "react-icons/lu";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa";
+import EditVariables from "./edit-variables";
 
-function TagsComponent({ modelId }) {
-  return (
-    <div>
-      📄 Analisando modelo #{modelId}...
-      {/* Here you can customize per modelId */}
-    </div>
-  );
-}
-
-function AnalisarArquivos() {
-  const defaultMessage =
-    "Use o modelo Despachos para análise automatizada de documentos do tipo despacho, identificando dados específicos com base em critérios definidos.";
+function AnalisarArquivos({ modelos, selectedModel, setSelectedModel, etapas, etapaAtual, setEtapaAtual }) {
+  const defaultMessage = "Use o modelo Despachos para análise automatizada de documentos.";
 
   const [text, setText] = useState(defaultMessage);
-  const [selectedModel, setSelectedModel] = useState(null);
 
-  const models = [
-    { id: 1, text: "Despachos" },
-    { id: 2, text: "Programas de Integridade" },
-    { id: 3, text: "Pareceres" },
-  ];
-
-  const handleModelText = (id) => {
-    if (id === 1) {
-      setText(
-        "Use o modelo Despachos para análise automatizada de documentos do tipo despacho, identificando dados específicos com base em critérios definidos."
-      );
-    } else if (id === 2) {
-      setText(
-        "Use o modelo Programa de Integridade para análise automatizada de documentos desse tipo, identificando dados específicos com base em critérios definidos."
-      );
-    } else {
-      setText(
-        "Use o modelo Parecer para análise automatizada de documentos desse tipo, identificando dados específicos com base em critérios definidos."
-      );
-    }
+  const handleCloseModal = () => {
+    setSelectedModel(null); // volta pro estado inicial
   };
 
-  // If a model is selected, show TagsComponent
-  if (selectedModel !== null) return <TagsComponent modelId={selectedModel} />;
+  const handleModelText = (id) => {
+    const model = modelos.find(m => m.id === id);
+    if (model) setText(`Use o modelo ${model.text} para análise automatizada de documentos.`);
+  };
+
+  // Se um modelo foi selecionado, exibe o modal de edição
+  if (selectedModel !== null) {
+    return (
+      <EditVariables
+        etapas={etapas}
+        etapaAtual={etapaAtual}
+        modelId={selectedModel}
+        onClose={handleCloseModal}
+      />
+    );
+  }
 
   return (
     <div className="AnalisaArquivos">
       <LuFileSearch size={30} className="icons" />
       <h2>Analisador de arquivos</h2>
-      <h3>
-        Selecione abaixo o modelo de captura de dados desejado para o arquivo
-        enviado
-      </h3>
+      <h3>Selecione abaixo o modelo de captura de dados desejado</h3>
 
       <div className="flex-left-right">
-        {models.map((model) => (
+        {modelos.map((model) => (
           <div
             key={model.id}
             className="Models-btn"
