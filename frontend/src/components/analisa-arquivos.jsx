@@ -3,9 +3,32 @@ import { LuFileSearch } from "react-icons/lu";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa";
 import EditVariables from "./edit-variables";
+import EditEtapas from "./edit-etapas";
 
-function AnalisarArquivos({ modelos, selectedModel, setSelectedModel, etapas, etapaAtual, setEtapaAtual }) {
-  const defaultMessage = "Use o modelo Despachos para análise automatizada de documentos.";
+function AnalisarArquivos({
+  modelos,
+  selectedModel,
+  setSelectedModel,
+  etapas,
+  etapaAtual,
+  setEtapaAtual, // agora é o goToEtapa
+  selectedTags,
+  setSelectedTags,
+  file,
+  setFile,
+  anexou,
+  setAnexou,
+  erroArquivo,
+  onBlocked, // novo
+  alert,
+  setAlert,
+  setTremer,
+  tremer,
+  closeAlert,
+  setCloseAlert
+}) {
+  const defaultMessage =
+    "Use o modelo Despachos para análise automatizada de documentos.";
 
   const [text, setText] = useState(defaultMessage);
 
@@ -14,19 +37,44 @@ function AnalisarArquivos({ modelos, selectedModel, setSelectedModel, etapas, et
   };
 
   const handleModelText = (id) => {
-    const model = modelos.find(m => m.id === id);
-    if (model) setText(`Use o modelo ${model.text} para análise automatizada de documentos.`);
+    const model = modelos.find((m) => m.id === id);
+    if (model)
+      setText(
+        `Use o modelo ${model.text} para análise automatizada de documentos.`
+      );
   };
 
   // Se um modelo foi selecionado, exibe o modal de edição
   if (selectedModel !== null) {
     return (
-      <EditVariables
-        etapas={etapas}
-        etapaAtual={etapaAtual}
-        modelId={selectedModel}
-        onClose={handleCloseModal}
-      />
+      <div className="flex-left-right , spc-bet">
+        <EditVariables
+          etapas={etapas}
+          etapaAtual={etapaAtual}
+          modelId={selectedModel}
+          onClose={handleCloseModal}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+          file={file}
+          setFile={setFile}
+          anexou={anexou}
+          setAnexou={setAnexou}
+          erroArquivo={erroArquivo}
+        />
+
+        <EditEtapas
+          etapas={etapas}
+          etapaAtual={etapaAtual}
+          setEtapaAtual={setEtapaAtual} // usa o guardado
+          anexou={anexou} // para UI desabilitar
+          alert={alert}
+          setAlert={setAlert}
+          tremer={tremer}
+          setTremer={setTremer}
+          closeAlert={closeAlert}
+          setCloseAlert={setCloseAlert}
+        />
+      </div>
     );
   }
 

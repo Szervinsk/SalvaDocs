@@ -7,9 +7,9 @@ import { useState } from "react";
 function ActionBlock({ path, types, pastas, atualizarCaminho, voltarUmNivel}) {
   const [selectedModel, setSelectedModel] = useState(null); // estado do modelo selecionado
   const models = [
-    { id: 1, text: "Despachos" },
+    { id: 1, text: "Despacho" },
     { id: 2, text: "Programas de Integridade" },
-    { id: 3, text: "Pareceres" },
+    { id: 3, text: "Parecer" },
   ];
 
   return (

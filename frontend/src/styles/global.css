@@ -1,12 +1,14 @@
 :root {
   --font-family: "Open Sans", sans-serif;
+  --border-color: #c1c1c1;
   --primary-color-grey: #313131;
   --primary-color-grey2: #848484;
   --primary-color-greyzin: #e9e7ea;
-  --second-color-blue: #597dff;
   --deep-wall-color: #f2f2f4;
   --deep-wall-color2: #f5f5f5;
-  --border-color: #c1c1c1;
+  --second-color-blue: #597dff;
+  --primary-color-red: rgb(255, 100, 100);
+  --check-container: #597dff50;
   --white: #fff;
 }
 
@@ -16,6 +18,7 @@
 
 .controle {
   color: var(--second-color-blue);
+  margin: 0 5px;
 }
 
 html,
@@ -181,6 +184,26 @@ h4 {
   flex-shrink: 0;
 }
 
+.select {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+  align-items: center;
+}
+
+.action-btns {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
 /* Área intermediária dividida em 2 colunas */
 .middle-area {
   flex: 1;
@@ -195,6 +218,36 @@ h4 {
   box-sizing: border-box; /* ← evita que o padding expanda além de 100% */
 }
 
+.alert {
+  background-color: var(--white);
+  border-radius: 2.5px;
+  border-left: 10px solid var(--primary-color-red);
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: fit-content;
+  gap: 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  /* animação */
+  animation: slide-alert 0.3s ease forwards;
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+@keyframes slide-alert {
+  from {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-10px);
+    opacity: 1;
+  }
+}
 
 /* Sidebar Pastas (agora compatível com motion.div) */
 .Pastas {
@@ -225,7 +278,6 @@ h4 {
   transform: translateX(-10px);
   pointer-events: none;
 }
-
 
 /* Container pasta e documentos */
 .folder-container {
@@ -331,7 +383,7 @@ hr {
   background: var(--second-color-blue);
   margin: 0 10px;
   z-index: 1;
-} 
+}
 
 /* Background block usado em telas secundárias */
 .background-block {
@@ -500,4 +552,132 @@ hr {
 
 .edit-tags:has(input[type="checkbox"]:checked) label {
   color: var(--white);
+}
+
+.edit-dropzone {
+  padding: 40;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed var(--border-color);
+  border-radius: 20px;
+  background-color: var(--deep-wall-color2);
+  height: 40%;
+  margin: 20px 0;
+}
+
+.edit-file {
+  display: flex;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.box-icon-pdf {
+  background-color: var(--primary-color-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin: 0 10px;
+  word-wrap: break-word;
+}
+
+.edit-etapas-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 55%;
+  height: 100%;
+  position: relative;
+}
+
+.edit-etapas {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.etapa-ativa {
+  border: 2px solid var(--second-color-blue);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Borda de erro */
+.tremer {
+  animation: tremer 0.3s ease;
+  border: 2px solid var(--primary-color-red);
+}
+
+@keyframes tremer {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+}
+
+/* desabilita visualmente as etapas bloqueadas (ex.: etapa 3 quando preso na 2) */
+.edit-etapas.etapa-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto; /* mantém click para disparar o shake */
+}
+
+/* switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  align-items: center;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 18px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #597dff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
 }
