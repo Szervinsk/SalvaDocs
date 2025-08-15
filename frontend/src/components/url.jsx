@@ -1,7 +1,7 @@
 function UrlText(){
     return (
         <div className="url">
-            <h3> SalvaDocs 2.0 </h3>
+            <h3>Desenvolvido por Szervinsk</h3>
         </div>
     )
 } export default UrlText;
