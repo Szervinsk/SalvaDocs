@@ -53,12 +53,13 @@ h4 {
 
 .main-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   width: 100vw;
   height: 100vh;
   background-color: var(--deep-wall-color);
+  box-sizing: border-box;
 }
 
 .url {
@@ -72,13 +73,6 @@ h4 {
   margin-bottom: 10px;
 }
 
-.main-container-little {
-  display: flex;
-  width: 95vw;
-  height: 90vh;
-  box-sizing: border-box;
-}
-
 /* NAVBAR */
 .navbar {
   display: flex;
@@ -87,11 +81,6 @@ h4 {
   height: 100%;
   padding: 20px;
   background-color: var(--deep-wall-color2);
-  border-left: 2px solid var(--border-color);
-  border-top: 2px solid var(--border-color);
-  border-bottom: 2px solid var(--border-color);
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -161,7 +150,7 @@ h4 {
 .background {
   display: flex;
   flex-direction: column;
-  height: 95%;
+  height: 85%;
   min-width: 1084px;
   width: 100%;
   border: 2px solid var(--border-color);
@@ -175,8 +164,7 @@ h4 {
   height: 70px;
   padding: 0 20px;
   border-radius: 10px 10px 0 0;
-  border: 2px solid var(--border-color);
-  border-bottom: none; /* evita borda dupla entre action-bar e middle-area */
+  border-bottom: 2px solid var(--border-color);
   background: var(--white);
   display: flex;
   align-items: center;
@@ -209,9 +197,9 @@ h4 {
   flex: 1;
   display: flex;
   flex-direction: row;
-  border-top: 2px solid var(--border-color);
-  border-bottom: 2px solid var(--border-color);
   background-color: var(--deep-wall-color2);
+  border-radius: 0 0 10px 10px;
+  border-top: none;
   width: 100%;
   height: 100%;
   padding: 10px;
@@ -349,6 +337,7 @@ hr {
 .content {
   flex: 1;
   padding: 20px;
+  padding-bottom: 90px; /* garante espaço para a barra */
   background-color: var(--deep-wall-color2);
   overflow-y: auto;
   box-sizing: border-box;
@@ -359,16 +348,20 @@ hr {
   height: 70px;
   padding: 0 20px;
   border-radius: 0 0 10px 10px;
-  border: 2px solid var(--border-color);
-  border-top: none; /* evitar borda dupla */
+  border-top: 2px solid var(--border-color);
   background: var(--white);
   display: flex;
   align-items: center;
   flex-shrink: 0;
+
+  position: fixed; /* fixa no rodapé */
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Botão salvar */
-.Status-btn {
+.Status-btn , .upload-btn {
   display: flex;
   width: 150px;
   height: 40px;
@@ -382,18 +375,22 @@ hr {
   border-radius: 5px;
   background: var(--second-color-blue);
   margin: 0 10px;
+  box-shadow: 0 2px #999;
   z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.Status-btn:active , .upload-btn:active {
+  box-shadow: 0 5px var(--check-container);
+  transform: translateY(2px);
 }
 
 /* Background block usado em telas secundárias */
 .background-block {
   background-color: var(--deep-wall-color2);
-  border: 2px solid var(--border-color);
   width: 100%;
   height: 100%;
-  padding: 20px;
-  border-bottom-right-radius: 20px;
-  border-top-right-radius: 20px;
+  padding: 10px;
   box-sizing: border-box;
 }
 
@@ -407,7 +404,7 @@ hr {
   gap: 15px;
   padding: 20px;
   background-color: var(--deep-wall-color2);
-  border-left: 1px solid var(--border-color);
+
 }
 
 /* Botões dos modelos */
@@ -508,8 +505,12 @@ hr {
   background-color: var(--white);
   border-radius: 10px;
   border: 1px solid var(--border-color);
+  box-sizing: border-box;
   width: 45%;
   height: 100%;
+  min-height: 100%;
+  overflow-y: auto; /* já tinha */
+  max-height: 80vh; 
 }
 
 .edit-p {
@@ -624,10 +625,19 @@ hr {
 }
 
 @keyframes tremer {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
 }
 
 /* desabilita visualmente as etapas bloqueadas (ex.: etapa 3 quando preso na 2) */

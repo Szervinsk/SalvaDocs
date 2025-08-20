@@ -1,12 +1,16 @@
-const express = require('express');
-const cors = require('cors');
+import express from "express";
+import dotenv from "dotenv";
+import fileRoutes from "./routes/fileRoutes";
 
-const routes = require('./routes');
-
+dotenv.config();
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-app.use('/', routes);
-module.exports = app;
+// Rotas de upload/análise
+app.use("/api/files", fileRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});

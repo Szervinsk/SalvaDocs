@@ -9,8 +9,10 @@ import { useState, useEffect } from "react";
 function Block({ modelos, selectedModel, setSelectedModel }) {
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [anexou, setAnexou] = useState(false);
+
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
+  
   const [erroArquivo, setErroArquivo] = useState(false);
   const [alert, setAlert] = useState(false);
   const [tremer, setTremer] = useState(false);

@@ -8,7 +8,7 @@ function ActionBlock({ path, types, pastas, atualizarCaminho, voltarUmNivel}) {
   const [selectedModel, setSelectedModel] = useState(null); // estado do modelo selecionado
   const models = [
     { id: 1, text: "Despacho" },
-    { id: 2, text: "Programas de Integridade" },
+    { id: 2, text: "Programas" },
     { id: 3, text: "Parecer" },
   ];
 

@@ -1,6 +1,5 @@
 import "./styles/global.css";
 import ActionBlock from "./pages/actionBlock/ActionBlock";
-import UrlText from "./components/url";
 import { useState } from "react";
 
 function Abas() {
@@ -23,15 +22,12 @@ function Abas() {
 
   return (
     <div className="main-container">
-      <UrlText />
-      <div className="main-container-little">
-        <ActionBlock
-          path={path}
-          pastas={pastas}
-          atualizarCaminho={atualizarCaminho}
-          voltarUmNivel={voltarUmNivel}
-        />
-      </div>
+      <ActionBlock
+        path={path}
+        pastas={pastas}
+        atualizarCaminho={atualizarCaminho}
+        voltarUmNivel={voltarUmNivel}
+      />
     </div>
   );
 }
