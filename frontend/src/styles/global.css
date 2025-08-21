@@ -192,6 +192,19 @@ h4 {
   height: 40px;
 }
 
+.action-big-btns {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  width: fit-content;
+  height: 32px;
+  margin: 0 10px;
+}
+
 /* Área intermediária dividida em 2 colunas */
 .middle-area {
   flex: 1;
@@ -690,4 +703,36 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(18px);
+}
+
+/* open docs */
+.open-docs-bar {
+  padding: 10px;
+  box-sizing: border-box;
+  border-bottom: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.open-edit-container {
+  padding: 10px;
+  box-sizing: border-box;
+}
+.open-docs-tags {
+  margin: 10px;
+  color: var(--primary-color-grey2);
+}
+
+.doc-title {
+  margin: 10px;
+}
+
+.results {
+  background-color: var(--deep-wall-color2);
+  padding: 5px;
+  min-width: 50px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid var(--border-color)
 }

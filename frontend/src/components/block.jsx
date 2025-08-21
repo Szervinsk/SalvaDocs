@@ -5,6 +5,7 @@ import { MdOutlineMoreHoriz } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import AnalisarArquivos from "./analisa-arquivos";
 import { useState, useEffect } from "react";
+import OpenDocs from "./open-docs";
 
 function Block({ modelos, selectedModel, setSelectedModel }) {
   const [etapaAtual, setEtapaAtual] = useState(1);
@@ -12,7 +13,6 @@ function Block({ modelos, selectedModel, setSelectedModel }) {
 
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
-  
   const [erroArquivo, setErroArquivo] = useState(false);
   const [alert, setAlert] = useState(false);
   const [tremer, setTremer] = useState(false);
@@ -76,7 +76,9 @@ function Block({ modelos, selectedModel, setSelectedModel }) {
                   <h4>Selecionar modelo</h4>
                   <div className="flex-left-right" style={{ marginTop: 5 }}>
                     <LuCircleDashed size={15} className="controle" />
-                    <h3 className="controle">Modelo {selectedModel} selecionado</h3>
+                    <h3 className="controle">
+                      Modelo {selectedModel} selecionado
+                    </h3>
                   </div>
                 </div>
                 |
@@ -92,9 +94,15 @@ function Block({ modelos, selectedModel, setSelectedModel }) {
                     {etapaAtual === 3 && file && (
                       <>
                         |
-                        <div className="flex-down-top" style={{ marginLeft: 20 }}>
+                        <div
+                          className="flex-down-top"
+                          style={{ marginLeft: 20 }}
+                        >
                           <h4>Arquivo selecionado</h4>
-                          <div className="flex-left-right" style={{ marginTop: 5 }}>
+                          <div
+                            className="flex-left-right"
+                            style={{ marginTop: 5 }}
+                          >
                             <FiFileText size={15} className="controle" />
                             <h3 className="controle">{file.name}</h3>
                           </div>
@@ -124,35 +132,36 @@ function Block({ modelos, selectedModel, setSelectedModel }) {
 
       {/* Middle Area */}
       <div className="middle-area">
-        {selectedModel && (selectedTags?.length ?? 0) >= 1 && etapaAtual === 3 && !file && (
-          <div className="alert">Nenhum arquivo foi anexado</div>
-        )}
+        {selectedModel &&
+          (selectedTags?.length ?? 0) >= 1 &&
+          etapaAtual === 3 &&
+          !file && <div className="alert">Nenhum arquivo foi anexado</div>}
 
-        <AnalisarArquivos
-          modelos={modelos}
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          etapas={etapas}
-          etapaAtual={etapaAtual}
-          setEtapaAtual={goToEtapa}
-          selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
-          file={file}
-          setFile={(f) => {
-            setFile(f);
-            if (f) setAnexou(true);
-          }}
-          anexou={anexou}
-          setAnexou={setAnexou}
-          erroArquivo={erroArquivo}
-          onBlocked={triggerShake}
-          alert={alert}
-          setAlert={setAlert}
-          tremer={tremer}
-          setTremer={setTremer}
-          closeAlert={closeAlert}
-          setCloseAlert={setCloseAlert}
-        />
+          <AnalisarArquivos
+            modelos={modelos}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            etapas={etapas}
+            etapaAtual={etapaAtual}
+            setEtapaAtual={goToEtapa}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            file={file}
+            setFile={(f) => {
+              setFile(f);
+              if (f) setAnexou(true);
+            }}
+            anexou={anexou}
+            setAnexou={setAnexou}
+            erroArquivo={erroArquivo}
+            onBlocked={triggerShake}
+            alert={alert}
+            setAlert={setAlert}
+            tremer={tremer}
+            setTremer={setTremer}
+            closeAlert={closeAlert}
+            setCloseAlert={setCloseAlert}
+          />
       </div>
 
       {/* Status Bar */}
@@ -161,19 +170,35 @@ function Block({ modelos, selectedModel, setSelectedModel }) {
           <div className="spc-bet">
             <div className="flex-top-down">
               <h4>Indicador de passos</h4>
-              <div className="flex-left-right" style={{ marginTop: 10, alignItems: "center" }}>
-                <LuCircleDashed size={15} style={{ marginRight: 10, color: "#597dff" }} />
-                <h3 className="controle">{etapaAtual} de {etapas.length}</h3>
+              <div
+                className="flex-left-right"
+                style={{ marginTop: 10, alignItems: "center" }}
+              >
+                <LuCircleDashed
+                  size={15}
+                  style={{ marginRight: 10, color: "#597dff" }}
+                />
+                <h3 className="controle">
+                  {etapaAtual} de {etapas.length}
+                </h3>
               </div>
             </div>
             <div className="flex-left-right">
-              <button className="Status-btn" onClick={handleVoltar}>Voltar</button>
-              {etapaAtual <= 2 && <button className="Status-btn" onClick={handleProxima}>Próxima</button>}
+              <button className="Status-btn" onClick={handleVoltar}>
+                Voltar
+              </button>
+              {etapaAtual <= 2 && (
+                <button className="Status-btn" onClick={handleProxima}>
+                  Próxima
+                </button>
+              )}
             </div>
           </div>
         ) : (
           <div>
-            <button className="Status-btn" style={{ opacity: 0.5 }}>Salvar modificações</button>
+            <button className="Status-btn" style={{ opacity: 0.5 }}>
+              Salvar modificações
+            </button>
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { MdFileUpload } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import OpenDocs from "./open-docs";
 
 function EditVariables({
   etapas,
@@ -18,137 +19,13 @@ function EditVariables({
   anexou,
   setAnexou,
   erroArquivo,
+  setIsResponse,
+  setResultados,
+  tagsUniversais,
+  tagsParecer,
+  tagsPrograma,
+  tagsIA,
 }) {
-  // Tags que sempre aparecem em qualquer documento
-  const tagsUniversais = [
-    {
-      id: 1,
-      content: "SEI",
-      type: "regex",
-      regex: "\\bSEI\\s*(\\d{5}-\\d{8}/\\d{4}-\\d{2})\\b",
-    },
-    {
-      id: 2,
-      content: "Gdoc",
-      type: "regex",
-      regex: "\\b(?:GDOC|Doc\. Id\.|Doc\. SEI(?:/GDF)?)\s*(?:n[º°]?\s*)?(\d{6,}|\d+/\d{4})",
-    },
-    {
-      id: 3,
-      content: "Data",
-      type: "regex",
-      regex: "\\b\\d{1,2} de [a-zç]+ de \\d{4}\\b",
-    },
-    {
-      id: 4,
-      content: "Destinatários",
-      type: "regex",
-      regex: "(?:Para|À)\\s*[:\\-]?\\s*(.+?)[,;\\n]", // baseado em extrair_despacho
-    },
-    {
-      id: 5,
-      content: "Documentos referenciados",
-      type: "regex",
-      regex:
-        "\\b(Lei|Portaria CGDF|Portaria|Decreto|Resolução|Decisão|Relatório)\\b", // baseado em extrair_dados
-    },
-  ];
-
-  // Tags que dependem de interpretação do texto (IA)
-  const tagsIA = [
-    {
-      id: 6,
-      content: "Resumo",
-      type: "ia",
-      prompt: "Resuma os parágrafos em um parágrafo",
-    },
-    {
-      id: 7,
-      content: "Título",
-      type: "ia",
-      prompt: "Gere um título contendo o documento principal",
-    },
-  ];
-
-  // Tags para pareceres
-  const tagsParecer = [
-    {
-      id: 8,
-      content: "Resumo Parecer",
-      type: "ia",
-      prompt: "Pegue o 1. Histórico + Conclusão e resuma",
-    },
-    {
-      id: 9,
-      content: "Número do Parecer",
-      type: "regex",
-      regex: "PARECER\\s*n[º°]?\\s*(\\d+/\\d+)",
-    },
-    {
-      id: 10,
-      content: "Norma/Política/Regimento",
-      type: "regex",
-      regex: "\\b(?:PL|ND|RG)\\.[0-9-]+\\b",
-    },
-    {
-      id: 11,
-      content: "Nome da Norma/Política/Instrução",
-      type: "ia",
-      prompt: "Extraia o nome da norma/regimento",
-    },
-  ];
-
-  // Tags para programas de integridade
-  const tagsPrograma = [
-    {
-      id: 12,
-      content: "Assunto",
-      type: "regex",
-      regex: "Assunto\\s*[:\\-]?\\s*(.+?)(?:\\n|$)", // baseado em extrair_dados
-    },
-    {
-      id: 13,
-      content: "Contrato",
-      type: "regex",
-      regex: "Contrato\\s*n[º°]?\\s*(\\d+/?\\d{0,4})", // suporta "123/2025" ou apenas "123"
-    },
-    {
-      id: 14,
-      content: "ARP",
-      type: "regex",
-      regex: "(?:ARP|Ata de Registro de Preços)\\s*n[º°]?\\s*(\\d+/?\\d{0,4})", // baseado em extrair_dados
-    },
-    {
-      id: 15,
-      content: "Valor",
-      type: "regex",
-      regex: "R\\$\\s*[0-9\\.,]+", // baseado em extrair_dados
-    },
-    {
-      id: 16,
-      content: "Pontuação",
-      type: "regex",
-      regex: "\\bPontuação\\s*[:\\-]?\\s*(\\d+)\\b", // exemplo genérico
-    },
-    {
-      id: 17,
-      content: "Empresa",
-      type: "regex",
-      regex: "empresa\\s+([A-Za-zÀ-ÿ\\s]+?(?:LTDA\\.?|Ltda\\.?|S/A|S\\.A))",
-    },
-    {
-      id: 18,
-      content: "Diretoria",
-      type: "regex",
-      regex: "Diretoria\\s+de\\s+[A-Za-z\\s]+-\\s*(DP|DE|DS|PR|DC)",
-    },
-    {
-      id: 19,
-      content: "Decisão",
-      type: "regex",
-      regex: "Decisão*n[º°]?s*(d+/d{4})",
-    },
-  ];
 
   const [moreTags, setMoreTags] = useState(false);
   const [sendFiles, setSendFiles] = useState(false);
@@ -203,6 +80,8 @@ function EditVariables({
         tagsParecer={tagsParecer}
         tagsPrograma={tagsPrograma}
         tagsIA={tagsIA}
+        setIsResponse={setIsResponse}
+        setResultados={setResultados}
       />
     );
   }
@@ -213,8 +92,8 @@ function EditVariables({
 function EditTags({
   etapas,
   etapaAtual,
-  modelId,
   onClose,
+  modelId,
   selectedTags,
   setSelectedTags,
   moreTags,
@@ -489,6 +368,8 @@ function EditAnalise({
   tagsParecer,
   tagsPrograma,
   tagsIA,
+  setIsResponse,
+  setResultados,
 }) {
   const handleSubmit = async () => {
     try {
@@ -523,7 +404,14 @@ function EditAnalise({
 
       console.log("Enviado com sucesso:", response.data);
       alert("Enviado com sucesso!");
+
+      // guarda os resultados do backend
+      setResultados(response.data.resultados);
+
+      // mostra a tela de resultados
       onClose();
+
+      setIsResponse(true);
     } catch (error) {
       console.error("Erro ao enviar:", error);
       alert("Erro ao enviar dados.");
@@ -552,7 +440,11 @@ function EditAnalise({
         <IoMdClose size={20} className="icons" onClick={onClose} />
       </div>
 
-      <p className="edit-p">Agora é só deixar com a gente, basta só conferir se todas as tags foram selecionada e após isso, enviar o documento para realizarmos a coleta dos dados solicitados</p>
+      <p className="edit-p">
+        Agora é só deixar com a gente, basta só conferir se todas as tags foram
+        selecionada e após isso, enviar o documento para realizarmos a coleta
+        dos dados solicitados
+      </p>
 
       <div>
         <strong>Tags selecionadas:</strong>
@@ -564,7 +456,7 @@ function EditAnalise({
         {file ? file.name : "Nenhum arquivo selecionado"}
       </div>
 
-      <div className="flex-left-right" style={{ justifyContent:"flex-end" }}>
+      <div className="flex-left-right" style={{ justifyContent: "flex-end" }}>
         <button
           className="upload-btn"
           onClick={handleSubmit}

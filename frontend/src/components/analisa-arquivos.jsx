@@ -4,6 +4,7 @@ import { MdOutlineDocumentScanner } from "react-icons/md";
 import { FaRegLightbulb } from "react-icons/fa";
 import EditVariables from "./edit-variables";
 import EditEtapas from "./edit-etapas";
+import OpenDocs from "./open-docs";
 
 function AnalisarArquivos({
   modelos,
@@ -25,15 +26,150 @@ function AnalisarArquivos({
   setTremer,
   tremer,
   closeAlert,
-  setCloseAlert
+  setCloseAlert,
 }) {
   const defaultMessage =
     "Use o modelo Despachos para análise automatizada de documentos.";
 
   const [text, setText] = useState(defaultMessage);
+  const [isResponse, setIsResponse] = useState(false);
+  const [resultados, setResultados] = useState(null);
+
+  // Tags que sempre aparecem em qualquer documento
+  const tagsUniversais = [
+    {
+      id: 1,
+      content: "SEI",
+      type: "regex",
+      regex: "\\bSEI\\s*(\\d{5}-\\d{8}/\\d{4}-\\d{2})\\b",
+    },
+    {
+      id: 2,
+      content: "Gdoc",
+      type: "regex",
+      regex:
+        "\\b(?:GDOC|Doc. Id.|Doc. SEI(?:/GDF)?)s*(?:n[º°]?s*)?(d{6,}|d+/d{4})",
+    },
+    {
+      id: 3,
+      content: "Data",
+      type: "regex",
+      regex: "\\b\\d{1,2} de [a-zç]+ de \\d{4}\\b",
+    },
+    {
+      id: 4,
+      content: "Destinatários",
+      type: "regex",
+      regex: "(?:Para|À)\\s*[:\\-]?\\s*(.+?)[,;\\n]", // baseado em extrair_despacho
+    },
+    {
+      id: 5,
+      content: "Documentos referenciados",
+      type: "regex",
+      regex:
+        "\\b(Lei|Portaria CGDF|Portaria|Decreto|Resolução|Decisão|Relatório)\\b", // baseado em extrair_dados
+    },
+  ];
+
+  // Tags que dependem de interpretação do texto (IA)
+  const tagsIA = [
+    {
+      id: 6,
+      content: "Resumo",
+      type: "ia",
+      prompt: "Resuma os parágrafos em um parágrafo",
+    },
+    {
+      id: 7,
+      content: "Título",
+      type: "ia",
+      prompt: "Gere um título contendo o documento principal",
+    },
+  ];
+
+  // Tags para pareceres
+  const tagsParecer = [
+    {
+      id: 8,
+      content: "Resumo Parecer",
+      type: "ia",
+      prompt: "Pegue o 1. Histórico + Conclusão e resuma",
+    },
+    {
+      id: 9,
+      content: "Número do Parecer",
+      type: "regex",
+      regex: "PARECER\\s*n[º°]?\\s*(\\d+/\\d+)",
+    },
+    {
+      id: 10,
+      content: "Norma/Política/Regimento",
+      type: "regex",
+      regex: "\\b(?:PL|ND|RG)\\.[0-9-]+\\b",
+    },
+    {
+      id: 11,
+      content: "Nome da Norma/Política/Instrução",
+      type: "ia",
+      prompt: "Extraia o nome da norma/regimento",
+    },
+  ];
+
+  // Tags para programas de integridade
+  const tagsPrograma = [
+    {
+      id: 12,
+      content: "Assunto",
+      type: "regex",
+      regex: "Assunto\\s*[:\\-]?\\s*(.+?)(?:\\n|$)", // baseado em extrair_dados
+    },
+    {
+      id: 13,
+      content: "Contrato",
+      type: "regex",
+      regex: "Contrato\\s*n[º°]?\\s*(\\d+/?\\d{0,4})", // suporta "123/2025" ou apenas "123"
+    },
+    {
+      id: 14,
+      content: "ARP",
+      type: "regex",
+      regex: "(?:ARP|Ata de Registro de Preços)\\s*n[º°]?\\s*(\\d+/?\\d{0,4})", // baseado em extrair_dados
+    },
+    {
+      id: 15,
+      content: "Valor",
+      type: "regex",
+      regex: "R\\$\\s*[0-9\\.,]+", // baseado em extrair_dados
+    },
+    {
+      id: 16,
+      content: "Pontuação",
+      type: "regex",
+      regex: "\\bPontuação\\s*[:\\-]?\\s*(\\d+)\\b", // exemplo genérico
+    },
+    {
+      id: 17,
+      content: "Empresa",
+      type: "regex",
+      regex: "empresa\\s+([A-Za-zÀ-ÿ\\s]+?(?:LTDA\\.?|Ltda\\.?|S/A|S\\.A))",
+    },
+    {
+      id: 18,
+      content: "Diretoria",
+      type: "regex",
+      regex: "Diretoria\\s+de\\s+[A-Za-z\\s]+-\\s*(DP|DE|DS|PR|DC)",
+    },
+    {
+      id: 19,
+      content: "Decisão",
+      type: "regex",
+      regex: "Decisão*n[º°]?s*(d+/d{4})",
+    },
+  ];
 
   const handleCloseModal = () => {
-    setSelectedModel(null); // volta pro estado inicial
+    setSelectedModel(null);
+    setIsResponse(null); // volta pro estado inicial
   };
 
   const handleModelText = (id) => {
@@ -45,7 +181,20 @@ function AnalisarArquivos({
   };
 
   // Se um modelo foi selecionado, exibe o modal de edição
-  if (selectedModel !== null) {
+  if (isResponse) {
+    return (
+      <OpenDocs
+        onClose={handleCloseModal}
+        resultados={resultados}
+        selectedTags={selectedTags}
+        selectedModel={selectedModel}
+        tagsUniversais={tagsUniversais}
+        tagsParecer={tagsParecer}
+        tagsPrograma={tagsPrograma}
+        tagsIA={tagsIA}
+      />
+    );
+  } else if (selectedModel !== null) {
     return (
       <div className="flex-left-right , spc-bet">
         <EditVariables
@@ -60,6 +209,12 @@ function AnalisarArquivos({
           anexou={anexou}
           setAnexou={setAnexou}
           erroArquivo={erroArquivo}
+          setIsResponse={setIsResponse}
+          setResultados={setResultados}
+          tagsUniversais={tagsUniversais}
+          tagsParecer={tagsParecer}
+          tagsPrograma={tagsPrograma}
+          tagsIA={tagsIA}
         />
 
         <EditEtapas

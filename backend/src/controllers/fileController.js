@@ -67,8 +67,12 @@ export const uploadFileAndAnalyze = async (req, res) => {
 };
 
 // função refinadora (opcional)
-const refinador = (resultados) => {
-  // aqui você pode processar ou padronizar os dados antes de enviar
+export const ShowData4Document = async (req, res, resultados) => {
+ 
+  
+
+
+
   return resultados;
 };
 
