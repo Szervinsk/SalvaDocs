@@ -1,108 +1,163 @@
 import fs from "fs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse"); // já vem como função
+import path from "path";
+import models from "../models/index.js";
+import { extractDataFromFile } from "../services/extractService.js";
 
-// inicializa cliente Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// ✅ Função auxiliar para substituir {tags} no template
+function replaceTemplateTags(templateName, tags = []) {
+  if (!templateName) return null;
+
+  return templateName.replace(/{(.*?)}/g, (_, tagName) => {
+    const tag = tags.find(
+      (t) => t.name.toLowerCase() === tagName.toLowerCase() && t.value
+    );
+    return tag ? tag.value : `${tagName}`; // mantém placeholder se não achar valor
+  });
+}
 
 export const uploadFileAndAnalyze = async (req, res) => {
   try {
-    if (!req.file) {
+    if (!req.file)
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
-    }
 
-    const { tags } = req.body;
-    if (!tags) {
-      return res.status(400).json({ error: "Nenhuma tag recebida" });
-    }
+    const { tags: rawTags, model, templateName } = req.body;
 
-    const parsedTags = typeof tags === "string" ? JSON.parse(tags) : tags;
-
-    // lê PDF
-    const dataBuffer = fs.readFileSync(req.file.path);
-    const pdfData = await pdf(dataBuffer);
-    const text = pdfData.text;
-    console.log(`Texto extraído:\n${text}\n`);
-
-    let resultados = {};
-
-    // --- regex ---
-    for (const tag of parsedTags) {
-      if (tag.type === "regex") {
-        if (tag.regex) {
-          try {
-            const regex = new RegExp(tag.regex, "i");
-            const match = text.match(regex);
-
-            // se houver grupos de captura, pega o primeiro grupo, senão pega match[0]
-            if (match) {
-              resultados[tag.content] = match[1] ? match[1] : match[0];
-            } else {
-              resultados[tag.content] = "Não encontrado";
-            }
-          } catch (err) {
-            resultados[tag.content] = "Erro no regex";
-          }
-        } else {
-          resultados[tag.content] = "Regex não fornecido";
-        }
+    let parsedTags = [];
+    if (rawTags) {
+      try {
+        parsedTags =
+          typeof rawTags === "string" ? JSON.parse(rawTags) : rawTags;
+      } catch (e) {
+        return res.status(400).json({ error: "Formato inválido para tags" });
       }
     }
 
-    // imprime JSON legível no console
-    console.log("Resultados extraídos:", JSON.stringify(resultados, null, 2));
+    const filePath = path.resolve(req.file.path);
 
-    // envia JSON para o frontend
-    res.json({
-      message: "Análise concluída",
-      resultados,
+    // 🔎 Extrai dados do arquivo
+    const extractedData =
+      (await extractDataFromFile(filePath, parsedTags)) || {};
+
+    // ✅ Substitui tags no template usando valores extraídos
+    const finalTemplateName = replaceTemplateTags(
+      templateName,
+      extractedData.tags || []
+    );
+
+    // Cria documento
+    const document = await models.Document.create({
+      name: req.file.originalname,
+      path: filePath,
+      model: model || "Desconhecido",
+      templateName: finalTemplateName || templateName || null,
     });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao processar o arquivo" });
+    // Filtra tags únicas (evita duplicação)
+    const allTags = [];
+
+    const existingNames = new Set();
+
+    // Tags extraídas
+    (extractedData.tags || []).forEach((tag) => {
+      if (!existingNames.has(tag.name)) {
+        allTags.push({
+          name: tag.name,
+          value: tag.value,
+          documentId: document.id,
+        });
+        existingNames.add(tag.name);
+      }
+    });
+
+    // Tags manuais do FE
+    (parsedTags || []).forEach((tag) => {
+      const name = tag.name || tag.content;
+      if (!existingNames.has(name)) {
+        allTags.push({
+          name,
+          value: null,
+          documentId: document.id,
+        });
+        existingNames.add(name);
+      }
+    });
+
+    if (allTags.length > 0) {
+      await models.Tag.bulkCreate(allTags);
+    }
+
+    const documentoComTags = await models.Document.findByPk(document.id, {
+      include: [
+        { model: models.Tag, as: "tags", attributes: ["id", "name", "value"] },
+      ],
+    });
+
+    res.json({
+      message: "Arquivo salvo e analisado",
+      document: documentoComTags,
+    });
+  } catch (err) {
+    console.error("Erro na API:", err);
+    res.status(500).json({ error: "Erro ao processar arquivo" });
   }
 };
 
-// função refinadora (opcional)
-export const ShowData4Document = async (req, res, resultados) => {
- 
-  
+export const getAllDocuments = async (req, res) => {
+  try {
+    const documentos = await models.Document.findAll({
+      include: [
+        { model: models.Tag, as: "tags", attributes: ["id", "name", "value"] },
+      ],
+    });
 
+    // ✅ Resolve template em cada documento antes de retornar
+    const documentosComTemplate = documentos.map((doc) => {
+      const docJson = doc.toJSON();
+      return {
+        ...docJson,
+        resolvedTemplate: replaceTemplateTags(
+          docJson.templateName,
+          docJson.tags
+        ),
+      };
+    });
 
-
-  return resultados;
+    res.json(documentosComTemplate);
+  } catch (err) {
+    console.error("Erro ao buscar documentos:", err);
+    res.status(500).json({ error: "Erro ao buscar documentos" });
+  }
 };
 
-    //     // --- IA ---
-    //     const iaTags = parsedTags.filter((t) => t.type === "ia");
-    //     if (iaTags.length > 0) {
-    //       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+export const DeleteDoc = async (req, res) => {
+  try {
+    const documentId = req.params.id;
 
-    //       const prompt = `
-    // Você é um extrator de informações de documentos.
-    // Texto extraído do PDF:
-    // "${text}"
+    const document = await models.Document.findByPk(documentId);
+    if (!document) {
+      return res.status(404).json({ error: "Documento não encontrado" });
+    }
 
-    // Encontre e retorne em JSON SOMENTE as seguintes tags:
-    // ${iaTags.map((t) => t.content).join(", ")}.
-    // Se algum dado não for encontrado, indique "Não encontrado".
-    // `;
+    if (document.path) {
+      try {
+        const filePath = path.resolve(document.path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Arquivo deletado: ${filePath}`);
+        } else {
+          console.warn(`Arquivo não encontrado: ${filePath}`);
+        }
+      } catch (fileErr) {
+        console.error("Erro ao remover arquivo:", fileErr);
+      }
+    }
 
-    //       const result = await model.generateContent(prompt);
-    //       const output = result.response.text();
+    await models.Tag.destroy({ where: { documentId } });
+    await document.destroy();
 
-    //       try {
-    //         const parsed = JSON.parse(output);
-    //         resultados = { ...resultados, ...parsed };
-    //       } catch (e) {
-    //         resultados = { ...resultados, erroIA: output };
-    //       }
-    //     }
-
-    //     res.json({
-    //       message: "Análise concluída",
-    //       resultados,
-    //     });
+    res.json({ message: "Documento e arquivo apagados com sucesso" });
+  } catch (err) {
+    console.error("Erro ao apagar documento:", err);
+    res.status(500).json({ error: "Erro ao apagar documento" });
+  }
+};

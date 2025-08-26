@@ -21,6 +21,9 @@ build/
 venv/
 .env
 
+./uploads
+database.sqlite
+
 # VSCode e IDEs
 .vscode/
 .idea/

@@ -1,4 +1,4 @@
-import { MdOutlineSearch } from "react-icons/md";
+import { Icons } from "../constants/icons";
 
 function SearchBar({ searchQuery, setSearchQuery }) {
   const handleSearch = (e) => {
@@ -7,7 +7,7 @@ function SearchBar({ searchQuery, setSearchQuery }) {
 
   return (
     <form className="search-container" onSubmit={handleSearch}>
-      <MdOutlineSearch size={20} className="search-icon" />
+      <Icons.Search size={20} className="search-icon" />
       <input
         type="text"
         placeholder="Pesquise suas pastas"

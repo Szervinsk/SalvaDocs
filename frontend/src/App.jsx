@@ -1,33 +1,42 @@
 import "./styles/global.css";
-import ActionBlock from "./pages/actionBlock/ActionBlock";
 import { useState } from "react";
+import { MODELOS, PASTAS } from "../src/constants/constants";
+import Block from "../src/components/block";
+import DynamicsStaticts from "../src/components/dynstatistics";
+import FoldersAction from "../src/components/folders-action";
 
 function Abas() {
-  const [path, setPath] = useState([]);
-
-  const pastas = [
-    { id: 1, text: "Despachos" },
-    { id: 2, text: "Pareceres" },
-    { id: 3, text: "Programas de Integridade" },
-    { id: 4, text: "Outros Documentos" },
-  ];
-
-  const atualizarCaminho = (novoItem) => {
-    setPath((prev) => [...prev, novoItem]);
-  };
-
-  const voltarUmNivel = () => {
-    setPath((prev) => prev.slice(0, -1));
-  };
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [docSelecionado, setDocSelecionado] = useState(null);
+  const [documentos, setDocumentos] = useState([]);
+  const [tool, setTool] = useState(null);
 
   return (
     <div className="main-container">
-      <ActionBlock
-        path={path}
-        pastas={pastas}
-        atualizarCaminho={atualizarCaminho}
-        voltarUmNivel={voltarUmNivel}
+      <FoldersAction // mexer depois pois está me dando dor de cabeça
+        pastas={PASTAS}
+        documentos={documentos}
+        setDocumentos={setDocumentos}
+        docSelecionado={docSelecionado}
+        setDocSelecionado={setDocSelecionado}
+        setTool={setTool}
       />
+
+      <div className="background-block">
+        {tool === 1 ? (
+          <Block
+            modelos={MODELOS} // lista de modelos
+            selectedModel={selectedModel} // envia modelo selecionado
+            setSelectedModel={setSelectedModel} // altera modelo selecionado
+            setDocSelecionado={setDocSelecionado}
+            docSelecionado={docSelecionado}
+            setDocumentos={setDocumentos}
+            onVoltar={() => setTool(null)}
+          />
+        ) : (
+          <DynamicsStaticts documentos={documentos} />
+        )}
+      </div>
     </div>
   );
 }

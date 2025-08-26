@@ -1,16 +1,12 @@
-import { MdOutlineEditNote } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
-import { PiFilePdf } from "react-icons/pi";
-import { MdFileUpload } from "react-icons/md";
-import { FaCheck } from "react-icons/fa6";
+import { Icons } from "../constants/icons";
 import { useState, useEffect, useRef } from "react";
+import AlterNameWithTags from './alterName';
 import axios from "axios";
-import OpenDocs from "./open-docs";
 
 function EditVariables({
   etapas,
   etapaAtual,
-  modelId,
+  selectedModel,
   onClose,
   selectedTags,
   setSelectedTags,
@@ -20,15 +16,22 @@ function EditVariables({
   setAnexou,
   erroArquivo,
   setIsResponse,
-  setResultados,
-  tagsUniversais,
-  tagsParecer,
-  tagsPrograma,
-  tagsIA,
+  setDocSelecionado,
+  setDocumentos,
+  tags,
 }) {
-
   const [moreTags, setMoreTags] = useState(false);
   const [sendFiles, setSendFiles] = useState(false);
+  const [alterName, setAlterName] = useState(false);
+  const [fileName, setFileName] = useState("");
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // --- ETAPA 1: EditTags ---
   if (etapaAtual === 1) {
@@ -36,16 +39,13 @@ function EditVariables({
       <EditTags
         etapas={etapas}
         etapaAtual={etapaAtual}
-        modelId={modelId}
+        selectedModel={selectedModel}
         onClose={onClose}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
         moreTags={moreTags}
         setMoreTags={setMoreTags}
-        tagsUniversais={tagsUniversais}
-        tagsParecer={tagsParecer}
-        tagsPrograma={tagsPrograma}
-        tagsIA={tagsIA}
+        tags={tags}
       />
     );
   }
@@ -55,15 +55,20 @@ function EditVariables({
       <EditExit
         etapas={etapas}
         etapaAtual={etapaAtual}
-        modelId={modelId}
+        selectedModel={selectedModel}
         onClose={onClose}
         file={file}
         setFile={setFile}
         anexou={anexou}
+        selectedTags={selectedTags}
+        setSelectedTags={setSelectedTags}
         setAnexou={setAnexou}
         sendFiles={sendFiles}
         setSendFiles={setSendFiles}
         erroArquivo={erroArquivo}
+        setAlterName={setAlterName}
+        alterName={alterName}
+        setFileName={setFileName}
       />
     );
   }
@@ -76,12 +81,12 @@ function EditVariables({
         onClose={onClose}
         selectedTags={selectedTags}
         file={file}
-        tagsUniversais={tagsUniversais}
-        tagsParecer={tagsParecer}
-        tagsPrograma={tagsPrograma}
-        tagsIA={tagsIA}
+        tags={tags}
         setIsResponse={setIsResponse}
-        setResultados={setResultados}
+        setDocSelecionado={setDocSelecionado}
+        setDocumentos={setDocumentos}
+        selectedModel={selectedModel}
+        fileName={fileName}
       />
     );
   }
@@ -93,28 +98,27 @@ function EditTags({
   etapas,
   etapaAtual,
   onClose,
-  modelId,
+  selectedModel,
   selectedTags,
   setSelectedTags,
   moreTags,
   setMoreTags,
-  tagsUniversais,
-  tagsParecer,
-  tagsPrograma,
-  tagsIA,
+  tags,
 }) {
   const [outrasTags, setOutrasTags] = useState([]);
   const [tagsAtuais, setTagsAtuais] = useState([]);
+  const { universais, parecer, programa, ia, todasTags } = tags;
 
   useEffect(() => {
     const mapaPreSelecao = {
-      Despacho: [...tagsUniversais, ...tagsIA],
-      Parecer: [...tagsUniversais, ...tagsParecer, ...tagsIA],
-      Programas: [...tagsUniversais, ...tagsPrograma, ...tagsIA],
+      Despacho: [...universais, ...ia],
+      Parecer: [...universais, ...parecer, ...ia],
+      Programas: [...universais, ...programa, ...ia],
     };
 
-    const chave = modelId.trim();
+    const chave = selectedModel?.name; // pega só o nome
     const tagsModelo = mapaPreSelecao[chave] || [];
+
     setTagsAtuais(tagsModelo);
     console.log(tagsModelo);
 
@@ -125,26 +129,12 @@ function EditTags({
     }
 
     // recalcula sempre as outras tags
-    const todasTags = [
-      ...tagsUniversais,
-      ...tagsParecer,
-      ...tagsPrograma,
-      ...tagsIA,
-    ];
     const naoSelecionadas = todasTags.filter(
       (tag) => !tagsModelo.some((t) => t.id === tag.id)
     );
     setOutrasTags(naoSelecionadas);
     console.log(naoSelecionadas);
-  }, [
-    modelId,
-    tagsUniversais,
-    tagsParecer,
-    tagsPrograma,
-    tagsIA,
-    selectedTags.length,
-    setSelectedTags,
-  ]);
+  }, [selectedModel, tags, selectedTags.length, setSelectedTags]);
 
   const handleChange = (tagId) => {
     setSelectedTags((prev) =>
@@ -162,17 +152,17 @@ function EditTags({
         style={{ justifyContent: "space-between" }}
       >
         <div className="flex-left-right">
-          <MdOutlineEditNote size={20} className="icons" />
+          <Icons.EditNote size={20} className="icons" />
           <h3>{etapas[etapaAtual - 1].text}</h3>
         </div>
-        <IoMdClose size={20} className="icons" onClick={onClose} />
+        <Icons.Close size={20} className="icons" onClick={onClose} />
       </div>
 
       {/* DESCRIÇÃO */}
       <p className="edit-p">
-        Você selecionou o modelo: <b>{modelId}</b>, todavia, você ainda pode
-        ajustar os critérios de captura conforme queira antes de iniciar o
-        processo.
+        Você selecionou o modelo: <b>{selectedModel?.name}</b>, todavia, você
+        ainda pode ajustar os critérios de captura conforme queira antes de
+        iniciar o processo.
       </p>
 
       {/* TAGS PRINCIPAIS */}
@@ -180,7 +170,7 @@ function EditTags({
         {tagsAtuais.map((tag) => (
           <div className="edit-tags" key={tag.id}>
             {selectedTags.includes(tag.id) && (
-              <FaCheck size={15} color="#fff" />
+              <Icons.Check size={15} color="#fff" />
             )}
             <input
               type="checkbox"
@@ -217,7 +207,7 @@ function EditTags({
           {outrasTags.map((tag) => (
             <div className="edit-tags" key={tag.id}>
               {selectedTags.includes(tag.id) && (
-                <FaCheck size={15} color="#fff" />
+                <Icons.Check size={15} color="#fff" />
               )}
               <input
                 type="checkbox"
@@ -244,11 +234,13 @@ function EditExit({
   onClose,
   file,
   setFile,
-  modelId,
-  sendFiles,
-  setSendFiles,
+  selectedModel,
+  selectedTags,
   setAnexou,
   erroArquivo,
+  alterName,
+  setAlterName,
+  setFileName,
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
@@ -277,10 +269,10 @@ function EditExit({
         style={{ justifyContent: "space-between" }}
       >
         <div className="flex-left-right">
-          <MdOutlineEditNote size={20} className="icons" />
+          <Icons.EditNote size={20} className="icons" />
           <h3>{etapas[etapaAtual - 1].text}</h3>
         </div>
-        <IoMdClose size={20} className="icons" onClick={onClose} />
+        <Icons.Close size={20} className="icons" onClick={onClose} />
       </div>
 
       {/* DESCRIÇÃO */}
@@ -296,23 +288,11 @@ function EditExit({
           <div className="edit-file">
             <div className="flex-left-right">
               <div className="box-icon-pdf">
-                <PiFilePdf size={20} className="icons" />
+                <Icons.Pdf_file size={20} className="icons" />
               </div>
               <p>{file.name}</p>
             </div>
-            <IoMdClose size={20} className="icons" onClick={handleNotFile} />
-          </div>
-
-          <div>
-            <input
-              type="checkbox"
-              name="change-name-file"
-              id="change-name-file"
-            />
-            <label htmlFor="change-name-file">
-              Deseja alterar o nome do arquivo para "{modelId} + nº do
-              processo"?
-            </label>
+            <Icons.Close size={20} className="icons" onClick={handleNotFile} />
           </div>
         </>
       ) : (
@@ -327,7 +307,7 @@ function EditExit({
           className="edit-dropzone"
         >
           {isDragging && <>tá arrastando fi</>}
-          <MdFileUpload size={40} />
+          <Icons.Upload size={40} />
           <p>Arraste um PDF ou clique para selecionar</p>
           <input
             type="file"
@@ -340,18 +320,24 @@ function EditExit({
       )}
 
       {/* SWITCH PARA SALVAR ARQUIVO */}
-      <div className="flex-left-right">
-        <>
+      <div className="flex-down-top" style={{ marginTop: 20 }}>
+        <div className="flex-left-right">
           <label className="switch">
             <input
               type="checkbox"
-              checked={sendFiles}
-              onChange={() => setSendFiles(!sendFiles)}
+              checked={alterName} // 🔹 usa alterName para controlar
+              onChange={(e) => setAlterName(e.target.checked)} // 🔹 toggle certo
             />
             <span className="slider"></span>
           </label>
-          <h3 style={{ marginLeft: 10 }}>Deseja salvar o arquivo?</h3>
-        </>
+          <h3 style={{ marginLeft: 10 }}>Deseja alterar o nome do arquivo?</h3>
+        </div>
+
+        {alterName && (
+          <AlterNameWithTags
+            selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName}
+          />
+        )}
       </div>
     </div>
   );
@@ -364,56 +350,45 @@ function EditAnalise({
   onClose,
   selectedTags,
   file,
-  tagsUniversais,
-  tagsParecer,
-  tagsPrograma,
-  tagsIA,
+  selectedModel,
+  tags,
   setIsResponse,
-  setResultados,
+  setDocSelecionado,
+  setDocumentos,
+  fileName,
 }) {
   const handleSubmit = async () => {
+    const tagsSelecionadas = (tags?.todasTags || []).filter((tag) =>
+      selectedTags.includes(tag.id)
+    );
+
+    if (!file) {
+      alert("Selecione um arquivo antes de enviar.");
+      return;
+    }
+
     try {
-      // junta todas as tags recebidas
-      const todasTags = [
-        ...tagsUniversais,
-        ...tagsParecer,
-        ...tagsPrograma,
-        ...tagsIA,
-      ];
-
-      // pega os objetos completos das tags selecionadas
-      const tagsSelecionadas = todasTags.filter((tag) =>
-        selectedTags.includes(tag.id)
-      );
-
-      // agora sim cria o formData
       const formData = new FormData();
       formData.append("tags", JSON.stringify(tagsSelecionadas));
-
-      if (file) {
-        formData.append("file", file);
-      }
+      formData.append("file", file);
+      formData.append("templateName", fileName); 
+      formData.append("model", selectedModel?.name);
 
       const response = await axios.post(
         "http://localhost:5000/api/files/upload",
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      console.log("Enviado com sucesso:", response.data);
-      alert("Enviado com sucesso!");
-
-      // guarda os resultados do backend
-      setResultados(response.data.resultados);
-
-      // mostra a tela de resultados
-      onClose();
-
+      setDocumentos((prev) => [...(prev || []), response.data.document]);
+      setDocSelecionado(response.data.document);
+      console.log(
+        "docSelecionado:",
+        JSON.stringify(response.data.document, null, 2)
+      );
       setIsResponse(true);
     } catch (error) {
-      console.error("Erro ao enviar:", error);
+      console.error("Erro ao enviar:", error.response?.data || error);
       alert("Erro ao enviar dados.");
     }
   };
@@ -434,10 +409,10 @@ function EditAnalise({
         style={{ justifyContent: "space-between" }}
       >
         <div className="flex-left-right">
-          <MdOutlineEditNote size={20} className="icons" />
+          <Icons.EditNote size={20} className="icons" />
           <h3>{etapas[etapaAtual - 1].text}</h3>
         </div>
-        <IoMdClose size={20} className="icons" onClick={onClose} />
+        <Icons.Close size={20} className="icons" onClick={onClose} />
       </div>
 
       <p className="edit-p">
@@ -448,7 +423,9 @@ function EditAnalise({
 
       <div>
         <strong>Tags selecionadas:</strong>
-        <pre>{JSON.stringify(selectedTags.content, null, 2)}</pre>
+        {selectedTags.map((tag) => (
+          <> {tag} </>
+        ))}
       </div>
 
       <div>
