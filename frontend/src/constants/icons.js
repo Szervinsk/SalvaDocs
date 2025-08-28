@@ -19,13 +19,26 @@ import { LuTextSearch } from "react-icons/lu";
 import { BsTrash } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { HiArrowLeftEndOnRectangle } from "react-icons/hi2";
-import { HiOutlineDocument } from "react-icons/hi2";
+import { MdEditDocument } from "react-icons/md";
 import { FaRegFolder } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { FaQuestion } from "react-icons/fa6";
 import { MdOutlineSearch } from "react-icons/md";
 import { RiArchiveLine } from "react-icons/ri";
-
+import { LuCalendarDays } from "react-icons/lu";
+import { HiOutlineUserCircle } from "react-icons/hi";
+import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
+import { TbDeviceDesktopAnalytics } from "react-icons/tb";
+import { FiSend } from "react-icons/fi";
+import { FaPenNib } from "react-icons/fa6";
+import { MdOutlineSubtitles } from "react-icons/md";
+import { TbNumber123 } from "react-icons/tb";
+import { VscLaw } from "react-icons/vsc";
+import { ImHammer2 } from "react-icons/im";
+import { GrScorecard } from "react-icons/gr";
+import { TbPigMoney } from "react-icons/tb";
+import { MdPeopleAlt } from "react-icons/md";
+import { BiSolidBusiness } from "react-icons/bi";
 
 // centralizar todos os ícones que você usa
 export const Icons = {
@@ -50,10 +63,24 @@ export const Icons = {
   Delete: BsTrash,
   Download: HiDownload,
   ArrowLeft: HiArrowLeftEndOnRectangle,
-  DocumentText: HiOutlineDocument,
+  DocumentText: MdEditDocument,
   Folder: FaRegFolder,
   ArrowDown: IoIosArrowDown,
   ArrowUp: IoIosArrowUp,
   Question:FaQuestion,
   Archive: RiArchiveLine,
+  Calendar: LuCalendarDays,
+  User: HiOutlineUserCircle,
+  Adjustments: HiOutlineAdjustmentsHorizontal,
+  Model: TbDeviceDesktopAnalytics,
+  Send: FiSend,
+  Summarize: FaPenNib,
+  Title: MdOutlineSubtitles,
+  Number: TbNumber123,
+  Law: VscLaw,
+  Hammer: ImHammer2,
+  Score: GrScorecard,
+  PigMoney: TbPigMoney,
+  People: MdPeopleAlt,
+  Business: BiSolidBusiness,
 };

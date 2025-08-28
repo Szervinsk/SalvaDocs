@@ -4,38 +4,53 @@ import { MODELOS, PASTAS } from "../src/constants/constants";
 import Block from "../src/components/block";
 import DynamicsStaticts from "../src/components/dynstatistics";
 import FoldersAction from "../src/components/folders-action";
+import Navbar from "./components/navbar";
 
 function Abas() {
   const [selectedModel, setSelectedModel] = useState(null);
   const [docSelecionado, setDocSelecionado] = useState(null);
   const [documentos, setDocumentos] = useState([]);
   const [tool, setTool] = useState(null);
+  const [reduzido, setReduzido] = useState(null);
+
+  // novo estado para abrir/fechar pastas
+  const [pastasAbertas, setPastasAbertas] = useState(false);
 
   return (
     <div className="main-container">
-      <FoldersAction // mexer depois pois está me dando dor de cabeça
-        pastas={PASTAS}
-        documentos={documentos}
-        setDocumentos={setDocumentos}
-        docSelecionado={docSelecionado}
-        setDocSelecionado={setDocSelecionado}
-        setTool={setTool}
-      />
+      <Navbar setTool={setTool} />
 
       <div className="background-block">
-        {tool === 1 ? (
-          <Block
-            modelos={MODELOS} // lista de modelos
-            selectedModel={selectedModel} // envia modelo selecionado
-            setSelectedModel={setSelectedModel} // altera modelo selecionado
-            setDocSelecionado={setDocSelecionado}
-            docSelecionado={docSelecionado}
+        {/* Pasta sempre aparece */}
+        <div
+          className={`folders-container ${pastasAbertas ? "open" : "closed"}`}
+        >
+          <FoldersAction
+            pastas={PASTAS}
+            documentos={documentos}
             setDocumentos={setDocumentos}
-            onVoltar={() => setTool(null)}
+            docSelecionado={docSelecionado}
+            setDocSelecionado={setDocSelecionado}
+            onToggle={() => setPastasAbertas(!pastasAbertas)}
+            setReduzido={setReduzido}
+            setTool={setTool}
+            reduzido={reduzido}
           />
-        ) : (
-          <DynamicsStaticts documentos={documentos} />
-        )}
+        </div>
+
+        {/* Aqui variam os outros blocos */}
+        <Block
+          modelos={MODELOS}
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          documentos={documentos}
+          setDocumentos={setDocumentos}
+          docSelecionado={docSelecionado}
+          setDocSelecionado={setDocSelecionado}
+          onVoltar={() => setTool(null)}
+          tool={tool}
+          setTool={setTool}
+        />
       </div>
     </div>
   );

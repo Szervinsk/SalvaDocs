@@ -1,6 +1,6 @@
 import { Icons } from "../constants/icons";
 import { useState, useEffect, useRef } from "react";
-import AlterNameWithTags from './alterName';
+import AlterNameWithTags from "./alterName";
 import axios from "axios";
 
 function EditVariables({
@@ -59,10 +59,8 @@ function EditVariables({
         onClose={onClose}
         file={file}
         setFile={setFile}
-        anexou={anexou}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        setAnexou={setAnexou}
         sendFiles={sendFiles}
         setSendFiles={setSendFiles}
         erroArquivo={erroArquivo}
@@ -236,7 +234,6 @@ function EditExit({
   setFile,
   selectedModel,
   selectedTags,
-  setAnexou,
   erroArquivo,
   alterName,
   setAlterName,
@@ -246,19 +243,19 @@ function EditExit({
   const fileInputRef = useRef(null);
 
   const handleFile = (f) => {
-    if (f) setFile(f); // <-- guarda o File real, não só o nome
+    if (f) {
+      setFile(f);
+    }
   };
 
   const handleNotFile = () => {
     setFile(null);
-    setAnexou(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setAnexou(true);
     setIsDragging(false);
-    handleFile(e.dataTransfer.files[0]);
+    handleFile(e.dataTransfer.files[0]); // 🔹 já chama handleFile, que agora seta anexou
   };
 
   return (
@@ -335,7 +332,9 @@ function EditExit({
 
         {alterName && (
           <AlterNameWithTags
-            selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName}
+            selectedTags={selectedTags}
+            selectedModel={selectedModel}
+            setFileName={setFileName}
           />
         )}
       </div>
@@ -371,7 +370,7 @@ function EditAnalise({
       const formData = new FormData();
       formData.append("tags", JSON.stringify(tagsSelecionadas));
       formData.append("file", file);
-      formData.append("templateName", fileName); 
+      formData.append("templateName", fileName);
       formData.append("model", selectedModel?.name);
 
       const response = await axios.post(

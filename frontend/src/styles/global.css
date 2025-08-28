@@ -67,84 +67,6 @@ h4 {
   box-sizing: border-box;
 }
 
-.url {
-  background-color: var(--primary-color-greyzin);
-  color: var(--primary-color-grey);
-  padding: 10px 5px;
-  text-align: center;
-  min-width: 20%;
-  border: 2px solid var(--border-color);
-  border-radius: 20px;
-  margin-bottom: 10px;
-}
-
-/* NAVBAR */
-.navbar {
-  display: flex;
-  flex-direction: column;
-  width: 256px;
-  height: 100%;
-  padding: 20px;
-  background-color: var(--deep-wall-color2);
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-.navbar h1 {
-  font-size: 24px;
-}
-
-.navbar h2 {
-  font-size: 14px;
-}
-
-.businessCard {
-  min-height: 24px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.icon-pen {
-  min-width: 50px;
-  height: 50px;
-  display: flex;
-  border-radius: 10px;
-  margin-right: 10px;
-  background-color: var(--second-color-blue);
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Search bar */
-.search-container {
-  display: flex;
-  align-items: center;
-  background-color: var(--white);
-  border: 2px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0 12px;
-  width: 100%;
-  height: 36px;
-  margin-bottom: 30px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.search-icon {
-  color: var(--primary-color-grey);
-  margin-right: 8px;
-}
-
-.search-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 90%;
-  font-size: 14px;
-  color: var(--primary-color-grey);
-}
-
 /* Ícones gerais */
 .icons {
   color: var(--primary-color-grey);
@@ -166,22 +88,10 @@ h4 {
   font-weight: 400;
 }
 
-/* Caixa principal */
-.background {
-  display: flex;
-  flex-direction: column;
-  height: 90%;
-  min-width: 1084px;
-  width: 100%;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
-  box-sizing: border-box;
-  background-color: var(--deep-wall-color2);
-}
-
 /* Barra superior */
 .action-bar {
   height: 70px;
+  width: 100%;
   padding: 0 20px;
   border-radius: 10px 10px 0 0;
   border-bottom: 2px solid var(--border-color);
@@ -229,13 +139,11 @@ h4 {
 .middle-area {
   flex: 1;
   display: flex;
-  flex-direction: row;
   background-color: var(--deep-wall-color2);
   border-radius: 0 0 10px 10px;
   border-top: none;
   width: 100%;
   height: 100%;
-  padding: 10px;
   box-sizing: border-box; /* ← evita que o padding expanda além de 100% */
 }
 
@@ -313,97 +221,6 @@ h4 {
   }
 }
 
-/* Sidebar Pastas (agora compatível com motion.div) */
-.Pastas {
-  background: var(--white);
-  border-right: 2px solid var(--border-color);
-  border-bottom-left-radius: 20px;
-  border-top-left-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch; /* agora ocupa toda a largura */
-  gap: 10px;
-  padding: 10px;
-  flex-shrink: 0;
-  min-height: 100%;
-  overflow: hidden;
-  transition: width 0.3s ease;
-}
-
-/* conteúdo que some quando reduzido */
-.Pastas .conteudo-colapsavel {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.Pastas.reduzido .conteudo-colapsavel {
-  opacity: 0;
-  transform: translateX(-10px);
-  pointer-events: none;
-}
-
-/* Container pasta e documentos */
-.folder-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 100%;
-  padding-bottom: 5px;
-}
-
-hr {
-  width: 100%;
-  color: var(--border-color);
-  margin: 10px 0 20px 0;
-}
-
-/* Cabeçalho da pasta */
-.folder {
-  width: 100%;
-  min-height: 32px;
-  align-items: center;
-  margin: auto;
-  justify-content: flex-start;
-  display: flex;
-  cursor: pointer;
-  gap: 20px;
-  transition: 0.3s ease-in;
-}
-
-.folder:hover {
-  color: var(--second-color-blue);
-}
-
-/* Conteúdo de pesquisa e lista de pastas */
-.folders {
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex: 1;
-  width: 100%;
-  gap: 10px;
-}
-
-/* tools - botões que ativam as funcionalidade */
-.tools-title {
-  width: 100%;
-  height: 32px;
-  margin: 10px 0 5px 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
-  border: 2px solid var(--border-color);
-  border-radius: 20px;
-}
-
-/* Mantém alinhamento quando a sidebar está reduzida */
-.Pastas h3 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .lengthDocs {
   background-color: var(--primary-color-grey);
   opacity: 0.75;
@@ -462,6 +279,7 @@ hr {
 /* Barra inferior */
 .status-bar {
   height: 70px;
+  width: 100%;
   padding: 0 20px;
   border-radius: 0 0 10px 10px;
   border-top: 2px solid var(--border-color);
@@ -469,11 +287,6 @@ hr {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-
-  position: fixed; /* fixa no rodapé */
-  bottom: 0;
-  left: 0;
-  right: 0;
 }
 
 /* Botão salvar */
@@ -503,13 +316,25 @@ hr {
   transform: translateY(2px);
 }
 
-/* Background block usado em telas secundárias */
+/* Background block usado em telas secundárias para as tools*/
 .background-block {
-  background-color: var(--deep-wall-color2);
   width: 100%;
   height: 100%;
-  padding: 10px;
+  background-color: var(--white);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid var(--border-color);
+}
+
+/* 
+content que vai conter as janelas das tools */
+.switch-area {
+width: 100%;
+height: 100%;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
 }
 
 /* Área principal ao lado da sidebar */
@@ -575,16 +400,15 @@ hr {
   width: 100%;
 }
 
-.slide-folder {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-  gap: 20px;
-  height: 50px;
-  border-top: 2px solid var(--border-color);
-  border-bottom: 2px solid var(--border-color);
+.btn-toggle {
+  background: none;
+  background-color: var(--border-color);
+  border-radius: 20px;
+  border: 2px solid var(--primary-color-grey);
+  padding: 2.5px 10px;
+  color: var(--primary-color-grey);
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .tags {
@@ -620,9 +444,7 @@ hr {
   box-sizing: border-box;
   width: 45%;
   height: 100%;
-  max-height: 90%;
   overflow-y: auto; /* já tinha */
-  max-height: 80vh;
 }
 
 .edit-p {
@@ -803,41 +625,6 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-/* open docs */
-.open-docs-bar,
-.moreOptions-bar {
-  padding: 15px;
-  box-sizing: border-box;
-  border-bottom: 2px solid var(--border-color);
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.open-edit-container {
-  padding: 10px;
-  box-sizing: border-box;
-}
-.open-docs-tags {
-  margin: 10px;
-  color: var(--primary-color-grey2);
-}
-
-.doc-title {
-  margin: 10px;
-}
-
-.results {
-  background-color: var(--deep-wall-color2);
-  padding: 5px;
-  min-width: 50px;
-  text-align: center;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-}
 
 .alterName-container {
   display: flex;
@@ -889,4 +676,33 @@ input:checked + .slider:before {
   cursor: pointer;
   padding: 0;
   margin-left: 4px;
+}
+
+/* dinamics */
+
+.docs-container {
+  padding: 10px;
+}
+
+.div-qtd-docs {
+  width: 100%;
+  min-width: 400px;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  text-decoration: none;
+  list-style: none;
+}
+
+.pasta-dashboard {
+  background-color: var(--white);
+  border: 2px solid var(--border-color);
+  padding: 10px;
+  width: 250px;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: 10px;
+  box-shadow: 1px 1px solid var(--primary-color-grey);
 }

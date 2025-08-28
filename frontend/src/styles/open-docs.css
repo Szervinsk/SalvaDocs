@@ -1,0 +1,79 @@
+/* open docs */
+.open-docs-container {
+  background-color: var(--white);
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto; /* já tinha */
+}
+
+.open-docs-bar,
+.moreOptions-bar {
+  padding: 15px;
+  box-sizing: border-box;
+  border-bottom: 2px solid var(--border-color);
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.open-docs-slide {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.open-docs-content {
+  padding: 10px;
+  box-sizing: border-box;
+  height: 100%;
+  width: 60%;
+}
+
+.open-docs-data {
+  padding: 10px;
+  box-sizing: border-box;
+  width: 30%;
+  height: 100%;
+  border-left: 2px solid var(--border-color)
+}
+
+.open-docs-data-content {
+    padding: 10px;
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.div-json {
+  overflow-y: scroll;
+  max-height: 300px;
+}
+
+.open-docs-data-feedback {
+    padding: 10px;
+    box-sizing: border-box;
+    max-height: 50%;
+    overflow-y: auto;
+}
+
+.open-docs-tags {
+  margin: 10px;
+  color: var(--primary-color-grey2);
+}
+
+.doc-title {
+  margin: 10px;
+}
+
+.results {
+  background-color: var(--deep-wall-color2);
+  padding: 5px;
+  min-width: 50px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}

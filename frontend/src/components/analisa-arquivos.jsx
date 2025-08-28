@@ -17,11 +17,9 @@ function AnalisarArquivos({
   setSelectedTags,
   file,
   setFile,
-  anexou,
-  setAnexou,
   erroArquivo,
-  alert,
-  setAlert,
+  handleClick,
+  isEtapaDisabled,
   setTremer,
   tremer,
   closeAlert,
@@ -52,7 +50,9 @@ function AnalisarArquivos({
   if (docSelecionado || isResponse) {
     return (
       <OpenDocs
-        onClose={() => ( setIsResponse(false), setDocSelecionado(null), setEtapaAtual(1) )}
+        onClose={() => (
+          setIsResponse(false), setDocSelecionado(null), setEtapaAtual(1)
+        )}
         docSelecionado={docSelecionado}
         tags={docSelecionado?.tags ?? []}
         onVoltar={onVoltar}
@@ -71,8 +71,6 @@ function AnalisarArquivos({
           setSelectedTags={setSelectedTags}
           file={file}
           setFile={setFile}
-          anexou={anexou}
-          setAnexou={setAnexou}
           erroArquivo={erroArquivo}
           setIsResponse={setIsResponse}
           setDocSelecionado={setDocSelecionado}
@@ -83,14 +81,15 @@ function AnalisarArquivos({
         <EditEtapas
           etapas={etapas}
           etapaAtual={etapaAtual}
-          setEtapaAtual={setEtapaAtual} // usa o guardado
-          anexou={anexou} // para UI desabilitar
+          setEtapaAtual={setEtapaAtual}
           alert={alert}
-          setAlert={setAlert}
           tremer={tremer}
           setTremer={setTremer}
           closeAlert={closeAlert}
           setCloseAlert={setCloseAlert}
+          handleClick={handleClick}
+          isEtapaDisabled={isEtapaDisabled}
+          file={file}
         />
       </div>
     );

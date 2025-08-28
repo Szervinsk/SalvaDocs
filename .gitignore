@@ -22,6 +22,7 @@ venv/
 .env
 
 ./uploads
+*./uploads
 database.sqlite
 
 # VSCode e IDEs

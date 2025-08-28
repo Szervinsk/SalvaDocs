@@ -1,0 +1,139 @@
+/* Sidebar base */
+.sidebar {
+  border-right: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.sidebar.reduzido h3,
+.sidebar.reduzido .mode-toggle,
+.sidebar.reduzido .documents-list {
+  display: none;
+}
+
+/* Header da sidebar */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  width: 100%;
+  height: 70px;
+  background-color: var(--white);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.icon-btn {
+  cursor: pointer;
+  color: var(--primary-color-grey);
+  transition: color 0.2s;
+}
+.icon-btn:hover {
+  color: var(--second-color-blue);
+}
+
+/* Toggle de modos */
+.mode-toggle {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--primary-color-grey);
+}
+
+/* Lista de tools */
+.folders-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  width: 100%;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.tool-item:hover {
+  background: var(--hover-bg);
+}
+.tool-item.ativo {
+  background: var(--second-color-blue);
+  color: white;
+}
+
+/* Pastas */
+.folder-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+
+  transition: background 0.2s;
+}
+.folder-header:hover {
+  background: var(--hover-bg);
+  opacity: 0.9;
+  border: 2px solid var(--second-color-blue);
+}
+
+.folder-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.doc-count {
+  background: var(--second-color-blue);
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+/* Documentos */
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 28px;
+  border-left: 2px solid var(--border-color);
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.document-item:hover {
+  background: var(--hover-bg);
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--primary-color-grey);
+  margin-left: 28px;
+}

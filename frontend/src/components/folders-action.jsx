@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { TOOLS } from "../constants/constants";
-import { Icons } from "../constants/icons";
 import axios from "axios";
-import Logo from "../assets/pen.svg";
+import { Icons } from "../constants/icons";
+import "../styles/library.css";
 import SearchBar from "../components/searchbar";
 
 function FoldersAction({
@@ -11,22 +10,23 @@ function FoldersAction({
   documentos,
   setDocumentos,
   setDocSelecionado,
+  reduzido,
+  setReduzido,
   setTool,
 }) {
-  const [pastasAtivas, setPastasAtivas] = useState({});
-  const [toolsAtivos, setToolsAtivos] = useState({});
-  const [reduzido, setReduzido] = useState(false);
+  const [pastasAbertas, setPastasAbertas] = useState({});
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [modo, setModo] = useState("pastas"); // "pastas" | "modelos"
 
   useEffect(() => {
     const fetchDocumentos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
+        const { data } = await axios.get(
           "http://localhost:5000/api/files/documentos"
         );
-        setDocumentos(response.data);
+        setDocumentos(data);
       } catch (error) {
         console.error("Erro ao buscar documentos:", error);
       } finally {
@@ -37,25 +37,24 @@ function FoldersAction({
   }, [setDocumentos]);
 
   const toggleReducao = () => setReduzido((prev) => !prev);
-
   const togglePasta = (id) =>
-    setPastasAtivas((prev) => ({ ...prev, [id]: !prev[id] }));
+    setPastasAbertas((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const toggleTool = (index) =>
-    setToolsAtivos((prev) => ({ ...prev, [index]: !prev[index] }));
-
-  // Filtra pastas/documentos pelo termo de pesquisa
+  // Filtragem
   const pastasFiltradas = pastas
     .map((pasta) => {
-      const docsDaPasta = documentos.filter(
+      const docs = documentos.filter(
         (doc) =>
           doc.model === pasta.name &&
           (doc.templateName || doc.name)
             .toLowerCase()
             .includes(searchQuery.toLowerCase())
       );
-      if (docsDaPasta.length > 0 || pasta.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return { ...pasta, documentos: docsDaPasta };
+      if (
+        docs.length > 0 ||
+        pasta.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return { ...pasta, documentos: docs };
       }
       return null;
     })
@@ -63,136 +62,112 @@ function FoldersAction({
 
   return (
     <motion.div
-      className={`Pastas ${reduzido ? "reduzido" : ""}`}
-      animate={{ width: reduzido ? 80 : 320, alignItems: reduzido ? "center" : "stretch" }}
+      className={`sidebar ${reduzido ? "reduzido" : ""}`}
+      animate={{ width: reduzido ? 80 : 280 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Logo */}
-      <div className="flex-left-right businessCard">
-        <div className="icon-pen">
-          <img src={Logo} alt="Ícone" />
-        </div>
-        {!reduzido && (
-          <div className="flex-top-down conteudo-colapsavel">
-            <h2>Empresa</h2>
-            <h3>sla</h3>
-          </div>
-        )}
-      </div>
-
-      {/* Botão reduzir */}
-      <div
-        className="slide-folder"
-        style={{
-          display: "flex",
-          justifyContent: reduzido ? "center" : "space-between",
-          alignItems: "center",
-          padding: "8px",
-        }}
-      >
-        {!reduzido && <h3 className="conteudo-colapsavel">Visualizar pastas</h3>}
+      {/* Header da Sidebar */}
+      <div className="sidebar-header">
+        {!reduzido && <h3>Acessar Pastas</h3>}
         <Icons.ArrowLeft
           size={20}
-          className="icons"
+          className="icon-btn"
           onClick={toggleReducao}
-          style={{ cursor: "pointer" }}
           title={reduzido ? "Expandir" : "Reduzir"}
         />
       </div>
+
+      {/* Toggle Pastas/Modelos */}
+      {!reduzido && (
+        <div className="mode-toggle">
+          <label>
+            <input
+              type="radio"
+              name="mode"
+              value="pastas"
+              checked={modo === "pastas"}
+              onChange={() => setModo("pastas")}
+            />
+            Suas Pastas
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="mode"
+              value="modelos"
+              checked={modo === "modelos"}
+              onChange={() => setModo("modelos")}
+            />
+            Seus Modelos
+          </label>
+        </div>
+      )}
 
       {/* Search */}
       {!reduzido ? (
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       ) : (
         <div className="search-container">
-          <Icons.Search size={20} className="search-icon" />
+          <Icons.Search size={20} className="search-icon" style={{margin:"auto"}} />
         </div>
       )}
 
-      {/* Tools e Pastas */}
-      <div className="folders" style={{ overflowY: "auto", maxHeight: 400 }}>
-        {TOOLS.map((tool, index) => (
-          <div key={index}>
-            <div
-              className="tools-title"
-              onClick={() => {
-                toggleTool(index);
-                if (index === 0) setPastasAtivas({}); // reset pastas quando abre a primeira tool
-                setTool(index);
-              }}
-              style={{ justifyContent: reduzido ? "center" : "flex-start" }}
-            >
-              {tool.icon && (() => {
-                const IconComponent = Icons[tool.icon];
-                return <IconComponent size={20} className="icons" />;
-              })()}
-              {!reduzido && <h3>{tool.name}</h3>}
-            </div>
+      <hr />
 
-            {/* Conteúdo expandido da tool */}
-            {toolsAtivos[index] && index === 0 && (
-              <div>
-                {pastasFiltradas.map((pasta) => {
-                  const pastaAberta =
-                    pastasAtivas[pasta.id] || (searchQuery && pasta.documentos.length > 0);
+      {/* Pastas */}
+      <div className="folders-list">
+        {pastasFiltradas.map((pasta) => {
+          const aberta =
+            pastasAbertas[pasta.id] ||
+            (searchQuery && pasta.documentos.length > 0);
 
-                  return (
-                    <div key={pasta.id} className="folder-container">
-                      <div
-                        className="flex-left-right folder"
-                        onClick={() => togglePasta(pasta.id)}
-                        style={{ justifyContent: reduzido ? "center" : "space-between" }}
-                      >
-                        <div className="folder" style={{ cursor: "pointer" }}>
-                          <Icons.Folder size={20} className="icons" />
-                          {!reduzido && <h3>{pasta.name}</h3>}
-                        </div>
-
-                        {!reduzido && (
-                          <div className="icon">
-                            <div className="lengthDocs">{pasta.documentos.length}</div>
-                            {pastaAberta ? (
-                              <Icons.ArrowUp size={20} className="icons" />
-                            ) : (
-                              <Icons.ArrowDown size={20} className="icons" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Documentos */}
-                      {!reduzido && pastaAberta && (
-                        <div className="documents">
-                          {loading ? (
-                            <p>Carregando...</p>
-                          ) : pasta.documentos.length === 0 ? (
-                            <h3 className="document-item">Sem arquivos nesta pasta</h3>
-                          ) : (
-                            pasta.documentos.map((doc) => (
-                              <div
-                                key={doc.id}
-                                className="document-item"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => (setDocSelecionado(doc) , setTool(1))}
-                              >
-                                <Icons.DocumentText size={20} className="icons" />
-                                <h3>
-                                  {(doc.templateName || doc.name).length > 25
-                                    ? (doc.templateName || doc.name).slice(0, 25) + "..."
-                                    : doc.templateName || doc.name}
-                                </h3>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+          return (
+            <div key={pasta.id} className="folder-block">
+              <div
+                className="folder-header"
+                onClick={() => togglePasta(pasta.id)}
+              >
+                <div className="flex-left-right">
+                  <Icons.Folder size={20} className="icons" />
+                  {!reduzido && <h3>{pasta.name}</h3>}
+                </div>
+                {!reduzido && (
+                  <div className="folder-info">
+                    <span className="doc-count">
+                      {pasta.documentos.length}
+                    </span>
+                    {aberta ? <Icons.ArrowUp size={16} /> : <Icons.ArrowDown size={16} />}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        ))}
+
+              {!reduzido && aberta && (
+                <div className="documents-list">
+                  {loading ? (
+                    <p>Carregando...</p>
+                  ) : pasta.documentos.length === 0 ? (
+                    <p className="empty-text">Sem arquivos nesta pasta</p>
+                  ) : (
+                    pasta.documentos.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="document-item"
+                        onClick={() => (setTool(1), setDocSelecionado(doc))}
+                      >
+                        <Icons.DocumentText size={18} className="icons" />
+                        <span>
+                          {(doc.templateName || doc.name).length > 25
+                            ? (doc.templateName || doc.name).slice(0, 25) + "..."
+                            : doc.templateName || doc.name}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </motion.div>
   );
