@@ -39,6 +39,7 @@ import { GrScorecard } from "react-icons/gr";
 import { TbPigMoney } from "react-icons/tb";
 import { MdPeopleAlt } from "react-icons/md";
 import { BiSolidBusiness } from "react-icons/bi";
+import { SlGraph } from "react-icons/sl";
 
 // centralizar todos os ícones que você usa
 export const Icons = {
@@ -83,4 +84,5 @@ export const Icons = {
   PigMoney: TbPigMoney,
   People: MdPeopleAlt,
   Business: BiSolidBusiness,
+  Graphics: SlGraph,
 };

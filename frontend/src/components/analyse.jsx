@@ -183,6 +183,7 @@ export function AnalyseDoc({
         isResponse={isResponse}
         isEtapaDisabled={isEtapaDisabled}
         handleClick={goToEtapa}
+        showAlert={showAlert}
       />
     </>
   );

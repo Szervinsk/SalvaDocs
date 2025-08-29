@@ -9,9 +9,12 @@ function StatusBar({
   setEtapaAtual,
   file, // <-- adicionar
   triggerShake,
+  docSelecionado,
+  setSelectedTags,
 }) {
   const handleProxima = () => {
-    if (etapaAtual === 2 && !file) { // 🔹 checa file, não anexou
+    if (etapaAtual === 2 && !file) {
+      // 🔹 checa file, não anexou
       triggerShake();
     } else {
       setEtapaAtual((prev) => Math.min(prev + 1, ETAPAS.length));
@@ -19,8 +22,12 @@ function StatusBar({
   };
 
   const handleVoltar = () => {
-    if (etapaAtual === 1) setSelectedModel(null);
-    else setEtapaAtual((prev) => Math.max(prev - 1, 1));
+    if (etapaAtual === 1) {
+      setSelectedModel(null);
+      setSelectedTags(null);
+    } else {
+      setEtapaAtual((prev) => Math.max(prev - 1, 1));
+    }
   };
 
   useEffect(() => {
@@ -32,6 +39,8 @@ function StatusBar({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedModel, etapaAtual, file]); // 🔹 dependência correta
+
+  if (docSelecionado) return null;
 
   return (
     <div className="status-bar">

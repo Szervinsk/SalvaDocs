@@ -30,6 +30,7 @@ function AnalisarArquivos({
   setDocumentos,
   setIsResponse,
   isResponse,
+  showAlert,
 }) {
   const handleCloseModal = () => {
     setSelectedModel(null);
@@ -57,6 +58,10 @@ function AnalisarArquivos({
         tags={docSelecionado?.tags ?? []}
         onVoltar={onVoltar}
         setDocSelecionado={setDocSelecionado}
+        setDocumentos={setDocumentos}
+        setSelectedModel={setSelectedModel}
+        showAlert={showAlert}
+        setIsResponse={setIsResponse}
       />
     );
   } else if (selectedModel !== null) {

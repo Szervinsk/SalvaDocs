@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { Icons } from "../constants/icons";
 import "../styles/library.css";
@@ -40,7 +40,7 @@ function FoldersAction({
   const togglePasta = (id) =>
     setPastasAbertas((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  // Filtragem
+  // Filtragem de pastas
   const pastasFiltradas = pastas
     .map((pasta) => {
       const docs = documentos.filter(
@@ -59,6 +59,13 @@ function FoldersAction({
       return null;
     })
     .filter(Boolean);
+
+  // Filtragem de documentos quando o modo é "modelos"
+  const documentosFiltrados = documentos.filter((doc) =>
+    (doc.templateName || doc.name)
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
   return (
     <motion.div
@@ -80,25 +87,34 @@ function FoldersAction({
       {/* Toggle Pastas/Modelos */}
       {!reduzido && (
         <div className="mode-toggle">
-          <label>
+          <div
+            className="toggle-bg"
+            style={{
+              transform:
+                modo === "modelos" ? "translateX(100%)" : "translateX(0)",
+            }}
+          />
+          <label onClick={() => setModo("pastas")}>
             <input
               type="radio"
               name="mode"
               value="pastas"
               checked={modo === "pastas"}
-              onChange={() => setModo("pastas")}
+              readOnly
+              style={{ display: "none" }}
             />
-            Suas Pastas
+            Pastas
           </label>
-          <label>
+          <label onClick={() => setModo("modelos")}>
             <input
               type="radio"
               name="mode"
               value="modelos"
               checked={modo === "modelos"}
-              onChange={() => setModo("modelos")}
+              readOnly
+              style={{ display: "none" }}
             />
-            Seus Modelos
+            Documentos
           </label>
         </div>
       )}
@@ -108,66 +124,112 @@ function FoldersAction({
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       ) : (
         <div className="search-container">
-          <Icons.Search size={20} className="search-icon" style={{margin:"auto"}} />
+          <Icons.Search
+            size={20}
+            className="search-icon"
+            style={{ margin: "auto" }}
+          />
         </div>
       )}
 
       <hr />
 
-      {/* Pastas */}
+      {/* Conteúdo: pastas ou documentos */}
       <div className="folders-list">
-        {pastasFiltradas.map((pasta) => {
-          const aberta =
-            pastasAbertas[pasta.id] ||
-            (searchQuery && pasta.documentos.length > 0);
-
-          return (
-            <div key={pasta.id} className="folder-block">
-              <div
-                className="folder-header"
-                onClick={() => togglePasta(pasta.id)}
-              >
-                <div className="flex-left-right">
-                  <Icons.Folder size={20} className="icons" />
-                  {!reduzido && <h3>{pasta.name}</h3>}
-                </div>
-                {!reduzido && (
-                  <div className="folder-info">
-                    <span className="doc-count">
-                      {pasta.documentos.length}
-                    </span>
-                    {aberta ? <Icons.ArrowUp size={16} /> : <Icons.ArrowDown size={16} />}
-                  </div>
-                )}
-              </div>
-
-              {!reduzido && aberta && (
-                <div className="documents-list">
-                  {loading ? (
-                    <p>Carregando...</p>
-                  ) : pasta.documentos.length === 0 ? (
-                    <p className="empty-text">Sem arquivos nesta pasta</p>
-                  ) : (
-                    pasta.documentos.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="document-item"
-                        onClick={() => (setTool(1), setDocSelecionado(doc))}
-                      >
-                        <Icons.DocumentText size={18} className="icons" />
-                        <span>
-                          {(doc.templateName || doc.name).length > 25
-                            ? (doc.templateName || doc.name).slice(0, 25) + "..."
-                            : doc.templateName || doc.name}
-                        </span>
+        <AnimatePresence mode="wait">
+          {modo === "pastas"
+            ? pastasFiltradas.map((pasta) => {
+                const aberta =
+                  pastasAbertas[pasta.id] ||
+                  (searchQuery && pasta.documentos.length > 0);
+                return (
+                  <motion.div
+                    key={pasta.id}
+                    className="folder-block"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div
+                      className="folder-header"
+                      onClick={() => togglePasta(pasta.id)}
+                    >
+                      <div className="flex-left-right">
+                        <Icons.Folder size={20} className="icons" />
+                        {!reduzido && <h3>{pasta.name}</h3>}
                       </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                      {!reduzido && (
+                        <div className="folder-info">
+                          <span className="doc-count">
+                            {pasta.documentos.length}
+                          </span>
+                          {aberta ? (
+                            <Icons.ArrowUp size={16} />
+                          ) : (
+                            <Icons.ArrowDown size={16} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {!reduzido && aberta && (
+                      <motion.div
+                        className="documents-list"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        {loading ? (
+                          <p>Carregando...</p>
+                        ) : pasta.documentos.length === 0 ? (
+                          <p className="empty-text">Sem arquivos nesta pasta</p>
+                        ) : (
+                          pasta.documentos.map((doc) => (
+                            <motion.div
+                              key={doc.id}
+                              className="document-item"
+                              onClick={() => (
+                                setTool(1), setDocSelecionado(doc)
+                              )}
+                              whileHover={{ x: 4 }}
+                            >
+                              <Icons.DocumentText size={18} className="icons" />
+                              <span>
+                                {(doc.templateName || doc.name).length > 25
+                                  ? (doc.templateName || doc.name).slice(
+                                      0,
+                                      25
+                                    ) + "..."
+                                  : doc.templateName || doc.name}
+                              </span>
+                            </motion.div>
+                          ))
+                        )}
+                      </motion.div>
+                    )}
+                  </motion.div>
+                );
+              })
+            : documentosFiltrados.map((doc) => (
+                <motion.div
+                  key={doc.id}
+                  className="document-item"
+                  onClick={() => (setTool(1), setDocSelecionado(doc))}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  whileHover={{ x: 4 }}
+                >
+                  <Icons.DocumentText size={18} className="icons" />
+                  <span>
+                    {(doc.templateName || doc.name).length > 25
+                      ? (doc.templateName || doc.name).slice(0, 25) + "..."
+                      : doc.templateName || doc.name}
+                  </span>
+                </motion.div>
+              ))}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

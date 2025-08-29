@@ -6,7 +6,7 @@ import Logo from "../assets/pen.svg";
 import SearchBar from "../components/searchbar";
 import "../styles/navbar.css";
 
-function Navbar({ setTool }) {
+function Navbar({ setTool , setDocSelecionado}) {
   const [collapsed, setCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -56,7 +56,7 @@ function Navbar({ setTool }) {
             <div
               key={tool.id}
               className="tool-item"
-              onClick={() => setTool(tool.id)}
+              onClick={() => { setTool(tool.id); setDocSelecionado(null); }}
             >
               <div className="tool-icon">{Icon && <Icon size={20} className="icons"/>}</div>
               {!collapsed && <span className="tool-label">{tool.name}</span>}

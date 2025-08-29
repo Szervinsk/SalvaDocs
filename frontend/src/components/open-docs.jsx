@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
+import axios from "axios";
 import { Icons } from "../constants/icons";
+import { OPEN_OPTIONS } from "../constants/constants";
+import Graphics from "./graphics";
 import "../styles/open-docs.css";
 
 function OpenDocs({
@@ -8,10 +11,15 @@ function OpenDocs({
   onClose,
   tags,
   onVoltar,
+  showAlert,
+  setIsResponse,
+  setEtapaAtual,
+  setDocumentos,
+  setSelectedModel,
 }) {
   const [json, setJson] = useState(false);
 
-  // Função para gerar cor
+  // Gerador de cor
   const RandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
     const saturation = 60 + Math.random() * 20;
@@ -19,7 +27,7 @@ function OpenDocs({
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
-  // Memoriza uma cor fixa para cada tag.id enquanto esse componente estiver montado
+  // Memoriza cores
   const tagColors = useMemo(() => {
     const colors = {};
     tags.forEach((tag) => {
@@ -32,43 +40,119 @@ function OpenDocs({
 
   const { name, model, templateName } = docSelecionado;
 
+  // 🔑 Aqui mapeamos cada ação pelo id (ou poderia ser pelo name)
+  const handleOptionClick = async (option) => {
+    switch (option.id) {
+      case 1: // Voltar
+        if (onVoltar) {
+          onVoltar();
+          setDocSelecionado(null);
+          setSelectedModel(null);
+        }
+        break;
+      case 2: // Compartilhar
+        console.log("Compartilhar doc:", docSelecionado);
+        alert("Compartilhar ainda não implementado 🚀");
+        break;
+      case 3: // Baixar
+        console.log("Baixar doc:", docSelecionado.path);
+        // Exemplo: abrir o PDF no navegador
+        window.open(`http://localhost:3000/${docSelecionado.path}`, "_blank");
+        break;
+      case 4: // Excluir
+        console.log("Excluir doc:", docSelecionado.id);
+        if (!window.confirm("Tem certeza que deseja apagar este documento?"))
+          return;
+
+        try {
+          const response = await axios.post(
+            `http://localhost:5000/api/files/delete/${docSelecionado.id}`
+          );
+
+          setDocumentos((prev) =>
+            prev.filter((d) => d.id !== docSelecionado.id)
+          );
+          setDocSelecionado(null);
+          setSelectedModel(null);
+          setIsResponse(false);
+          setEtapaAtual(1);
+
+          showAlert("success", "Documento apagado com sucesso!");
+        } catch (error) {
+          console.error("Erro ao apagar documento:", error);
+          showAlert("error", "Erro ao apagar documento!");
+        }
+        break;
+      default:
+        console.warn("Ação não reconhecida:", option);
+    }
+  };
+
   return (
     <main className="open-docs-container">
-      <div
-        className="open-docs-bar"
-        style={{ justifyContent: "space-between" }}
-      >
-        <button
-          className="action-big-btns"
-          style={{ width: "100px" }}
-          onClick={() => onVoltar()}
-        >
-          Voltar
-        </button>
-        espaço pra sla oq
+      <div className="open-docs-bar">
+        <div className="flex-left-right" style={{ gap: "20px" }}>
+          {OPEN_OPTIONS.map((option) => {
+            const Icon = Icons[option.icon];
+            return (
+              <button
+                key={option.id}
+                className="action-btns"
+                onClick={() => handleOptionClick(option)}
+              >
+                {Icon && <Icon size={20} />}
+              </button>
+            );
+          })}
+        </div>
+        <div> eita </div>
       </div>
+
+      {/* resto igual */}
 
       <div className="open-docs-slide">
         <div className="open-docs-content">
           <div className="doc-title">
-            <div className="flex-left-right spc-bet" >
+            <div
+              className="flex-left-right spc-bet"
+              style={{
+                margin: "20px 10px",
+                display: "flex",
+                justifyContent: "flex-start",
+              }}
+            >
               <div className="flex-left-right">
-                <Icons.Calendar size={15} />
-                <h3>{docSelecionado.uploadedAt}</h3>
+                <Icons.Calendar size={15} className="icons2" />
+                <h3>{docSelecionado.uploadedAt.split("T")[0]}</h3>
               </div>
               <div className="flex-left-right">
-                <Icons.Model size={15} />
+                <Icons.Model size={15} className="icons2" />
                 <h3>{model}</h3>
               </div>
             </div>
 
-            <h2>{templateName ? templateName : name}</h2>
+            {/* titulo dessa porra */}
+            {tags
+              .filter((tag) => tag.name === "Título")
+              .map((tag) => (
+                <h2 className="copy" key={tag.id}>
+                  {tag.value}
+                </h2>
+              ))}
           </div>
 
-          <p>
-            Aqui vai ficar os parágrafos muito grandes do texto para que fique
-            legal e tals, aí vc vai poder ver algo dele né e tome le dale tuft
-          </p>
+          <div className="open-docs-content-main">
+            {/* paragrafoooo */}
+            <p>
+              {tags
+                .filter((tag) => tag.name === "Resumo")
+                .map((tag) => (
+                  <p className="copy" key={tag.id}>
+                    {tag.value}
+                  </p>
+                ))}
+            </p>
+          </div>
         </div>
 
         <div className="open-docs-data">
@@ -91,31 +175,43 @@ function OpenDocs({
                 {JSON.stringify(docSelecionado, null, 2)}
               </pre>
             ) : (
-              <div>
-                {tags.map((tag) => {
-                  const Icon = Icons[tag.icon];
-                  return (
-                    <div className="flex-left-right" key={tag.id}>
-                      {Icon && <Icon size={15} className="icons" />}
-                      <h3 className="open-docs-tags">{tag.content}:</h3>
-                      <div
-                        className="results"
-                        style={{ backgroundColor: tagColors[tag.id] }}
-                      >
-                        <h3>{tag.value || "Não encontrado"}</h3>
+              <div className="div-tags">
+                {tags
+                  .filter(
+                    (tag) => tag.name !== "Título" && tag.name !== "Resumo"
+                  )
+                  .map((tag) => {
+                    const Icon = Icons[tag.icon];
+                    return (
+                      <div className="flex-left-right" key={tag.id}>
+                        {Icon && <Icon size={15} className="icons" />}
+                        <h3 className="open-docs-tags">{tag.name}:</h3>
+                        <div
+                          className="results"
+                          style={{ backgroundColor: tagColors[tag.id] }}
+                        >
+                          <h3>{tag.value || "Não encontrado"}</h3>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
             <hr />
 
             <div className="open-docs-data-feedback">
-              <h3>Feedback sobre a coleta dos dados</h3>
+              <div className="flex-left-right">
+                <Icons.Graphics size={15} className="icons" />
+                <h3>Feedback sobre a coleta dos dados</h3>
+              </div>
 
-              <div>grafico</div>
-              <div>quantidade de informações captadas</div>
+              <Graphics
+                docSelecionado={docSelecionado}
+                setDocSelecionado={setDocSelecionado}
+                onClose={onClose}
+                tags={tags}
+                onVoltar={onVoltar}
+              />
             </div>
           </div>
         </div>

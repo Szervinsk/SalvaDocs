@@ -18,7 +18,7 @@ function Abas() {
 
   return (
     <div className="main-container">
-      <Navbar setTool={setTool} />
+      <Navbar setTool={setTool} setDocSelecionado={setDocSelecionado}/>
 
       <div className="background-block">
         {/* Pasta sempre aparece */}

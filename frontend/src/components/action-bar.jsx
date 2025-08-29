@@ -3,12 +3,13 @@ import { Icons } from "../constants/icons";
 function ActionBar({
   docSelecionado,
   selectedModel,
+  setDocSelecionado,
   selectedTags,
   etapaAtual,
   file,
   setMore,
   more,
-  setTool
+  setTool,
 }) {
   return (
     <div className="action-bar">
@@ -78,14 +79,14 @@ function ActionBar({
         </div>
 
         <div className="spc-bet flex-left-right" style={{ width: "9%" }}>
-          <button className="action-btns">
-            <Icons.Add size={20} onClick={() => setTool(1)} />
+          <button
+            className="action-btns"
+            onClick={() => (setDocSelecionado(null), setTool(1))}
+          >
+            <Icons.Add size={20} />
           </button>
-          <button className="action-btns">
-            <Icons.MdOutlineMoreHoriz
-              size={20}
-              onClick={() => setMore(!more)}
-            />
+          <button className="action-btns" onClick={() => setMore(!more)}>
+            <Icons.MdOutlineMoreHoriz size={20} />
           </button>
         </div>
       </div>

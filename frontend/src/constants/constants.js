@@ -18,12 +18,19 @@ export const ALERTS = [
   { id: 3, type: "warning", message: "Atenção: verifique os dados inseridos." },
 ];
 
+export const OPEN_OPTIONS = [
+  { id: 1, name: "Voltar", icon: "DoorOpen" },
+  { id: 2, name: "Compartilhar", icon: "Send" },
+  { id: 3, name: "Baixar", icon: "Download" },
+  { id: 4, name: "Excluir", icon: "Delete" },
+];
+
 export const TOOLS = [
-  {id: 1, name:"Analisar Documentos", icon:"ScannerDocument"},
-  {id: 2, name:"Editar Modelos", icon:"Model"},
-  {id: 3, name:"Configurações", icon:"Adjustments"},
-  {id: 4, name:"Sua Conta", icon:"User"},
-]
+  { id: 1, name: "Analisar Documentos", icon: "ScannerDocument" },
+  { id: 2, name: "Editar Modelos", icon: "Model" },
+  { id: 3, name: "Configurações", icon: "Adjustments" },
+  { id: 4, name: "Sua Conta", icon: "User" },
+];
 // Pastas iniciais
 export const PASTAS = [
   { id: 1, name: "Despacho" },
@@ -46,7 +53,7 @@ export const TAGS_UNIVERSAIS = [
     icon: "Archive",
     type: "regex",
     regex:
-      "\\b(?:GDOC|Doc\\. Id\\.|Doc\\. SEI(?:/GDF)?)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+/\\d{4})"
+      "\\b(?:GDOC|Doc\\. Id\\.|Doc\\. SEI(?:/GDF)?)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+/\\d{4})",
   },
   {
     id: 3,
@@ -195,6 +202,29 @@ export const TAGS = {
     ...TAGS_UNIVERSAIS,
   ],
 };
+
+// Mapeamento das categorias em blocos
+export const BLOCOS = [
+  {
+    key: "universais",
+    title: "Tags Universais",
+    data: TAGS_UNIVERSAIS,
+    color: "#4CAF50",
+  }, // verde
+  { key: "ia", title: "Tags de IA", data: TAGS_IA, color: "#9C27B0" }, // roxo
+  {
+    key: "programa",
+    title: "Tags de Programa",
+    data: TAGS_PROGRAMA,
+    color: "#2196F3",
+  }, // azul
+  {
+    key: "parecer",
+    title: "Tags de Parecer",
+    data: TAGS_PARECER,
+    color: "#FF9800",
+  }, // laranja
+];
 
 export const ETAPAS = [
   { id: 1, text: "Editar tags" },

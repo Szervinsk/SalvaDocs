@@ -71,6 +71,7 @@ function Block({
           setMore={setMore}
           more={more}
           setTool={setTool}
+          setDocSelecionado={setDocSelecionado}
         />
 
         {/* Middle Area */}
@@ -124,6 +125,8 @@ function Block({
           etapaAtual={etapaAtual}
           file={file}
           triggerShake={triggerShake}
+          docSelecionado={docSelecionado}
+          setSelectedTags={setSelectedTags}
         />
       </main>
     </>
