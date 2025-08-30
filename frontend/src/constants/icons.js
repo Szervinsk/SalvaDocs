@@ -19,9 +19,11 @@ import { LuTextSearch } from "react-icons/lu";
 import { BsTrash } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import { HiArrowLeftEndOnRectangle } from "react-icons/hi2";
-import { MdEditDocument } from "react-icons/md";
+import { HiOutlineDocumentText } from "react-icons/hi";
 import { FaRegFolder } from "react-icons/fa";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+
+import { IoIosArrowDown, IoIosArrowUp, IoIosArrowForward , IoIosArrowBack} from "react-icons/io";
+
 import { FaQuestion } from "react-icons/fa6";
 import { MdOutlineSearch } from "react-icons/md";
 import { RiArchiveLine } from "react-icons/ri";
@@ -40,6 +42,15 @@ import { TbPigMoney } from "react-icons/tb";
 import { MdPeopleAlt } from "react-icons/md";
 import { BiSolidBusiness } from "react-icons/bi";
 import { SlGraph } from "react-icons/sl";
+import { BsQuestionCircleFill } from "react-icons/bs";
+import { AiOutlineHome } from "react-icons/ai";
+
+import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
+import { HiOutlineClipboardDocument } from "react-icons/hi2";
+import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+
+import { FaArrowLeftLong } from "react-icons/fa6";
+import { backIn } from "framer-motion";
 
 // centralizar todos os ícones que você usa
 export const Icons = {
@@ -52,7 +63,13 @@ export const Icons = {
   Search: MdOutlineSearch,
   Lamp: FaRegLightbulb, // lampada para modelos
   ScannerDocument: MdOutlineDocumentScanner, // scanner de documentos
+
+  // voltar
   Close: IoMdClose,
+  BackIn: HiArrowLeftEndOnRectangle,
+  BackInSeta: FaArrowLeftLong,
+
+
   Pdf_file: PiFilePdf,
   Upload: MdFileUpload,
   Check: FaCheck,
@@ -63,17 +80,28 @@ export const Icons = {
   Process: BiArchive,
   Delete: BsTrash,
   Download: HiDownload,
-  ArrowLeft: HiArrowLeftEndOnRectangle,
-  DocumentText: MdEditDocument,
+  DocumentText: HiOutlineDocumentText,
   Folder: FaRegFolder,
+  
+  // setas para voltar
   ArrowDown: IoIosArrowDown,
   ArrowUp: IoIosArrowUp,
+  ArrowRight: IoIosArrowForward,
+  ArrowLeft: IoIosArrowBack,
+
+  // duvida
   Question:FaQuestion,
+  CircleQuestion:BsQuestionCircleFill,
+
+  // arquivos
   Archive: RiArchiveLine,
   Calendar: LuCalendarDays,
   User: HiOutlineUserCircle,
   Adjustments: HiOutlineAdjustmentsHorizontal,
+
   Model: TbDeviceDesktopAnalytics,
+
+  // tags
   Send: FiSend,
   Summarize: FaPenNib,
   Title: MdOutlineSubtitles,
@@ -85,4 +113,9 @@ export const Icons = {
   People: MdPeopleAlt,
   Business: BiSolidBusiness,
   Graphics: SlGraph,
+  Home: AiOutlineHome,
+
+  Programas: HiOutlineClipboardDocumentCheck,
+  Despacho: HiOutlineClipboardDocument,
+  Parecer: HiOutlineClipboardDocumentList,
 };

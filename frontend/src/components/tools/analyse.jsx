@@ -1,7 +1,7 @@
-import { Icons } from "../constants/icons";
-import AnalisarArquivos from "../components/analisa-arquivos";
+import { Icons } from "../../constants/icons";
+import AnalisarArquivos from "../..//components/analisa-arquivos";
 import axios from "axios";
-import { ETAPAS } from "../constants/constants";
+import { ETAPAS } from "../../constants/constants";
 
 export function AnalyseDoc({
   modelos,

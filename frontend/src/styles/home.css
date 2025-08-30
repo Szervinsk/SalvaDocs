@@ -1,0 +1,101 @@
+/* Home Page Styles */
+
+.home {
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+}
+
+.welcome h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.welcome h3 {
+  margin: 5px 0 20px;
+  font-size: 16px;
+  color: var(--primary-color-grey2);
+}
+
+.div-qtd-docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+.pasta-dashboard {
+  flex: 1 1 200px;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid var(--border-color);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.flex-left-right {
+  display: flex;
+  gap: 20px;
+}
+
+.spc-bet {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.block-content {
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 15px;
+  height: 350px;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title-graphics {
+  font-size: 14px;
+}
+
+.chart-box {
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chart-box h4 {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* barra lateral */
+.lateral-bar {
+  background: var(--white);
+  border-left: 2px solid var(--border-color);
+  padding: 15px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.lateral-bar-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.list-documents {
+    margin-top: 20px;
+    width: 100%;
+    height: 200px;
+}

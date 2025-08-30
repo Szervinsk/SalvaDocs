@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Icons } from "../constants/icons";
-import { ETAPAS, ALERTS } from "../constants/constants";
-import axios from "axios";
+import { ETAPAS } from "../constants/constants";
+import ActionBar from "./bars/action-bar";
 
-import ActionBar from "./action-bar";
-import DynamicsStaticts from "./dynstatistics";
-import { AnalyseDoc } from "./analyse";
-import StatusBar from "./status-bar";
+// tools
+import AnalyseDoc from "./tools/analyse";
+import Home from "./tools/home";
+import EditModels from "./tools/edit-models";
+import Configurations from "./tools/configurations";
+import Account from "./tools/account";
+import OpenDocs from "./open-docs";
+
+import StatusBar from "./bars/status-bar";
 
 function Block({
   modelos,
@@ -28,8 +33,8 @@ function Block({
   const [closeAlert, setCloseAlert] = useState(false);
   const [more, setMore] = useState(false);
   const [isResponse, setIsResponse] = useState(false);
-
   const [alert, setAlert] = useState(null); // { type: 'success' | 'error' | 'warning', message: string }
+  const [searchQuery, setSearchQuery] = useState("");
 
   const showAlert = (type, message) => {
     setAlert({ type, message });
@@ -51,6 +56,76 @@ function Block({
     return false;
   };
 
+  const handleSelectTool = (id) => {
+    switch (id) {
+      case 1:
+        return <Home documentos={documentos} />;
+      case 2:
+        return (
+          <AnalyseDoc
+            modelos={modelos}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            etapas={ETAPAS}
+            etapaAtual={etapaAtual}
+            setEtapaAtual={setEtapaAtual}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            file={file}
+            setFile={setFile}
+            erroArquivo={erroArquivo}
+            setErroArquivo={setErroArquivo}
+            tremer={tremer}
+            setTremer={setTremer}
+            closeAlert={closeAlert}
+            setCloseAlert={setCloseAlert}
+            more={more}
+            setMore={setMore}
+            isResponse={isResponse}
+            setIsResponse={setIsResponse}
+            documentos={documentos} // <- passa para o filho
+            setDocumentos={setDocumentos}
+            docSelecionado={docSelecionado}
+            setDocSelecionado={setDocSelecionado}
+            onVoltar={onVoltar}
+            triggerShake={triggerShake}
+            isEtapaDisabled={isEtapaDisabled}
+            showAlert={showAlert}
+          />
+        );
+      case 3:
+        return (
+          <EditModels
+            modelos={modelos}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+          />
+        );
+      case 4:
+        return <Configurations />;
+      case 5:
+        return <Account />;
+      case 6:
+        return (
+          <OpenDocs
+            onClose={() => (
+              setIsResponse(false), setDocSelecionado(null), setEtapaAtual(1)
+            )}
+            docSelecionado={docSelecionado}
+            setDocSelecionado={setDocSelecionado}
+            tags={docSelecionado?.tags ?? []}
+            onVoltar={onVoltar}
+            setDocumentos={setDocumentos}
+            setSelectedModel={setSelectedModel}
+            showAlert={showAlert}
+            setIsResponse={setIsResponse}
+          />
+        );
+      default:
+        setTool(1);
+    }
+  };
+
   return (
     <>
       {alert && (
@@ -70,52 +145,16 @@ function Block({
           file={file}
           setMore={setMore}
           more={more}
+          tool={tool}
           setTool={setTool}
           setDocSelecionado={setDocSelecionado}
+          setSearchQuery={setSearchQuery}
+          searchQuery={searchQuery}
         />
 
         {/* Middle Area */}
         <div className="middle-area">
-          {tool === 1 ? (
-            <AnalyseDoc
-              modelos={modelos}
-              selectedModel={selectedModel}
-              setSelectedModel={setSelectedModel}
-              etapas={ETAPAS}
-              etapaAtual={etapaAtual}
-              setEtapaAtual={setEtapaAtual}
-              selectedTags={selectedTags}
-              setSelectedTags={setSelectedTags}
-              file={file}
-              setFile={setFile}
-              erroArquivo={erroArquivo}
-              setErroArquivo={setErroArquivo}
-              tremer={tremer}
-              setTremer={setTremer}
-              closeAlert={closeAlert}
-              setCloseAlert={setCloseAlert}
-              more={more}
-              setMore={setMore}
-              isResponse={isResponse}
-              setIsResponse={setIsResponse}
-              documentos={documentos} // <- passa para o filho
-              setDocumentos={setDocumentos}
-              docSelecionado={docSelecionado}
-              setDocSelecionado={setDocSelecionado}
-              onVoltar={onVoltar}
-              triggerShake={triggerShake}
-              isEtapaDisabled={isEtapaDisabled}
-              showAlert={showAlert}
-            />
-          ) : (
-            <DynamicsStaticts
-              selectedModel={selectedModel}
-              selectedTags={selectedTags}
-              etapaAtual={etapaAtual}
-              file={file}
-              documentos={documentos}
-            />
-          )}
+          <>{handleSelectTool(tool)}</>
         </div>
 
         <StatusBar
@@ -127,6 +166,7 @@ function Block({
           triggerShake={triggerShake}
           docSelecionado={docSelecionado}
           setSelectedTags={setSelectedTags}
+          tool={tool}
         />
       </main>
     </>

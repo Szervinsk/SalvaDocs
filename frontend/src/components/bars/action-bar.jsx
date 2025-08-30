@@ -1,4 +1,5 @@
-import { Icons } from "../constants/icons";
+import { Icons } from "../../constants/icons";
+import SearchBar from "./searchbar";
 
 function ActionBar({
   docSelecionado,
@@ -10,11 +11,14 @@ function ActionBar({
   setMore,
   more,
   setTool,
+  tool,
+  searchQuery,
+  setSearchQuery,
 }) {
   return (
     <div className="action-bar">
       <div className="select">
-        <div className="flex-left-right">
+        <div className="flex-left-right" style={{ width: "80%" }}>
           {/* 1 Documento selecionado */}
           {docSelecionado && !selectedModel && (
             <div className="flex-left-right">
@@ -71,10 +75,18 @@ function ActionBar({
           )}
 
           {/* 5️ Caso nada esteja selecionado */}
-          {!docSelecionado && !selectedModel && (
+          {!docSelecionado && !selectedModel && tool !== 1 && (
             <div>
               <h3>Selecione algo</h3>
             </div>
+          )}
+
+          {tool === 1 && (
+            <SearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              placeholder={"Pesquise seus arquivos..."}
+            />
           )}
         </div>
 

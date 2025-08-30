@@ -1,22 +1,23 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { Icons } from "../constants/icons";
-import "../styles/library.css";
-import SearchBar from "../components/searchbar";
+import { Icons } from "../../constants/icons";
+import "../../styles/library.css";
+import SearchBar from "./searchbar";
+import { PASTAS } from "../../constants/constants";
 
 function FoldersAction({
   pastas,
   documentos,
   setDocumentos,
   setDocSelecionado,
-  reduzido,
-  setReduzido,
   setTool,
 }) {
   const [pastasAbertas, setPastasAbertas] = useState({});
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [reduzido, setReduzido] = useState(null);
+  const [placeholder, setPlaceholder] = useState("Buscar pastas...");
   const [modo, setModo] = useState("pastas"); // "pastas" | "modelos"
 
   useEffect(() => {
@@ -27,6 +28,7 @@ function FoldersAction({
           "http://localhost:5000/api/files/documentos"
         );
         setDocumentos(data);
+        console.log(data);
       } catch (error) {
         console.error("Erro ao buscar documentos:", error);
       } finally {
@@ -75,8 +77,8 @@ function FoldersAction({
     >
       {/* Header da Sidebar */}
       <div className="sidebar-header">
-        {!reduzido && <h3>Acessar Pastas</h3>}
-        <Icons.ArrowLeft
+        {!reduzido && <h2>Pastas</h2>}
+        <Icons.BackIn
           size={20}
           className="icon-btn"
           onClick={toggleReducao}
@@ -85,16 +87,21 @@ function FoldersAction({
       </div>
 
       {/* Toggle Pastas/Modelos */}
-      {!reduzido && (
+      {!reduzido ? (
         <div className="mode-toggle">
           <div
             className="toggle-bg"
             style={{
               transform:
-                modo === "modelos" ? "translateX(100%)" : "translateX(0)",
+                modo === "modelos" ? "translateX(96%)" : "translateX(0)",
             }}
           />
-          <label onClick={() => setModo("pastas")}>
+          <label
+            onClick={() => (
+              setModo("pastas"), setPlaceholder("Buscar pastas...")
+            )}
+          >
+            <Icons.Folder size={16} style={{ marginRight: 6 }} />
             <input
               type="radio"
               name="mode"
@@ -105,7 +112,12 @@ function FoldersAction({
             />
             Pastas
           </label>
-          <label onClick={() => setModo("modelos")}>
+          <label
+            onClick={() => (
+              setModo("modelos"), setPlaceholder("Buscar documentos...")
+            )}
+          >
+            <Icons.DocumentText size={16} style={{ marginRight: 6 }} />
             <input
               type="radio"
               name="mode"
@@ -114,14 +126,26 @@ function FoldersAction({
               readOnly
               style={{ display: "none" }}
             />
-            Documentos
+            Docs
           </label>
+        </div>
+      ) : (
+        <div className="mode-toggle reduzido-toggle">
+          {modo === "pastas" ? (
+            <Icons.Folder size={18} />
+          ) : (
+            <Icons.DocumentText size={18} />
+          )}
         </div>
       )}
 
       {/* Search */}
       {!reduzido ? (
-        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          placeholder={placeholder}
+        />
       ) : (
         <div className="search-container">
           <Icons.Search
@@ -190,18 +214,18 @@ function FoldersAction({
                               key={doc.id}
                               className="document-item"
                               onClick={() => (
-                                setTool(1), setDocSelecionado(doc)
+                                setTool(6), setDocSelecionado(doc)
                               )}
                               whileHover={{ x: 4 }}
                             >
                               <Icons.DocumentText size={18} className="icons" />
                               <span>
-                                {(doc.templateName || doc.name).length > 25
-                                  ? (doc.templateName || doc.name).slice(
+                                {(doc.resolvedTemplate || doc.name).length > 25
+                                  ? (doc.resolvedTemplate || doc.name).slice(
                                       0,
                                       25
                                     ) + "..."
-                                  : doc.templateName || doc.name}
+                                  : doc.resolvedTemplate || doc.name}
                               </span>
                             </motion.div>
                           ))
@@ -215,18 +239,36 @@ function FoldersAction({
                 <motion.div
                   key={doc.id}
                   className="document-item"
-                  onClick={() => (setTool(1), setDocSelecionado(doc))}
+                  onClick={() => (setTool(6), setDocSelecionado(doc))}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   whileHover={{ x: 4 }}
                 >
-                  <Icons.DocumentText size={18} className="icons" />
-                  <span>
-                    {(doc.templateName || doc.name).length > 25
-                      ? (doc.templateName || doc.name).slice(0, 25) + "..."
-                      : doc.templateName || doc.name}
-                  </span>
+                  <div className="documents-scroll">
+                    <div className="documents-content">
+                      <>
+                        {() => {
+                          const IconComponent =
+                            Icons[pastasFiltradas[doc.pastaId].model];
+                          return IconComponent ? (
+                            <IconComponent
+                              size={50}
+                              className="icons-pasta-dashboard"
+                            />
+                          ) : null;
+                        }}
+                        <h3>
+                          {(doc.templateName || doc.name).length > 25
+                            ? (doc.templateName || doc.name).slice(0, 25) +
+                              "..."
+                            : doc.templateName || doc.name}
+                        </h3>
+                      </>
+
+                      <Icons.ArrowRight size={18} className="icons" />
+                    </div>
+                  </div>
                 </motion.div>
               ))}
         </AnimatePresence>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Icons } from "../constants/icons";
-import { ETAPAS } from "../constants/constants";
+import { Icons } from "../../constants/icons";
+import { ETAPAS } from "../../constants/constants";
 
 function StatusBar({
   selectedModel,
@@ -11,6 +11,7 @@ function StatusBar({
   triggerShake,
   docSelecionado,
   setSelectedTags,
+  tool,
 }) {
   const handleProxima = () => {
     if (etapaAtual === 2 && !file) {
@@ -41,6 +42,7 @@ function StatusBar({
   }, [selectedModel, etapaAtual, file]); // 🔹 dependência correta
 
   if (docSelecionado) return null;
+  if (tool === 1 || tool === 4 || tool === 5) return null;
 
   return (
     <div className="status-bar">

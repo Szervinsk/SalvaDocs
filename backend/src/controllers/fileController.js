@@ -1,10 +1,12 @@
+// Importações necessárias
 import fs from "fs";
 import path from "path";
 import models from "../models/index.js";
 import { extractDataFromFile } from "../services/extractService.js";
 import { askGemini } from "../services/geminiService.js";
 
-// Função auxiliar para substituir {tags} no template
+
+// 🔹 Substitui {tags} em um template
 function replaceTemplateTags(templateName, tags = []) {
   if (!templateName) return null;
 
@@ -16,12 +18,11 @@ function replaceTemplateTags(templateName, tags = []) {
   });
 }
 
-// Função para gerar um único prompt para todas as tags de IA
+
+// 🔹 Gera um único prompt para todas as tags IA
 function generatePromptForMultipleTags(tags, text) {
-  // Filtra apenas as tags de IA para processamento
   const iaTags = tags.filter((t) => t.type === "ia");
 
-  // Cria a lista de instruções de prompt para cada tag de IA
   const promptsList = iaTags
     .map((t) => `"${t.name}": ${t.prompt}`)
     .join("\n");
@@ -39,7 +40,8 @@ Responda EXCLUSIVAMENTE com o objeto JSON. Não adicione qualquer outro texto, e
 `;
 }
 
-// Controller principal para upload e análise de arquivos
+
+// 🔹 Controller principal: upload + análise
 export const uploadFileAndAnalyze = async (req, res) => {
   try {
     if (!req.file)
@@ -47,6 +49,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
 
     const { tags: rawTags, model, templateName } = req.body;
 
+    // 🔎 Converte tags enviadas pelo front
     let parsedTags = [];
     if (rawTags) {
       try {
@@ -59,11 +62,12 @@ export const uploadFileAndAnalyze = async (req, res) => {
 
     const filePath = path.resolve(req.file.path);
 
-    // Extrai o texto do arquivo e os dados das tags regex
+    // 🔎 Extrai texto + regex
     const extractedData =
       (await extractDataFromFile(filePath, parsedTags)) || {};
     const textContent = extractedData.text || "";
 
+    // 🔎 Cria documento
     const document = await models.Document.create({
       name: req.file.originalname,
       path: filePath,
@@ -73,14 +77,14 @@ export const uploadFileAndAnalyze = async (req, res) => {
 
     const allTags = [];
     const existingNames = new Set();
-    const iaTags = (extractedData.tags || []).filter((t) => t.type === "ia");
-    const regexTags = (extractedData.tags || []).filter(
-      (t) => t.type === "regex"
-    );
+
+    // 🔎 IA e Regex definidos pelo front
+    const iaTags = parsedTags.filter((t) => t.type === "ia");
+    const regexTags = parsedTags.filter((t) => t.type === "regex");
 
     let geminiResults = {};
 
-    // Processa todas as tags de IA com uma única chamada ao Gemini
+    // 🔎 Chamada única ao Gemini para todas as tags IA
     if (iaTags.length > 0) {
       try {
         const prompt = generatePromptForMultipleTags(parsedTags, textContent);
@@ -95,34 +99,35 @@ export const uploadFileAndAnalyze = async (req, res) => {
         geminiResults = JSON.parse(cleanJsonString);
       } catch (err) {
         console.error("Erro Gemini:", err);
-        // Em caso de erro, define um valor padrão para todas as tags de IA
-        iaTags.forEach((tag) => (geminiResults[tag.name] = "Erro IA")); // 
+        iaTags.forEach((tag) => (geminiResults[tag.name] = "Erro IA"));
       }
     }
 
-    // Constrói a lista final de tags
-    // Adiciona as tags de IA com os resultados obtidos
+    // 🔹 Adiciona tags IA
     for (const tag of iaTags) {
-      const tagName = tag.name || "Desconhecido"; // Alterado de tag.content para tag.name
+      const tagName = tag.name || "Desconhecido";
       if (!existingNames.has(tagName)) {
         allTags.push({
           name: tagName,
-          value: geminiResults[tagName] || "Não encontrado",
+          value: geminiResults[tagName] || null,
           type: "ia",
-          icon: tag.icon,
+          icon: tag.icon || "default",
           documentId: document.id,
         });
         existingNames.add(tagName);
       }
     }
 
-    // Adiciona as tags de regex com os resultados obtidos anteriormente
+    // 🔹 Adiciona tags Regex
     for (const tag of regexTags) {
-      const tagName = tag.name || "Desconhecido"; // Alterado de tag.content para tag.name
+      const extracted = (extractedData.tags || []).find(
+        (t) => t.name === tag.name
+      );
+      const tagName = tag.name || "Desconhecido";
       if (!existingNames.has(tagName)) {
         allTags.push({
           name: tagName,
-          value: tag.value || null,
+          value: extracted?.value || null,
           type: "regex",
           icon: tag.icon || "default",
           documentId: document.id,
@@ -131,12 +136,12 @@ export const uploadFileAndAnalyze = async (req, res) => {
       }
     }
 
-    // Salva tags no banco
+    // 🔎 Salva tags no banco
     if (allTags.length > 0) {
       await models.Tag.bulkCreate(allTags);
     }
 
-    // Busca documento com tags já incluídas
+    // 🔎 Busca documento já com tags
     const documentoComTags = await models.Document.findByPk(document.id, {
       include: [
         {
@@ -148,11 +153,10 @@ export const uploadFileAndAnalyze = async (req, res) => {
     });
 
     const docJson = documentoComTags.toJSON();
-    const resolvedTemplate = replaceTemplateTags(
+    docJson.resolvedTemplate = replaceTemplateTags(
       docJson.templateName,
       docJson.tags
     );
-    docJson.resolvedTemplate = resolvedTemplate;
 
     res.json({
       message: "Arquivo salvo e analisado",
@@ -164,6 +168,8 @@ export const uploadFileAndAnalyze = async (req, res) => {
   }
 };
 
+
+// 🔹 Retorna todos os documentos
 export const getAllDocuments = async (req, res) => {
   try {
     const documentos = await models.Document.findAll({
@@ -176,7 +182,6 @@ export const getAllDocuments = async (req, res) => {
       ],
     });
 
-    // ✅ Resolve template em cada documento antes de retornar
     const documentosComTemplate = documentos.map((doc) => {
       const docJson = doc.toJSON();
       return {
@@ -195,6 +200,8 @@ export const getAllDocuments = async (req, res) => {
   }
 };
 
+
+// 🔹 Deleta documento + arquivo físico
 export const DeleteDoc = async (req, res) => {
   try {
     const documentId = req.params.id;
@@ -204,7 +211,7 @@ export const DeleteDoc = async (req, res) => {
       return res.status(404).json({ error: "Documento não encontrado" });
     }
 
-    // 🔎 Remove arquivo físico (se existir)
+    // 🔎 Remove arquivo físico
     if (document.path) {
       try {
         const filePath = path.resolve(document.path);
@@ -217,7 +224,7 @@ export const DeleteDoc = async (req, res) => {
       }
     }
 
-    // 🔎 Remove tags e documento
+    // 🔎 Remove tags + documento
     await models.Tag.destroy({ where: { documentId } });
     await document.destroy();
 

@@ -19,23 +19,24 @@ export const ALERTS = [
 ];
 
 export const OPEN_OPTIONS = [
-  { id: 1, name: "Voltar", icon: "DoorOpen" },
+  { id: 1, name: "Voltar", icon: "BackInSeta" },
   { id: 2, name: "Compartilhar", icon: "Send" },
   { id: 3, name: "Baixar", icon: "Download" },
   { id: 4, name: "Excluir", icon: "Delete" },
 ];
 
 export const TOOLS = [
-  { id: 1, name: "Analisar Documentos", icon: "ScannerDocument" },
-  { id: 2, name: "Editar Modelos", icon: "Model" },
-  { id: 3, name: "Configurações", icon: "Adjustments" },
-  { id: 4, name: "Sua Conta", icon: "User" },
+  { id: 1, name: "Home", icon: "Home" },
+  { id: 2, name: "Analisar Documentos", icon: "ScannerDocument" },
+  { id: 3, name: "Editar Modelos", icon: "Model" },
+  { id: 4, name: "Configurações", icon: "Adjustments" },
+  { id: 5, name: "Sua Conta", icon: "User" },
 ];
 // Pastas iniciais
 export const PASTAS = [
-  { id: 1, name: "Despacho" },
-  { id: 2, name: "Programas" },
-  { id: 3, name: "Parecer" },
+  { id: 1, name: "Despacho", color: "#f44336" },   // vermelho
+  { id: 2, name: "Programas", color: "#2196f3" },  // azul
+  { id: 3, name: "Parecer", color: "#4caf50" },    // verde
 ];
 
 // Tags gerais (despacho)
@@ -208,19 +209,22 @@ export const BLOCOS = [
   {
     key: "universais",
     title: "Tags Universais",
+    info: "Tratam-se das tags que podem ser aplicadas a qualquer tipo de documento.",
     data: TAGS_UNIVERSAIS,
     color: "#4CAF50",
   }, // verde
-  { key: "ia", title: "Tags de IA", data: TAGS_IA, color: "#9C27B0" }, // roxo
+  { key: "ia", title: "Tags de IA", info: "Tags que utilizam inteligência artificial.", data: TAGS_IA, color: "#9C27B0" }, // roxo
   {
     key: "programa",
     title: "Tags de Programa",
+    info: "Tags relacionadas a programas de integridade.",
     data: TAGS_PROGRAMA,
     color: "#2196F3",
   }, // azul
   {
     key: "parecer",
     title: "Tags de Parecer",
+    info: "Tags que são utilizadas em pareceres / revisões de normativos.",
     data: TAGS_PARECER,
     color: "#FF9800",
   }, // laranja

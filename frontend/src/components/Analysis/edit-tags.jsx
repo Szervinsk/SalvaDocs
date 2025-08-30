@@ -1,4 +1,4 @@
-import SearchBar from "../searchbar";
+import SearchBar from "../bars/searchbar";
 import { BLOCOS, TAGS } from "../../constants/constants";
 import { Icons } from "../../constants/icons";
 import { useState, useEffect } from "react";
@@ -12,6 +12,7 @@ function EditTags({
   setSelectedTags,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [needTagInfo, setNeedTagInfo] = useState(false);
   const [openBlocks, setOpenBlocks] = useState(
     BLOCOS.reduce((acc, bloco) => {
       acc[bloco.key] = true; // todos começam abertos
@@ -66,15 +67,19 @@ function EditTags({
       {/* DESCRIÇÃO */}
       <p className="edit-p">
         Você selecionou o modelo <b>{selectedModel?.name}</b>. Isso significa
-        que já existem tags pré-configuradas para esse tipo de documento. Mesmo
-        assim, você pode ajustar os critérios de captura conforme desejar antes
-        de iniciar o processo.
+        que já existem <b>tags pré-configuradas</b> para esse tipo de documento.
+        Mesmo assim, você pode ajustar os critérios de captura conforme desejar
+        antes de iniciar o processo.
       </p>
 
-      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        placeholder={"Buscar tags..."}
+      />
 
       {/* BLOCOS DE TAGS */}
-      {blocos.map(({ key, title, data, color }) => {
+      {blocos.map(({ key, title, data, color, info }) => {
         const filtradas = filterTags(data);
 
         return (
@@ -101,6 +106,23 @@ function EditTags({
                   }{" "}
                   / {data.length}
                 </h4>
+
+                {/* Container para o ícone e a info */}
+                <div className="icon-info-wrapper">
+                  <Icons.CircleQuestion
+                    size={15}
+                    className="icons"
+                    style={{ color: "var(--white)" }}
+                    onMouseOver={() => setNeedTagInfo(key)}
+                    onMouseOut={() => setNeedTagInfo(false)}
+                  />
+                  {needTagInfo === key && (
+                    <div className="tags-info" style={{borderColor: color}}>
+                      <b>{info}</b>
+                    </div>
+                  )}
+                </div>
+
                 {openBlocks[key] ? <Icons.ArrowUp /> : <Icons.ArrowDown />}
               </div>
             </div>

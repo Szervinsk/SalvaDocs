@@ -27,7 +27,7 @@ function AlterNameWithTags({ selectedTags, selectedModel, setFileName }) {
           placeholder="Digite o nome ou clique nas tags..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          style={{ marginBottom: "10px" }}
+          style={{ marginBottom: "10px", width: "100%" }}
         />
 
         <div className="tags-list">
