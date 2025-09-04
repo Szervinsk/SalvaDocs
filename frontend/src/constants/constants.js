@@ -70,18 +70,17 @@ export const TAGS_UNIVERSAIS = [
     type: "regex",
     regex: "(?:Para|À)\\s*[:\\-]?\\s*(.+?)[,;\\n]", // baseado em extrair_despacho
   },
-  {
-    id: 5,
-    content: "Documentos referenciados",
-    icon: "DocumentText",
-    type: "regex",
-    regex:
-      "\\b(Lei|Portaria CGDF|Portaria|Decreto|Resolução|Decisão|Relatório)\\b", // baseado em extrair_dados
-  },
 ];
 
 // Tags que dependem de interpretação do texto (IA)
 export const TAGS_IA = [
+  {
+    id: 5,
+    content: "Documentos referenciados",
+    icon: "DocumentText",
+    type: "ia",
+    prompt: "Liste os documentos referenciados neste texto em um formato de lista.",
+  },
   {
     id: 6,
     content: "Resumo",

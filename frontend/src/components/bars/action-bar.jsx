@@ -97,7 +97,7 @@ function ActionBar({
           >
             <Icons.Add size={20} />
           </button>
-          <button className="action-btns" onClick={() => setMore(!more)}>
+          <button className="action-btns" onClick={() => (setMore(!more) , alert("abrir o more"))}>
             <Icons.MdOutlineMoreHoriz size={20} />
           </button>
         </div>

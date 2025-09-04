@@ -55,7 +55,7 @@ function OpenDocs({
         break;
       case 2: // Compartilhar
         console.log("Compartilhar doc:", docSelecionado);
-        alert("Compartilhar ainda não implementado 🚀");
+        alert("Compartilhar ainda não implementado");
         break;
       case 3: // Baixar
         console.log("Baixar doc:", docSelecionado.path);
@@ -129,23 +129,22 @@ function OpenDocs({
             >
               <div className="flex-left-right">
                 <Icons.Calendar size={15} className="icons2" />
-                <h3>{docSelecionado.uploadedAt.split("T")[0]}</h3>
+                {tags
+                  .filter((tag) => tag.name === "Data")
+                  .map((tag) => (
+                    <div
+                      className="flex-left-right"
+                      key={tag.id}
+                      style={{ width: "fit-content" }}
+                    >
+                      <h3 className="copy">{tag.value}</h3>
+                    </div>
+                  ))}
               </div>
               <div className="flex-left-right">
                 <Icons.Model size={15} className="icons2" />
                 <h3>{model}</h3>
               </div>
-            </div>
-
-            <div className="eachTag">
-              {tags
-                .filter((tag) => tag.name === "Data")
-                .map((tag) => (
-                  <div className="flex-left-right" key={tag.id} style={{ width: "fit-content" }}>
-                    <h3 className="tagName">{tag.name}:</h3>
-                    <h3 className="copy">{tag.value}</h3>
-                  </div>
-                ))}
             </div>
 
             {/* titulo dessa porra */}
@@ -177,17 +176,17 @@ function OpenDocs({
                 )
                 .map((tag) => (
                   <>
-                  <b className="tagName">{tag.name}: </b>
-                  <p className="copy" key={tag.id}>
-                    {tag.value}
-                  </p>
+                    <b className="tagName">{tag.name}: </b>
+                    <p className="copy" key={tag.id}>
+                      {tag.value}
+                    </p>
                   </>
                 ))}
             </p>
 
             <div className="files-area">
               <div className="flex-left-right spc-bet">
-                <h2>Links</h2>
+                <h2>Documentos referenciados</h2>
 
                 {!links ? (
                   <Icons.ArrowDown
@@ -205,8 +204,26 @@ function OpenDocs({
               </div>
 
               {links && (
-                <div className="file">
-                  <h3>{docSelecionado.name}</h3>
+                <div className="file" style={{map: "10px"}}>
+                  {tags
+                    .filter((tag) => tag.name === "Documentos referenciados")
+                    .map((tag) => {
+                      let docs = [];
+
+                      try {
+                        docs = JSON.parse(tag.value); // transforma em array de novo
+                      } catch (e) {
+                        docs = [tag.value]; // fallback caso não seja JSON
+                      }
+
+                      return docs.map((doc, idx) => (
+                        
+                        <div className="flex-left-right" style={{marginBlock: "5px"}}>
+                          <Icons.DocumentText size={20} className="icons2" />
+                          <h3 key={`${tag.id}-${idx}`}>{doc}</h3>
+                        </div>
+                      ));
+                    })}
                 </div>
               )}
             </div>
@@ -290,7 +307,8 @@ function OpenDocs({
                         (tag) =>
                           tag.name !== "Título" &&
                           tag.name !== "Resumo" &&
-                          tag.name !== "Resumo Parecer"
+                          tag.name !== "Resumo Parecer" &&
+                          tag.name !== "Documentos referenciados"
                       )
                       .map((tag) => {
                         const Icon = Icons[tag.icon];

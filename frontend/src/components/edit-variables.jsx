@@ -19,7 +19,6 @@ function EditVariables({
   setDocumentos,
   tags,
 }) {
-  const [moreTags, setMoreTags] = useState(false);
   const [sendFiles, setSendFiles] = useState(false);
   const [alterName, setAlterName] = useState(false);
   const [limitador, setLimitador] = useState(false);

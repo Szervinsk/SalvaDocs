@@ -11,6 +11,7 @@ import Configurations from "./tools/configurations";
 import Account from "./tools/account";
 import OpenDocs from "./open-docs";
 
+import More from "./more";
 import StatusBar from "./bars/status-bar";
 
 function Block({
@@ -24,6 +25,7 @@ function Block({
   tool,
   setTool,
   onVoltar,
+  user,
 }) {
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -59,7 +61,7 @@ function Block({
   const handleSelectTool = (id) => {
     switch (id) {
       case 1:
-        return <Home documentos={documentos} />;
+        return <Home documentos={documentos} modelos={modelos} user={user}/>;
       case 2:
         return (
           <AnalyseDoc
@@ -133,6 +135,10 @@ function Block({
           {alert.message}
           <Icons.Close size={20} onClick={() => setAlert(null)} />
         </div>
+      )}
+
+      {more && (
+        <More more={more} docSelecionado={docSelecionado} setMore={setMore} />
       )}
 
       <main className="switch-area">

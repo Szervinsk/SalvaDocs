@@ -5,7 +5,6 @@ import models from "../models/index.js";
 import { extractDataFromFile } from "../services/extractService.js";
 import { askGemini } from "../services/geminiService.js";
 
-
 // 🔹 Substitui {tags} em um template
 function replaceTemplateTags(templateName, tags = []) {
   if (!templateName) return null;
@@ -18,14 +17,11 @@ function replaceTemplateTags(templateName, tags = []) {
   });
 }
 
-
 // 🔹 Gera um único prompt para todas as tags IA
 function generatePromptForMultipleTags(tags, text) {
   const iaTags = tags.filter((t) => t.type === "ia");
 
-  const promptsList = iaTags
-    .map((t) => `"${t.name}": ${t.prompt}`)
-    .join("\n");
+  const promptsList = iaTags.map((t) => `"${t.name}": ${t.prompt}`).join("\n");
 
   return `
 Você é um assistente de extração de dados. Extraia as seguintes informações do texto e formate-as em um único objeto JSON.
@@ -39,7 +35,6 @@ ${promptsList}
 Responda EXCLUSIVAMENTE com o objeto JSON. Não adicione qualquer outro texto, explicações ou formatação extra, como blocos de código markdown.
 `;
 }
-
 
 // 🔹 Controller principal: upload + análise
 export const uploadFileAndAnalyze = async (req, res) => {
@@ -106,14 +101,23 @@ export const uploadFileAndAnalyze = async (req, res) => {
     // 🔹 Adiciona tags IA
     for (const tag of iaTags) {
       const tagName = tag.name || "Desconhecido";
+
       if (!existingNames.has(tagName)) {
+        let tagValue = geminiResults[tagName] ?? null;
+
+        // Se for objeto ou array → converte em string JSON
+        if (tagValue && typeof tagValue === "object") {
+          tagValue = JSON.stringify(tagValue, null, 2);
+        }
+
         allTags.push({
           name: tagName,
-          value: geminiResults[tagName] || null,
+          value: tagValue,
           type: "ia",
           icon: tag.icon || "default",
-          documentId: document.id,
+          documentId: document.id, // agora sempre vai vincular ao documento
         });
+
         existingNames.add(tagName);
       }
     }
@@ -168,7 +172,6 @@ export const uploadFileAndAnalyze = async (req, res) => {
   }
 };
 
-
 // 🔹 Retorna todos os documentos
 export const getAllDocuments = async (req, res) => {
   try {
@@ -199,7 +202,6 @@ export const getAllDocuments = async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar documentos" });
   }
 };
-
 
 // 🔹 Deleta documento + arquivo físico
 export const DeleteDoc = async (req, res) => {

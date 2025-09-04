@@ -173,7 +173,8 @@ h4 {
 .middle-area {
   flex: 1;
   display: flex;
-  background-color: var(--deep-wall-color2);
+  /* background-color: var(--deep-wall-color2); */
+  background-color: var(--white);
   border-radius: 0 0 10px 10px;
   border-top: none;
   width: 100%;

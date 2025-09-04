@@ -1,4 +1,5 @@
 /* Home Page Styles */
+/* Home Page Styles */
 
 .home {
   padding: 20px;
@@ -6,8 +7,21 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-
   box-sizing: border-box;
+}
+
+.account-img {
+  background-color: var(--primary-color-grey2);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .welcome h2 {
@@ -21,12 +35,100 @@
   color: var(--primary-color-grey2);
 }
 
-.div-qtd-docs {
+.docs-container {
+  margin-block: 10px;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  list-style: none;
-  padding: 0;
+  justify-content: flex-start;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.data-content {
+  background-color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  width: 300px;
+  height: 180px;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin-block: 10px;
+  justify-content: space-between;
+}
+
+.home-type {
+  border-bottom: 2px solid var(--border-color);
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.areas {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  gap: 15px;
+}
+
+.docs-length {
+  font-size: 26px;
+  text-align: left;
+  margin: 0;
+}
+
+.column {
+  width: 24px;
+  border-radius: 4px;
+  transition: height 0.3s ease-in-out;
+}
+
+.column-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin-inline: 4px;
+}
+
+.column-area h4 {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--primary-color-grey2);
+}
+
+.grafico-area {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+}
+
+.circledata {
+  border-radius: 50%;
+  border: 12px solid var(--border-color);
+  background: var(--white);
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--primary-color-grey2);
 }
 
 .pasta-dashboard {
@@ -95,7 +197,7 @@
 }
 
 .list-documents {
-    margin-top: 20px;
-    width: 100%;
-    height: 200px;
+  margin-top: 20px;
+  width: 100%;
+  height: 200px;
 }
