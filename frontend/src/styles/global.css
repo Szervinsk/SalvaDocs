@@ -10,10 +10,17 @@
   --primary-color-red: rgb(255, 100, 100);
   --check-container: #597dff50;
   --white: #fff;
+  --open-docs-width: 55%;
 }
 
 * {
   box-sizing: border-box;
+}
+
+.italic {
+  font-style: italic;
+  align-content: center;
+  color: var(--primary-color-grey2);
 }
 
 .controle {
@@ -23,6 +30,14 @@
 .delete {
   color: var(--primary-color-red);
   margin: 0 10px;
+}
+
+.blur {
+  background-color: var(--primary-color-grey);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
 }
 
 html,
@@ -81,6 +96,17 @@ h4 {
   margin-inline: 5px;
 }
 
+.icons-r {
+  color: var(--primary-color-grey);
+  margin: 0;
+  margin-right: 5px;
+}
+.icons-l {
+  color: var(--primary-color-grey);
+  margin: 0;
+  margin-left: 5px;
+}
+
 .icons2 {
   color: var(--white);
   background-color: var(--second-color-blue);
@@ -91,7 +117,7 @@ h4 {
   margin: 0 10px;
 }
 
-.welcome {
+.welcome , header {
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -169,19 +195,76 @@ h4 {
   transform: translateY(1px);
 }
 
-/* Área intermediária dividida em 2 colunas */
+/* Middle area é container pai */
 .middle-area {
-  flex: 1;
+  position: relative;      /* necessário para o wrapper absoluto */
   display: flex;
-  /* background-color: var(--deep-wall-color2); */
-  background-color: var(--white);
-  border-radius: 0 0 10px 10px;
-  border-top: none;
   width: 100%;
   height: 100%;
-  position: relative;
-  box-sizing: border-box; /* ← evita que o padding expanda além de 100% */
+  overflow: hidden;        /* evita scroll duplo durante animação */
+  box-sizing: border-box;
 }
+
+/* Conteúdo principal que será reduzido */
+.main-content {
+  width: 100%;
+  height: 100%;
+  min-width: 0;            /* ESSENCIAL para permitir que o conteúdo encolha em flex containers */
+  transition: width 0.35s ease, margin-right 0.35s ease;
+  box-sizing: border-box;
+  /* opcional: controle de overflow para evitar conteúdo “vazar” */
+  overflow: auto;
+}
+
+.analyse-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* Wrapper do OpenDocs (responsável pela animação) */
+.open-docs-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: var(--open-docs-width);
+  transform: translateX(100%);  /* escondido */
+  transition: transform 0.35s ease;
+  z-index: 20;
+  box-shadow: -8px 0 16px rgba(0,0,0,0.06);
+}
+
+.middle-area.with-open-docs .open-docs-wrapper {
+  transform: translateX(0); /* visível */
+}
+
+
+.middle-area.with-open-docs .main-content {
+  width: calc(100% - var(--open-docs-width));
+}
+
+/* quando expandir */
+.middle-area.expanded .open-docs-wrapper {
+  width: 100% !important;
+  transform: translateX(0);
+}
+
+.middle-area.expanded .main-content {
+  display: none; /* some com o conteúdo pra deixar só o OpenDocs */
+  transition: all 0.3 ease;
+}
+
+
+/* Ajustes internos do OpenDocs para preencher wrapper (no CSS do OpenDocs) */
+.lateral-bar, .open-docs-container {
+  /* garantir que o componente interno ocupe 100% do wrapper */
+  width: 100% !important;
+  height: 100%;
+  position: relative; /* não precisa ser absolute, o wrapper já posiciona */
+  box-sizing: border-box;
+}
+
 
 .alert {
   background-color: var(--white);
@@ -387,10 +470,16 @@ content que vai conter as janelas das tools */
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
   justify-content: center;
   gap: 15px;
   padding: 20px;
   background-color: var(--deep-wall-color2);
+}
+
+.model-list {
+  display: flex;
+  flex-direction: row;
 }
 
 /* Botões dos modelos */

@@ -16,8 +16,12 @@ function EditVariables({
   erroArquivo,
   setIsResponse,
   setDocSelecionado,
+  setEtapaAtual,
   setDocumentos,
+  user,
   tags,
+  setTags,
+  setTool
 }) {
   const [sendFiles, setSendFiles] = useState(false);
   const [alterName, setAlterName] = useState(false);
@@ -42,6 +46,8 @@ function EditVariables({
         selectedModel={selectedModel}
         selectedTags={selectedTags || []}
         setSelectedTags={setSelectedTags}
+        setTags={setTags}
+        tags={tags}
       />
     );
   }
@@ -74,15 +80,22 @@ function EditVariables({
       <EditAnalise
         etapas={etapas}
         etapaAtual={etapaAtual}
-        onClose={onClose}
         selectedTags={selectedTags}
         file={file}
         tags={tags}
-        setIsResponse={setIsResponse}
+        onClose={() => {
+          setIsResponse(false);
+          setDocSelecionado(null);
+          setEtapaAtual(1);
+        }}
+        user={user}
         setDocSelecionado={setDocSelecionado}
+        setIsResponse={setIsResponse}
         setDocumentos={setDocumentos}
         selectedModel={selectedModel}
+        setEtapaAtual={setEtapaAtual}
         fileName={fileName}
+        setTool={setTool}
       />
     );
   }

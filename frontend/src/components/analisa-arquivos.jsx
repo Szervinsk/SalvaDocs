@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icons } from "../constants/icons";
-import { TAGS } from "../constants/constants";
+import axios from "axios";
 
 import EditVariables from "./edit-variables";
 import EditEtapas from "./edit-etapas";
-import OpenDocs from "./open-docs";
 
 function AnalisarArquivos({
-  modelos,
+  openDocsVisible,
   selectedModel,
+  setModelos,
+  modelos,
   setSelectedModel,
   etapas,
   etapaAtual,
-  setEtapaAtual, // agora é o goToEtapa
+  setEtapaAtual,
   selectedTags,
   setSelectedTags,
   file,
@@ -25,51 +26,41 @@ function AnalisarArquivos({
   closeAlert,
   setCloseAlert,
   setDocSelecionado,
-  docSelecionado,
-  onVoltar,
+  user,
   setDocumentos,
   setIsResponse,
-  isResponse,
-  showAlert,
+  setTool,
+  tags,
+  setTags
 }) {
-  const handleCloseModal = () => {
-    setSelectedModel(null);
-  }; // fechar content pelo x
+  const handleCloseModal = () => setSelectedModel(null);
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/models/")
+      .then((res) => {
+        console.log(res.data);
+        setModelos(res.data);
+      })
+      .catch((err) => console.error("Erro ao buscar modelos:", err));
+  }, []); 
+
+
 
   const defaultMessage =
     "Use o modelo Despachos para análise automatizada de documentos.";
-
-  const [text, setText] = useState(defaultMessage); // texto para explicar os modelos
+  const [text, setText] = useState(defaultMessage);
 
   const handleModelText = (model) => {
-    setText(
-      `Use o modelo ${model.name} para análise automatizada de documentos.`
-    );
+    setText(`Use o modelo ${model.name} para análise automatizada de documentos.`);
   };
 
-  // Se um modelo foi selecionado, exibe o modal de edição
-  if (docSelecionado || isResponse) {
+  if (selectedModel !== null) {
     return (
-      <OpenDocs
-        onClose={() => (
-          setIsResponse(false), setDocSelecionado(null), setEtapaAtual(1)
-        )}
-        docSelecionado={docSelecionado}
-        tags={docSelecionado?.tags ?? []}
-        onVoltar={onVoltar}
-        setDocSelecionado={setDocSelecionado}
-        setDocumentos={setDocumentos}
-        setSelectedModel={setSelectedModel}
-        showAlert={showAlert}
-        setIsResponse={setIsResponse}
-      />
-    );
-  } else if (selectedModel !== null) {
-    return (
-      <div className="flex-left-right , spc-bet">
+      <div className="analyse-content">
         <EditVariables
           etapas={etapas}
           etapaAtual={etapaAtual}
+          setEtapaAtual={setEtapaAtual}
           selectedModel={selectedModel}
           onClose={handleCloseModal}
           selectedTags={selectedTags}
@@ -79,15 +70,17 @@ function AnalisarArquivos({
           erroArquivo={erroArquivo}
           setIsResponse={setIsResponse}
           setDocSelecionado={setDocSelecionado}
-          tags={TAGS}
+          tags={tags}
+          setTags={setTags}
           setDocumentos={setDocumentos}
+          setTool={setTool}
+          user={user}
         />
 
         <EditEtapas
           etapas={etapas}
           etapaAtual={etapaAtual}
           setEtapaAtual={setEtapaAtual}
-          alert={alert}
           tremer={tremer}
           setTremer={setTremer}
           closeAlert={closeAlert}
@@ -98,35 +91,36 @@ function AnalisarArquivos({
         />
       </div>
     );
-  } else {
-    return (
-      <div className="AnalisaArquivos">
-        <Icons.Search size={30} className="icons" />
-        <h2>Analisador de arquivos</h2>
-        <h3>Selecione abaixo o modelo de captura de dados desejado</h3>
-
-        <div className="flex-left-right">
-          {modelos.map((model) => (
-            <div
-              key={model.id}
-              className="Models-btn"
-              onMouseEnter={() => handleModelText(model)}
-              onMouseLeave={() => setText(defaultMessage)}
-              onClick={() => setSelectedModel(model)} // agora salva o objeto inteiro
-            >
-              <Icons.ScannerDocument size={20} className="icons" />
-              <h3>{model.name}</h3>
-            </div>
-          ))}
-        </div>
-
-        <div className="Models-text">
-          <Icons.Lamp size={20} className="icons" />
-          <p>{text}</p>
-        </div>
-      </div>
-    );
   }
+
+  return (
+    <div className="AnalisaArquivos">
+      <Icons.Search size={30} className="icons" />
+      <h2>Analisador de arquivos</h2>
+      <h3>Selecione abaixo o modelo de captura de dados desejado</h3>
+
+      <div className="model-list" style={{ flexDirection: !openDocsVisible ? "row" : "column" }}>
+        {modelos.map((model) => (
+          <div
+            key={model.id}
+            className="Models-btn"
+            onMouseEnter={() => handleModelText(model)}
+            onMouseLeave={() => setText(defaultMessage)}
+            onClick={() => setSelectedModel(model)}
+          >
+            <Icons.ScannerDocument size={20} className="icons" />
+            <h3>{model.name}</h3>
+          </div>
+        ))}
+      </div>
+
+      <div className="Models-text">
+        <Icons.Lamp size={20} className="icons" />
+        <p>{text}</p>
+      </div>
+    </div>
+  );
 }
+
 
 export default AnalisarArquivos;

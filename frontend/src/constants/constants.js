@@ -18,13 +18,6 @@ export const ALERTS = [
   { id: 3, type: "warning", message: "Atenção: verifique os dados inseridos." },
 ];
 
-export const OPEN_OPTIONS = [
-  { id: 1, name: "Voltar", icon: "BackInSeta" },
-  { id: 2, name: "Compartilhar", icon: "Send" },
-  { id: 3, name: "Baixar", icon: "Download" },
-  { id: 4, name: "Excluir", icon: "Delete" },
-];
-
 export const TOOLS = [
   { id: 1, name: "Home", icon: "Home" },
   { id: 2, name: "Analisar Documentos", icon: "ScannerDocument" },
@@ -35,7 +28,7 @@ export const TOOLS = [
 // Pastas iniciais
 export const PASTAS = [
   { id: 1, name: "Despacho", color: "#f44336" },   // vermelho
-  { id: 2, name: "Programas", color: "#2196f3" },  // azul
+  { id: 2, name: "Programa", color: "#2196f3" },  // azul
   { id: 3, name: "Parecer", color: "#4caf50" },    // verde
 ];
 

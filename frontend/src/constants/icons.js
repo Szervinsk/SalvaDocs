@@ -21,7 +21,7 @@ import { HiDownload } from "react-icons/hi";
 import { HiArrowLeftEndOnRectangle } from "react-icons/hi2";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { FaRegFolder } from "react-icons/fa";
-
+import { LuLayoutPanelLeft } from "react-icons/lu";
 import { IoIosArrowDown, IoIosArrowUp, IoIosArrowForward , IoIosArrowBack} from "react-icons/io";
 
 import { FaQuestion } from "react-icons/fa6";
@@ -51,6 +51,7 @@ import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { backIn } from "framer-motion";
+import { FaClockRotateLeft } from "react-icons/fa6";
 
 // centralizar todos os ícones que você usa
 export const Icons = {
@@ -98,6 +99,7 @@ export const Icons = {
   Calendar: LuCalendarDays,
   User: HiOutlineUserCircle,
   Adjustments: HiOutlineAdjustmentsHorizontal,
+  Clock: FaClockRotateLeft,
 
   Model: TbDeviceDesktopAnalytics,
 
@@ -114,6 +116,8 @@ export const Icons = {
   Business: BiSolidBusiness,
   Graphics: SlGraph,
   Home: AiOutlineHome,
+
+  Layout: LuLayoutPanelLeft,
 
   Programas: HiOutlineClipboardDocumentCheck,
   Despacho: HiOutlineClipboardDocument,

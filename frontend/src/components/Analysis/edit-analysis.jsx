@@ -15,18 +15,13 @@ function EditAnalise({
   setDocSelecionado,
   setDocumentos,
   fileName,
+  user,
+  setEtapaAtual,
+  setTool
+
 }) {
   const handleSubmit = async () => {
-    const tagsSelecionadas = (tags?.todasTags || [])
-      .filter((tag) => selectedTags.includes(tag.id))
-      .map((tag) => ({
-        name: tag.content,
-        type: tag.type,
-        icon: tag.icon,
-        regex: tag.regex,
-        prompt: tag.prompt,
-      }));
-
+    
     if (!file) {
       alert("Selecione um arquivo antes de enviar.");
       return;
@@ -34,27 +29,36 @@ function EditAnalise({
 
     try {
       const formData = new FormData();
-      formData.append("tags", JSON.stringify(tagsSelecionadas));
+      formData.append("tags", JSON.stringify(selectedTags)); // tags como string
       formData.append("file", file);
-      formData.append("templateName", fileName);
-      formData.append("model", selectedModel?.name);
+      formData.append("templateName", fileName || "");
+      formData.append("model", selectedModel?.name || "");
+      formData.append("ownerId", user?.id || "");
 
       const response = await axios.post(
         "http://localhost:5000/api/files/upload",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // ou onde vc salva
+          },
+        }
       );
+      console.log("Resposta do servidor:", response.data);
 
       setDocumentos((prev) => [...(prev || []), response.data.document]);
       setDocSelecionado(response.data.document);
-      console.log(
-        "docSelecionado:",
-        JSON.stringify(response.data.document, null, 2)
-      );
       setIsResponse(true);
+      setEtapaAtual(1);
+      setTool(6);
+      console.log("docSelecionado:", response.data.document);
     } catch (error) {
-      console.error("Erro ao enviar:", error.response?.data || error);
-      alert("Erro ao enviar dados.");
+      console.error(
+        "Erro ao enviar:",
+        error.response?.data || error.message || error
+      );
+      alert("Erro ao enviar dados. Verifique o console para mais detalhes.");
     }
   };
 
@@ -87,6 +91,12 @@ function EditAnalise({
       </p>
 
       <div>
+
+        {/* <div>
+        <h2>tags aqui man</h2>
+        <h3>{JSON.stringify(tagsSelecionadas)}</h3>
+      </div> */}
+
         <strong>Tags selecionadas:</strong>
         {selectedTags.map((tag) => (
           <> {tag} </>

@@ -1,6 +1,19 @@
-/* Home Page Styles */
-/* Home Page Styles */
+:root {
+  --font-family: "Open Sans", sans-serif;
+  --border-color: #c1c1c1;
+  --primary-color-grey: #313131;
+  --primary-color-grey2: #848484;
+  --primary-color-greyzin: #e9e7ea;
+  --deep-wall-color: #f2f2f4;
+  --deep-wall-color2: #f5f5f5;
+  --second-color-blue: #597dff;
+  --primary-color-red: rgb(255, 100, 100);
+  --check-container: #597dff50;
+  --white: #fff;
+  --open-docs-width: 55%;
+}
 
+/* Home Page Styles */
 .home {
   padding: 20px;
   width: 100%;
@@ -39,6 +52,7 @@
   margin-block: 10px;
   width: 100%;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: flex-start;
@@ -57,7 +71,7 @@ header {
   background-color: white;
   border: 2px solid var(--border-color);
   border-radius: 16px;
-  width: 300px;
+  width: 400px;
   height: 180px;
   padding: 12px;
   box-sizing: border-box;
@@ -181,23 +195,364 @@ header {
   margin-bottom: 10px;
 }
 
-/* barra lateral */
-.lateral-bar {
-  background: var(--white);
-  border-left: 2px solid var(--border-color);
-  padding: 15px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-  height: 100%;
-}
-
-.lateral-bar-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.list-documents {
-  margin-top: 20px;
+.documents-table {
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.documents-table th,
+.documents-table td {
+  border: 2px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.documents-table td:hover {
+  background-color: var(--deep-wall-color2);
+}
+
+/* Scroll container */
+.scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+/* Container flex dos atalhos */
+.atalhos-container {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+}
+
+/* Card individual de atalho */
+.atalho-card {
+  flex: 0 0 200px;
+  height: 120px;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.atalho-card h3 {
+  margin-top: 10px;
+  font-size: 16px;
+  color: var(--primary-color-grey2);
+  text-align: center;
+}
+
+/* Efeito de hover */
+.atalho-card:hover {
+  background: var(--deep-wall-color2);
+  transform: translateY(-4px);
+  border-color: var(--second-color-blue);
+}
+
+/* Novos estilos para a Home incrementada */
+.home-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 10px 0;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.home-types {
+  display: flex;
+  gap: 5px;
+}
+
+.home-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.home-type:hover {
+  background-color: var(--deep-wall-color2);
+}
+
+.home-type.active {
+  background-color: var(--second-color-blue);
+  color: white;
+}
+
+.home-search {
+  width: 40%;
+}
+
+.recent-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: start;
+}
+
+.recent-doc-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recent-doc-item:hover {
+  background-color: var(--deep-wall-color2);
+}
+
+.recent-doc-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-doc-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.recent-doc-date {
+  font-size: 12px;
+  color: var(--primary-color-grey2);
+}
+
+.no-docs {
+  text-align: center;
+  color: var(--primary-color-grey2);
+  font-style: italic;
+  margin: 20px 0;
+}
+
+.atalho-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.atalho-card p {
+  font-size: 12px;
+  color: var(--primary-color-grey2);
+  margin-top: 5px;
+  text-align: center;
+}
+
+.recent-activity {
+  margin-top: 30px;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid var(--border-color);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.activity-item:hover {
+  background-color: var(--deep-wall-color2);
+}
+
+.activity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--second-color-blue);
+  border-radius: 50%;
+  color: white;
+}
+
+.activity-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-content p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.activity-content span {
+  font-size: 12px;
+  color: var(--primary-color-grey2);
+}
+
+.charts-container {
+  margin-top: 20px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.placeholder-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 200px;
+  background-color: var(--deep-wall-color);
+  border-radius: 8px;
+  color: var(--primary-color-grey2);
+}
+
+.placeholder-chart p {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.list-documents header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.doc-count {
+  font-size: 14px;
+  color: var(--primary-color-grey2);
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 15px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+}
+
+.doc-name {
+  font-weight: 500;
+}
+
+.doc-category {
+  background-color: var(--deep-wall-color);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.tag-count {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: var(--check-container);
+  border-radius: 12px;
+  color: var(--second-color-blue);
+  font-weight: 500;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+  background-color: var(--deep-wall-color2);
+}
+
+.text-area {
+  margin: 0;
+  font-size: 14px;
+  color: var(--primary-color-grey2);
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .docs-container {
+    justify-content: center;
+  }
+  
+  .data-content {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .home-options {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .home-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    padding: 15px;
+  }
+  
+  .atalhos-container {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .atalho-card {
+    flex: 0 0 calc(50% - 10px);
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-types {
+    flex-wrap: wrap;
+  }
+  
+  .atalho-card {
+    flex: 0 0 100%;
+  }
+  
+  .welcome h2 {
+    font-size: 18px;
+  }
+  
+  .docs-length {
+    font-size: 22px;
+  }
 }

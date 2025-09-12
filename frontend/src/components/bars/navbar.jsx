@@ -63,7 +63,6 @@ function Navbar({ setTool, tool, setDocSelecionado }) {
                 className="tool-item"
                 onClick={() => {
                   setTool(tool.id);
-                  setDocSelecionado(null);
                 }}
                 style={
                   selectedTool === tool.id

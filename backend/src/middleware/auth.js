@@ -7,10 +7,11 @@ export const authMiddleware = (req, res, next) => {
 
   if (!token) return res.status(401).json({ error: "Token ausente" });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ error: "Token inválido" });
 
-    req.user = user;
+    // Aqui 'decoded' é o payload do JWT, ex: { id: 123, iat: ..., exp: ... }
+    req.user = { id: decoded.id };
     next();
   });
 };

@@ -1,0 +1,135 @@
+[
+  {
+    "name": "SEI",
+    "icon": "Archive",
+    "type": "regex",
+    "regex": "\\b(?:SEI|NUP)\\s*(\\d{5}-\\d{8}/\\d{4}-\\d{2})",
+    "category": "despacho"
+  },
+  {
+    "name": "Gdoc",
+    "icon": "Archive",
+    "type": "regex",
+    "regex": "\\b(?:GDOC|Doc\\. Id\\.|Doc\\. SEI(?:/GDF)?)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+/\\d{4})",
+    "category": "despacho"
+  },
+  {
+    "name": "Data",
+    "icon": "Calendar",
+    "type": "regex",
+    "regex": "\\b\\d{1,2} de [a-zç]+ de \\d{4}\\b",
+    "category": "despacho"
+  },
+  {
+    "name": "Destinatários",
+    "icon": "Send",
+    "type": "regex",
+    "regex": "(?:Para|À)\\s*[:\\-]?\\s*(.+?)[,;\\n]",
+    "category": "despacho"
+  },
+  {
+    "name": "Documentos referenciados",
+    "icon": "DocumentText",
+    "type": "ia",
+    "prompt": "Liste os documentos referenciados neste texto em um formato de lista.",
+    "category": "despacho"
+  },
+  {
+    "name": "Resumo",
+    "icon": "Summarize",
+    "type": "ia",
+    "prompt": "Resuma os parágrafos em um parágrafo",
+    "category": "despacho"
+  },
+  {
+    "name": "Título",
+    "icon": "Title",
+    "type": "ia",
+    "prompt": "Gere um título contendo o documento principal",
+    "category": "despacho"
+  },
+  {
+    "name": "Resumo Parecer",
+    "icon": "Summarize",
+    "type": "ia",
+    "prompt": "Pegue o 1. Histórico + Conclusão e resuma",
+    "category": "parecer"
+  },
+  {
+    "name": "Número do Parecer",
+    "icon": "Number",
+    "type": "regex",
+    "regex": "PARECER\\s*n[º°]?\\s*(\\d+/\\d+)",
+    "category": "parecer"
+  },
+  {
+    "name": "Norma/Política/Regimento",
+    "icon": "Law",
+    "type": "regex",
+    "regex": "\\b(?:PL|ND|RG)\\.[0-9-]+\\b",
+    "category": "parecer"
+  },
+  {
+    "name": "Nome da Norma/Política/Instrução",
+    "icon": "Law",
+    "type": "ia",
+    "prompt": "Extraia o nome da norma/regimento",
+    "category": "parecer"
+  },
+  {
+    "name": "Assunto",
+    "icon": "Summarize",
+    "type": "regex",
+    "regex": "Assunto\\s*[:\\-]?\\s*(.+?)(?:\\n|$)",
+    "category": "programa"
+  },
+  {
+    "name": "Contrato",
+    "icon": "Hammer",
+    "type": "regex",
+    "regex": "Contrato\\s*n[º°]?\\s*(\\d+/?\\d{0,4})",
+    "category": "programa"
+  },
+  {
+    "name": "ARP",
+    "icon": "Hammer",
+    "type": "regex",
+    "regex": "(?:ARP|Ata de Registro de Preços)\\s*n[º°]?\\s*(\\d+/?\\d{0,4})",
+    "category": "programa"
+  },
+  {
+    "name": "Valor",
+    "icon": "PigMoney",
+    "type": "regex",
+    "regex": "R\\$\\s*[0-9\\.,]+",
+    "category": "programa"
+  },
+  {
+    "name": "Pontuação",
+    "icon": "Score",
+    "type": "regex",
+    "regex": "\\bPontuação\\s*[:\\-]?\\s*(\\d+)\\b",
+    "category": "programa"
+  },
+  {
+    "name": "Empresa",
+    "icon": "Document",
+    "type": "regex",
+    "regex": "empresa\\s+([A-Za-zÀ-ÿ\\s]+?(?:LTDA\\.?|Ltda\\.?|S/A|S\\.A))",
+    "category": "programa"
+  },
+  {
+    "name": "Diretoria",
+    "icon": "People",
+    "type": "regex",
+    "regex": "Diretoria\\s+de\\s+[A-Za-z\\s]+-\\s*(DP|DE|DS|PR|DC)",
+    "category": "programa"
+  },
+  {
+    "name": "Decisão",
+    "icon": "Hammer",
+    "type": "regex",
+    "regex": "Decisão*n[º°]?s*(d+/d{4})",
+    "category": "programa"
+  }
+]

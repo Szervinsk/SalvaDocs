@@ -1,4 +1,4 @@
-// Importações necessárias
+// controllers/fileController.js
 import fs from "fs";
 import path from "path";
 import models from "../models/index.js";
@@ -20,7 +20,6 @@ function replaceTemplateTags(templateName, tags = []) {
 // 🔹 Gera um único prompt para todas as tags IA
 function generatePromptForMultipleTags(tags, text) {
   const iaTags = tags.filter((t) => t.type === "ia");
-
   const promptsList = iaTags.map((t) => `"${t.name}": ${t.prompt}`).join("\n");
 
   return `
@@ -38,118 +37,113 @@ Responda EXCLUSIVAMENTE com o objeto JSON. Não adicione qualquer outro texto, e
 
 // 🔹 Controller principal: upload + análise
 export const uploadFileAndAnalyze = async (req, res) => {
+  console.log("🚀 Controller chamado!");
+  console.log("req.body:", req.body);
+  console.log("req.file:", req.file);
+
   try {
     if (!req.file)
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
 
-    const { tags: rawTags, model, templateName } = req.body;
-
-    // 🔎 Converte tags enviadas pelo front
-    let parsedTags = [];
-    if (rawTags) {
-      try {
-        parsedTags =
-          typeof rawTags === "string" ? JSON.parse(rawTags) : rawTags;
-      } catch (e) {
-        return res.status(400).json({ error: "Formato inválido para tags" });
-      }
+    // 🔹 Converte tags enviadas pelo front (apenas IDs)
+    let parsedTagIds = [];
+    if (req.body.tags) {
+      parsedTagIds =
+        typeof req.body.tags === "string"
+          ? JSON.parse(req.body.tags)
+          : req.body.tags;
     }
 
-    const filePath = path.resolve(req.file.path);
+    // 🔹 Busca as tags completas no banco
+    const selectedTags = await models.TagBase.findAll({
+      where: { id: parsedTagIds },
+    });
 
-    // 🔎 Extrai texto + regex
+    // 🔹 Extrai dados do arquivo
     const extractedData =
-      (await extractDataFromFile(filePath, parsedTags)) || {};
-    const textContent = extractedData.text || "";
+      (await extractDataFromFile(req.file.path, selectedTags)) || {};
 
-    // 🔎 Cria documento
+    // 🔹 Cria o documento
     const document = await models.Document.create({
       name: req.file.originalname,
-      path: filePath,
-      model: model || "Desconhecido",
-      templateName: templateName || null,
+      path: req.file.path,
+      model: req.body.model || "Desconhecido",
+      templateName: req.body.templateName || null,
+      ownerId: req.user?.id || null,
     });
 
     const allTags = [];
     const existingNames = new Set();
 
-    // 🔎 IA e Regex definidos pelo front
-    const iaTags = parsedTags.filter((t) => t.type === "ia");
-    const regexTags = parsedTags.filter((t) => t.type === "regex");
+    // 🔹 Separa IA e Regex
+    const iaTags = selectedTags.filter((t) => t.type === "ia");
+    const regexTags = selectedTags.filter((t) => t.type === "regex");
 
     let geminiResults = {};
 
-    // 🔎 Chamada única ao Gemini para todas as tags IA
+    // 🔹 Processa IA
     if (iaTags.length > 0) {
       try {
-        const prompt = generatePromptForMultipleTags(parsedTags, textContent);
+        const prompt = generatePromptForMultipleTags(
+          iaTags,
+          extractedData.text || ""
+        );
         console.log("Prompt enviado ao Gemini:", prompt);
 
         const geminiResultText = await askGemini(prompt);
-        console.log("Resposta do Gemini:", geminiResultText);
-
-        const cleanJsonString = geminiResultText
-          .replace(/```json|```/g, "")
-          .trim();
-        geminiResults = JSON.parse(cleanJsonString);
+        geminiResults = JSON.parse(
+          geminiResultText.replace(/```json|```/g, "").trim()
+        );
       } catch (err) {
         console.error("Erro Gemini:", err);
         iaTags.forEach((tag) => (geminiResults[tag.name] = "Erro IA"));
       }
-    }
 
-    // 🔹 Adiciona tags IA
-    for (const tag of iaTags) {
-      const tagName = tag.name || "Desconhecido";
+      for (const tag of iaTags) {
+        if (!existingNames.has(tag.name)) {
+          let value = geminiResults[tag.name] ?? null;
+          if (value && typeof value === "object")
+            value = JSON.stringify(value, null, 2);
 
-      if (!existingNames.has(tagName)) {
-        let tagValue = geminiResults[tagName] ?? null;
-
-        // Se for objeto ou array → converte em string JSON
-        if (tagValue && typeof tagValue === "object") {
-          tagValue = JSON.stringify(tagValue, null, 2);
+          allTags.push({
+            name: tag.name,
+            value,
+            type: "ia",
+            icon: tag.icon || "default",
+            documentId: document.id,
+          });
+          existingNames.add(tag.name);
         }
-
-        allTags.push({
-          name: tagName,
-          value: tagValue,
-          type: "ia",
-          icon: tag.icon || "default",
-          documentId: document.id, // agora sempre vai vincular ao documento
-        });
-
-        existingNames.add(tagName);
       }
     }
 
-    // 🔹 Adiciona tags Regex
+    // 🔹 Processa Regex
     for (const tag of regexTags) {
       const extracted = (extractedData.tags || []).find(
         (t) => t.name === tag.name
       );
-      const tagName = tag.name || "Desconhecido";
-      if (!existingNames.has(tagName)) {
+      if (!existingNames.has(tag.name)) {
         allTags.push({
-          name: tagName,
+          name: tag.name,
           value: extracted?.value || null,
           type: "regex",
           icon: tag.icon || "default",
           documentId: document.id,
         });
-        existingNames.add(tagName);
+        existingNames.add(tag.name);
       }
     }
 
-    // 🔎 Salva tags no banco
+    // 🔹 Salva todas as instâncias
     if (allTags.length > 0) {
-      await models.Tag.bulkCreate(allTags);
+      await models.TagInstance.bulkCreate(allTags, { ignoreDuplicates: true });
     }
 
-    // 🔎 Busca documento já com tags
+    // 🔹 Busca documento com tags para retorno
     const documentoComTags = await models.Document.findByPk(document.id, {
       include: [
         {
-          model: models.Tag,
+          model: models.TagInstance,
           as: "tags",
           attributes: ["id", "name", "value", "type", "icon"],
         },
@@ -162,13 +156,13 @@ export const uploadFileAndAnalyze = async (req, res) => {
       docJson.tags
     );
 
-    res.json({
+    return res.json({
       message: "Arquivo salvo e analisado",
       document: docJson,
     });
   } catch (err) {
     console.error("Erro na API:", err);
-    res.status(500).json({ error: "Erro ao processar arquivo" });
+    return res.status(500).json({ error: "Erro ao processar arquivo" });
   }
 };
 
@@ -178,7 +172,7 @@ export const getAllDocuments = async (req, res) => {
     const documentos = await models.Document.findAll({
       include: [
         {
-          model: models.Tag,
+          model: models.TagInstance,
           as: "tags",
           attributes: ["id", "name", "value", "type", "icon"],
         },
@@ -196,43 +190,43 @@ export const getAllDocuments = async (req, res) => {
       };
     });
 
-    res.json(documentosComTemplate);
+    return res.json(documentosComTemplate);
   } catch (err) {
     console.error("Erro ao buscar documentos:", err);
-    res.status(500).json({ error: "Erro ao buscar documentos" });
+    return res
+      .status(500)
+      .json({ error: err.message || "Erro ao buscar documentos" });
   }
 };
 
-// 🔹 Deleta documento + arquivo físico
+// 🔹 Deleta documento + tags
 export const DeleteDoc = async (req, res) => {
   try {
     const documentId = req.params.id;
 
     const document = await models.Document.findByPk(documentId);
-    if (!document) {
+    if (!document)
       return res.status(404).json({ error: "Documento não encontrado" });
-    }
 
-    // 🔎 Remove arquivo físico
+    // Remove arquivo físico
     if (document.path) {
       try {
         const filePath = path.resolve(document.path);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`Arquivo deletado: ${filePath}`);
-        }
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       } catch (fileErr) {
-        console.error("Erro ao remover arquivo:", fileErr);
+        console.log("oxes")
       }
     }
 
-    // 🔎 Remove tags + documento
-    await models.Tag.destroy({ where: { documentId } });
+    // Remove tags + documento
+    await models.TagInstance.destroy({ where: { documentId } });
     await document.destroy();
 
-    res.json({ message: "Documento e arquivo apagados com sucesso" });
+    return res
+      .status(200)
+      .json({ message: "Documento e arquivo apagados com sucesso" });
   } catch (err) {
     console.error("Erro ao apagar documento:", err);
-    res.status(500).json({ error: "Erro ao apagar documento" });
+    return res.status(500).json({ error: "Erro ao apagar documento" });
   }
 };

@@ -20,7 +20,7 @@ function ActionBar({
       <div className="select">
         <div className="flex-left-right" style={{ width: "80%" }}>
           {/* 1 Documento selecionado */}
-          {docSelecionado && !selectedModel && (
+          {docSelecionado && !selectedModel && tool === 6 && (
             <div className="flex-left-right">
               <div className="flex-down-top">
                 <h4>Arquivo selecionado</h4>
@@ -33,8 +33,6 @@ function ActionBar({
                   </h3>
                 </div>
               </div>
-
-              {/* barra para separar */}
               <div style={{ margin: "0 20px" }}>|</div>
             </div>
           )}
@@ -66,7 +64,7 @@ function ActionBar({
           {/* 4 Arquivo selecionado na etapa 3 */}
           {etapaAtual === 3 && file && (
             <div className="flex-down-top" style={{ marginLeft: 20 }}>
-              <h4>Arquivo selecionados</h4>
+              <h4>Arquivo selecionado</h4>
               <div className="flex-left-right" style={{ marginTop: 5 }}>
                 <Icons.FiFileText size={15} className="controle" />
                 <h3 className="controle">{file.name}</h3>
@@ -74,7 +72,7 @@ function ActionBar({
             </div>
           )}
 
-          {/* 5️ Caso nada esteja selecionado */}
+          {/* 5 Caso nada esteja selecionado */}
           {!docSelecionado && !selectedModel && tool !== 1 && (
             <div>
               <h3>Selecione algo</h3>
@@ -93,11 +91,20 @@ function ActionBar({
         <div className="spc-bet flex-left-right" style={{ width: "9%" }}>
           <button
             className="action-btns"
-            onClick={() => (setDocSelecionado(null), setTool(1))}
+            onClick={() => {
+              setDocSelecionado(null);
+              setTool(2);
+            }}
           >
             <Icons.Add size={20} />
           </button>
-          <button className="action-btns" onClick={() => (setMore(!more) , alert("abrir o more"))}>
+          <button
+            className="action-btns"
+            onClick={() => {
+              setMore(!more);
+              alert("abrir o more");
+            }}
+          >
             <Icons.MdOutlineMoreHoriz size={20} />
           </button>
         </div>

@@ -1,24 +1,37 @@
+// models/index.js
 import { Sequelize } from "sequelize";
-import DocumentModel from "./documentos.js";
-import TagModel from "./tags.js";
-import UserModel from "./user.js";
 import path from "path";
+import { fileURLToPath } from "url";
+
+import DocumentModel from "./documentos.js";
+import ModeloDef from "./modelos.js";
+import TagInstanceDef from "./tagInstance.js";
+import TagBaseDef from "./tagBase.js";
+import UserModel from "./user.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: path.join(process.cwd(), "database.sqlite"),
-  logging: console.log,
+  logging: false,
 });
 
+// models/index.js
 const models = {
   Document: DocumentModel(sequelize),
-  Tag: TagModel(sequelize),
+  Modelo: ModeloDef(sequelize),
+  TagInstance: TagInstanceDef(sequelize),
+  TagBase: TagBaseDef(sequelize),
   User: UserModel(sequelize),
 };
 
-// associações
+// chama associate de todos os models
 Object.values(models).forEach((model) => {
-  if (model.associate) model.associate(models);
+  if (typeof model.associate === "function") {
+    model.associate(models);
+  }
 });
 
 export { sequelize };

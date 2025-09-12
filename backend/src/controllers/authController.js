@@ -13,7 +13,11 @@ export const register = async (req, res) => {
     if (existing) return res.status(400).json({ error: "Email já registrado" });
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await models.User.create({ username: name, email, password: hashed });
+    const user = await models.User.create({
+      username: name,
+      email,
+      password: hashed,
+    });
 
     res.json({ message: "Usuário registrado com sucesso", user });
   } catch (err) {
@@ -32,8 +36,12 @@ export const login = async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ error: "Senha incorreta" });
 
-    const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "15m" });
-    const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
+    const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, {
+      expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -49,13 +57,16 @@ export const login = async (req, res) => {
 };
 
 export const refreshToken = (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies?.refreshToken; // importante colocar '?'
+
   if (!token) return res.status(401).json({ error: "Sem token de refresh" });
 
-  jwt.verify(token, JWT_REFRESH_SECRET, (err, user) => {
+  jwt.verify(token, JWT_REFRESH_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ error: "Token inválido" });
 
-    const newAccess = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "15m" });
+    const newAccess = jwt.sign({ id: decoded.id }, JWT_SECRET, {
+      expiresIn: "15m",
+    });
     res.json({ accessToken: newAccess });
   });
 };
@@ -67,9 +78,12 @@ export const logout = (req, res) => {
 
 export const me = async (req, res) => {
   try {
-    const user = await models.User.findByPk(req.user.id, { attributes: ["id", "username", "name", "email"] });
+    const user = await models.User.findByPk(req.user.id, {
+      attributes: ["id", "username", "email"],
+    });
     res.json(user);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Erro ao buscar usuário" });
   }
 };

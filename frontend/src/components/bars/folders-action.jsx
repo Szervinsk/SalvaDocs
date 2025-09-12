@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
-import { Icons } from "../../constants/icons";
-import "../../styles/library.css";
-import SearchBar from "./searchbar";
-import { PASTAS } from "../../constants/constants";
+import "../../styles/library.css"; // estilos da bliblioteca própria
+import { useState, useEffect } from "react"; // states e efeitos
+import { motion, AnimatePresence } from "framer-motion"; // animações
+import axios from "axios"; //para fazer requisições via api
+import { Icons } from "../../constants/icons"; // banco de icons
+import SearchBar from "./searchbar"; // componente barra de busca
 
 function FoldersAction({
   pastas,
@@ -12,13 +11,17 @@ function FoldersAction({
   setDocumentos,
   setDocSelecionado,
   setTool,
+  setBarraLateral,
+  barraLateral,
 }) {
-  const [pastasAbertas, setPastasAbertas] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [reduzido, setReduzido] = useState(null);
-  const [placeholder, setPlaceholder] = useState("Buscar pastas...");
+  const [pastasAbertas, setPastasAbertas] = useState({}); // estado para controlar quais pastas deverão abrir ou não
+  const [loading, setLoading] = useState(false); //carregar dados caso não chegue da api
+
+  const [searchQuery, setSearchQuery] = useState(""); // estado para a busca
+  const [placeholder, setPlaceholder] = useState("Buscar pastas..."); // placeholder para pesquisar
+
   const [modo, setModo] = useState("pastas"); // "pastas" | "modelos"
+  const [folderSlide, setFolderSlide] = useState(null); // true = reduzido, false = expandido
 
   useEffect(() => {
     const fetchDocumentos = async () => {
@@ -38,9 +41,15 @@ function FoldersAction({
     fetchDocumentos();
   }, [setDocumentos]);
 
-  const toggleReducao = () => setReduzido((prev) => !prev);
+  const toggleFolderSlide = () => setFolderSlide((prev) => !prev);
   const togglePasta = (id) =>
     setPastasAbertas((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const handleDocumentClick = (doc) => {
+    setBarraLateral(false); // fecha a lateral quando abre doc
+    setDocSelecionado(doc); // seleciona doc
+  };
+
 
   // Filtragem de pastas
   const pastasFiltradas = pastas
@@ -71,23 +80,23 @@ function FoldersAction({
 
   return (
     <motion.div
-      className={`sidebar ${reduzido ? "reduzido" : ""}`}
-      animate={{ width: reduzido ? 80 : 280 }}
+      className={`sidebar ${folderSlide ? "reduzido" : ""}`}
+      animate={{ width: folderSlide ? 80 : 280 }}
       transition={{ duration: 0.3 }}
     >
       {/* Header da Sidebar */}
       <div className="sidebar-header">
-        {!reduzido && <h2>Pastas</h2>}
+        {!folderSlide && <h2>Pastas</h2>}
         <Icons.BackIn
           size={20}
           className="icon-btn"
-          onClick={toggleReducao}
-          title={reduzido ? "Expandir" : "Reduzir"}
+          onClick={toggleFolderSlide}
+          title={folderSlide ? "Expandir" : "Reduzir"}
         />
       </div>
 
       {/* Toggle Pastas/Modelos */}
-      {!reduzido ? (
+      {!folderSlide ? (
         <div className="mode-toggle">
           <div
             className="toggle-bg"
@@ -140,7 +149,7 @@ function FoldersAction({
       )}
 
       {/* Search */}
-      {!reduzido ? (
+      {!folderSlide ? (
         <SearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -163,114 +172,116 @@ function FoldersAction({
         <AnimatePresence mode="wait">
           {modo === "pastas"
             ? pastasFiltradas.map((pasta) => {
-                const aberta =
-                  pastasAbertas[pasta.id] ||
-                  (searchQuery && pasta.documentos.length > 0);
-                return (
-                  <motion.div
-                    key={pasta.id}
-                    className="folder-block"
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div
-                      className="folder-header"
-                      onClick={() => togglePasta(pasta.id)}
-                    >
-                      <div className="flex-left-right">
-                        <Icons.Folder size={20} className="icons" />
-                        {!reduzido && <h3>{pasta.name}</h3>}
-                      </div>
-                      {!reduzido && (
-                        <div className="folder-info">
-                          <span className="doc-count">
-                            {pasta.documentos.length}
-                          </span>
-                          {aberta ? (
-                            <Icons.ArrowUp size={16} />
-                          ) : (
-                            <Icons.ArrowDown size={16} />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    {!reduzido && aberta && (
-                      <motion.div
-                        className="documents-list"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        {loading ? (
-                          <p>Carregando...</p>
-                        ) : pasta.documentos.length === 0 ? (
-                          <p className="empty-text">Sem arquivos nesta pasta</p>
-                        ) : (
-                          pasta.documentos.map((doc) => (
-                            <motion.div
-                              key={doc.id}
-                              className="document-item"
-                              onClick={() => (
-                                setTool(6), setDocSelecionado(doc)
-                              )}
-                              whileHover={{ x: 4 }}
-                            >
-                              <Icons.DocumentText size={18} className="icons" />
-                              <span>
-                                {(doc.resolvedTemplate || doc.name).length > 25
-                                  ? (doc.resolvedTemplate || doc.name).slice(
-                                      0,
-                                      25
-                                    ) + "..."
-                                  : doc.resolvedTemplate || doc.name}
-                              </span>
-                            </motion.div>
-                          ))
-                        )}
-                      </motion.div>
-                    )}
-                  </motion.div>
-                );
-              })
-            : documentosFiltrados.map((doc) => (
+              const aberta =
+                pastasAbertas[pasta.id] ||
+                (searchQuery && pasta.documentos.length > 0);
+              return (
                 <motion.div
-                  key={doc.id}
-                  className="document-item"
-                  onClick={() => (setTool(6), setDocSelecionado(doc))}
+                  key={pasta.id}
+                  className="folder-block"
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
-                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <div className="documents-scroll">
-                    <div className="documents-content">
-                      <>
-                        {() => {
-                          const IconComponent =
-                            Icons[pastasFiltradas[doc.pastaId].model];
-                          return IconComponent ? (
-                            <IconComponent
-                              size={50}
-                              className="icons-pasta-dashboard"
-                            />
-                          ) : null;
-                        }}
-                        <h3>
-                          {(doc.templateName || doc.name).length > 25
-                            ? (doc.templateName || doc.name).slice(0, 25) +
-                              "..."
-                            : doc.templateName || doc.name}
-                        </h3>
-                      </>
-
-                      <Icons.ArrowRight size={18} className="icons" />
+                  <div
+                    className="folder-header"
+                    onClick={() => togglePasta(pasta.id)}
+                  >
+                    <div className="flex-left-right">
+                      <Icons.Folder size={20} className="icons" />
+                      {!folderSlide && <h3>{pasta.name}</h3>}
                     </div>
+                    {!folderSlide && (
+                      <div className="folder-info">
+                        <span className="doc-count">
+                          {pasta.documentos.length}
+                        </span>
+                        {aberta ? (
+                          <Icons.ArrowUp size={16} />
+                        ) : (
+                          <Icons.ArrowDown size={16} />
+                        )}
+                      </div>
+                    )}
                   </div>
+                  {!folderSlide && aberta && (
+                    <motion.div
+                      className="documents-list"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {loading ? (
+                        <p>Carregando...</p>
+                      ) : pasta.documentos.length === 0 ? (
+                        <p className="empty-text">Sem arquivos nesta pasta</p>
+                      ) : (
+                        pasta.documentos.map((doc) => (
+                          <motion.div
+                            key={doc.id}
+                            className="document-item"
+                            onClick={() => {
+                              handleDocumentClick(doc);
+                            }}
+                            whileHover={{ x: 4 }}
+                          >
+                            <Icons.DocumentText size={18} className="icons" />
+                            <span>
+                              {(doc.resolvedTemplate || doc.name).length > 25
+                                ? (doc.resolvedTemplate || doc.name).slice(
+                                  0,
+                                  25
+                                ) + "..."
+                                : doc.resolvedTemplate || doc.name}
+                            </span>
+                          </motion.div>
+                        ))
+                      )}
+                    </motion.div>
+                  )}
                 </motion.div>
-              ))}
+              );
+            })
+            : documentosFiltrados.map((doc) => (
+              <motion.div
+                key={doc.id}
+                className="document-item"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                whileHover={{ x: 4 }}
+                onClick={() => {
+                  handleDocumentClick(doc);
+                }}
+              >
+                <div className="documents-scroll">
+                  <div className="documents-content">
+                    <>
+                      {(() => {
+                        const IconComponent =
+                          Icons[pastasFiltradas[doc.pastaId]?.model];
+                        return IconComponent ? (
+                          <IconComponent
+                            size={50}
+                            className="icons-pasta-dashboard"
+                          />
+                        ) : null;
+                      })()}
+                      <h3>
+                        {(doc.templateName || doc.name).length > 25
+                          ? (doc.templateName || doc.name).slice(0, 25) +
+                          "..."
+                          : doc.templateName || doc.name}
+                      </h3>
+                    </>
+
+                    <Icons.ArrowRight size={18} className="icons" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
         </AnimatePresence>
       </div>
     </motion.div>
