@@ -1,0 +1,141 @@
+/* ==========================================================================
+   4. HOME.CSS (Página Principal/Dashboard)
+   ========================================================================== */
+
+.home {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+/* --- Cabeçalho da Home --- */
+.welcome {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.welcome h2 {
+  margin: 0;
+  font-size: 1.375rem; /* 22px */
+}
+
+.welcome h3 {
+  margin: var(--spacing-xs) 0 var(--spacing-lg);
+  font-size: var(--font-size-base); /* 16px */
+  color: var(--color-text-secondary);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: var(--border-width-md) solid var(--color-border);
+}
+
+/* --- Cards de Dados e Atalhos --- */
+.docs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-block: var(--spacing-sm);
+}
+
+.data-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 400px;
+  height: 280px;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: 16px;
+}
+
+.areas {
+  display: flex;
+  flex-direction: row;
+}
+
+.atalhos-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.atalho-card {
+  flex: 0 0 200px;
+  height: 120px;
+  min-width: 270px;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.atalho-card:hover {
+  background: var(--color-background);
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+}
+
+/* --- Gráficos e Tabelas --- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+}
+
+.documents-table th,
+.documents-table td {
+  padding: var(--spacing-sm) 12px;
+  border: var(--border-width-md) solid var(--color-border);
+  text-align: left;
+  cursor: pointer;
+}
+
+.documents-table td:hover {
+  background-color: var(--color-background);
+}
+
+.home-options {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  margin-bottom: 20px;
+}
+
+.home-types {
+  display: flex;
+}
+
+.home-type {
+  background-color: var(--color-background);
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  border-radius: 20px;
+  width: 150px;
+  cursor: pointer;
+}
+
+.active {
+  background-color: var(--color-accent);
+}

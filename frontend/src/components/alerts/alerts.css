@@ -1,0 +1,18 @@
+.Welcome-Alert {
+    background-color: var(--primary-color-grey);;
+    border-radius: 10px;
+    position: absolute;
+    top: 10px;
+    color: var(--white);
+    animation: showDown 1s ease;
+}
+
+@keyframes showDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    } to {
+        opacity: 1;
+        transform: translateY(10px);
+    }
+}

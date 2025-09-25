@@ -18,7 +18,8 @@ import { LuDoorOpen } from "react-icons/lu";
 import { LuTextSearch } from "react-icons/lu";
 import { BsTrash } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
-import { HiArrowLeftEndOnRectangle } from "react-icons/hi2";
+import { TbBrowserMaximize } from "react-icons/tb";
+import { TbLayoutSidebarRight } from "react-icons/tb";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { FaRegFolder } from "react-icons/fa";
 import { LuLayoutPanelLeft } from "react-icons/lu";
@@ -44,13 +45,13 @@ import { BiSolidBusiness } from "react-icons/bi";
 import { SlGraph } from "react-icons/sl";
 import { BsQuestionCircleFill } from "react-icons/bs";
 import { AiOutlineHome } from "react-icons/ai";
+import { AiOutlineReload } from "react-icons/ai";
 
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { backIn } from "framer-motion";
 import { FaClockRotateLeft } from "react-icons/fa6";
 
 // centralizar todos os ícones que você usa
@@ -67,9 +68,9 @@ export const Icons = {
 
   // voltar
   Close: IoMdClose,
-  BackIn: HiArrowLeftEndOnRectangle,
+  BackIn: TbLayoutSidebarRight,
   BackInSeta: FaArrowLeftLong,
-
+  Retry: AiOutlineReload,
 
   Pdf_file: PiFilePdf,
   Upload: MdFileUpload,

@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
+
 import { Icons } from "../constants/icons";
-import { ETAPAS, TAGS } from "../constants/constants";
-import ActionBar from "./bars/action-bar";
+import { ETAPAS } from "../constants/constants";
+import ActionBar from "./bars/actionStatusBars/action-bar";
 import axios from "axios";
 
 // tools
-import AnalyseDoc from "./tools/analyse";
-import Home from "./tools/home";
-import EditModels from "./tools/edit-models";
-import Configurations from "./tools/configurations";
-import Account from "./tools/account";
-import OpenDocs from "./open-docs";
+import AnalyseDoc from "./tools/analyse/analyse";
+import Home from "./tools/home/home"; 
+import EditModels from "./tools/models/edit-models";
+import Configurations from "./tools/configurations/configurations";
+import Account from "./tools/account/account";
+import OpenDocs from "./openDocs/open-docs";
 
-import More from "./more";
-import StatusBar from "./bars/status-bar";
+import StatusBar from "./bars/actionStatusBars/status-bar";
 
 function Block({
   setModelos,
@@ -28,6 +28,8 @@ function Block({
   setTool,
   onVoltar,
   user,
+  setDarkMode,
+  darkMode,
   barraLateral,
   setBarraLateral,
 }) {
@@ -171,7 +173,7 @@ function Block({
         );
 
       case 4:
-        return <Configurations />;
+        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} setBarraLateral={setBarraLateral} barraLateral={barraLateral}/>
 
       case 5:
         return <Account />;
@@ -191,10 +193,6 @@ function Block({
           {alert.message}
           <Icons.Close size={20} onClick={() => setAlert(null)} />
         </div>
-      )}
-
-      {more && (
-        <More more={more} docSelecionado={docSelecionado} setMore={setMore} />
       )}
 
       <main className="switch-area">

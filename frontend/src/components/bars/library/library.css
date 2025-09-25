@@ -1,0 +1,184 @@
+/* LIBRARY.CSS (Barra Lateral de Documentos) */
+
+/* --- Base da Sidebar --- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  height: 100%;
+  width: 280px; /* Largura expandida */
+  background: var(--color-surface);
+  border-right: var(--border-width-md) solid var(--color-border);
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: width 0.3s ease;
+  padding: 5px;
+}
+
+.sidebar.reduzido {
+  width: 80px; /* Largura reduzida */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Oculta elementos de texto no modo reduzido */
+.sidebar.reduzido h2,
+.sidebar.reduzido h3,
+.sidebar.reduzido span,
+.sidebar.reduzido .search-container,
+.sidebar.reduzido .documents-list {
+  display: none;
+}
+
+/* --- Cabeçalho da Sidebar --- */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: var(--header-height);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-bottom: var(--border-width-md) solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sidebar-header h2 {
+  font-size: var(--font-size-sm);
+}
+
+.mode-toggle {
+  background-color: var(--color-surface);
+  border-radius: 20px;
+  padding: 10px;
+  border: var(--border-width-md) solid var(--color-border);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mode-toggle input {
+  background-color: var(--color-border);
+}
+
+.mode-toggle input:checked {
+  background-color: var(--color-accent);
+}
+
+.icon-btn {
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.icon-btn:hover {
+  color: var(--color-accent);
+}
+
+/* --- Pastas e Documentos --- */
+.folders-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--spacing-sm);
+  overflow-y: auto;
+  padding: var(--spacing-xs);
+}
+
+.folder-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  animation: slideUp 0.3s ease;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+  border-left: 7px solid transparent;
+}
+
+.folder-header:hover {
+  transform: translateX(2px);
+  border-left-color: var(--color-accent);
+}
+
+.folder-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.FolderListH3 {
+  display: flex;
+  flex-direction: row;
+  margin-left: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.doc-count {
+  background: var(--color-accent);
+  color: var(--color-surface);
+  font-size: var(--font-size-xs);
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--border-radius-lg);
+  animation: popIn 0.3s ease;
+}
+
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-left: 28px;
+  padding-left: var(--spacing-sm);
+  border-left: var(--border-width-md) solid var(--color-border);
+  animation: fadeSlide 0.35s ease;
+}
+
+.documents-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  box-shadow: var(--box-shadow-light);
+  transition: all 0.2s ease;
+}
+
+.documents-content:hover {
+  transform: translateX(2px);
+  border-left: 7px solid var(--color-accent);
+  width: calc(100% - 4px);
+}
+
+.documents-scroll {
+  width: 95%;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.document-item:hover {
+  color: var(--color-accent);
+  transform: translateX(2px);
+}

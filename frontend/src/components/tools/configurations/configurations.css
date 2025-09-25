@@ -1,0 +1,50 @@
+.configurations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  height: 100%;
+  background-color: var(--deep-wall-color2);
+  color: var(--primary-color-grey);
+  font-size: var(--font-size);
+}
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-btn {
+  background-color: var(--white);
+  color: var(--primary-color-grey);
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  max-width: 200px;
+  transition: all 0.2s ease;
+  font-size: var(--font-size);
+}
+
+.config-btn:hover {
+  border-color: var(--second-color-blue);
+  box-shadow: 0 0 3px var(--second-color-blue);
+}
+
+.config-btn:active {
+  transform: translateY(1px);
+  opacity: 0.8;
+}
+
+/* Dark mode adjustments */
+.dark .configurations-container {
+  background-color: var(--deep-wall-color);
+  color: var(--primary-color-grey);
+}
+
+.dark .config-btn {
+  background-color: var(--deep-wall-color2);
+  color: var(--primary-color-grey2);
+  border-color: var(--border-color);
+}

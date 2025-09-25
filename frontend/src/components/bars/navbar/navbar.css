@@ -1,0 +1,111 @@
+/*  NAVBAR */
+
+.sidebar-navbar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  min-height: 100vh;
+  background: var(--color-background);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sidebar-navbar-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: var(--border-width-md) solid var(--color-border);
+  margin-bottom: 10px;
+}
+
+.sidebar-navbar-date {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding-bottom: 10px;
+  border-bottom: var(--border-width-md) solid var(--color-border);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sidebar-navbar-date h4 {
+  font-size: var(--font-size-base);
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-accent);
+}
+
+.app-title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.toggle-btn {
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.toggle-btn.rotated {
+  transform: rotate(180deg);
+}
+
+/* --- Ferramentas/Links da Navbar --- */
+.sidebar-navbar-tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--spacing-sm) 12px;
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  border-left: 7.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-item:hover {
+  color: var(--color-accent);
+  border-left-color: var(--color-accent);
+}
+
+.tool-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.navbar-account-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 10px;
+  border-top: var(--border-width-md) solid var(--color-border);
+}
+
+.navbar-account-div h3 {
+  font-size: var(--font-size-h4);
+}
