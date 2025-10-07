@@ -7,12 +7,15 @@ import axios from "axios";
 
 function FoldersAction({
   pastas,
-  
   documentos,
   setDocumentos,
   setDocSelecionado,
+  docSelecionado,
   setBarraLateral,
   barraLateral,
+  onClose,
+  setOpenDocsVisible,
+  openDocsVisible,
 }) {
   const [pastasAbertas, setPastasAbertas] = useState({}); // estado para controlar quais pastas deverão abrir ou não
   const [loading, setLoading] = useState(false); //carregar dados caso não chegue da api
@@ -22,6 +25,17 @@ function FoldersAction({
 
   const [modo, setModo] = useState("pastas"); // "pastas" | "modelos"
   const [folderSlide, setFolderSlide] = useState(null); // true = reduzido, false = expandido
+  const [recentDocuments, setRecentDocuments] = useState([]);
+  const [viewRecentDocs, setViewRecentDocs] = useState(false);
+
+  // Ordenar documentos recentes
+  useEffect(() => {
+    const sorted = [...documentos]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+    setRecentDocuments(sorted);
+  }, [documentos]);
+
 
   useEffect(() => {
     const fetchDocumentos = async () => {
@@ -46,8 +60,14 @@ function FoldersAction({
     setPastasAbertas((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const handleDocumentClick = (doc) => {
-    setBarraLateral(false); // fecha a lateral quando abre doc
-    setDocSelecionado(doc); // seleciona doc
+    if (docSelecionado === doc) {
+      setDocSelecionado(null); // deseleciona se clicar novamente no mesmo doc
+      setBarraLateral(true);
+      onClose(false);
+    } else {
+      setBarraLateral(false); // fecha a lateral quando abre doc
+      setDocSelecionado(doc); // seleciona doc
+    }
   };
 
 
@@ -102,7 +122,7 @@ function FoldersAction({
             className="toggle-bg"
             style={{
               transform:
-                modo === "modelos" ? "translateX(96%)" : "translateX(0)",
+                modo === "modelos" ? "translateX(115%)" : "translateX(0)",
             }}
           />
           <label
@@ -165,7 +185,7 @@ function FoldersAction({
         </div>
       )}
 
-      <hr />
+      <hr style={{marginBlock: "var(--spacing-md)"}}/>
 
       {/* Conteúdo: pastas ou documentos */}
       <div className="folders-list">
@@ -190,7 +210,7 @@ function FoldersAction({
                   >
                     <div className="flex-row">
                       <Icons.Folder size={20} className="icons" />
-                      {!folderSlide && <h3 className="FolderListH3" style={{fontSize: "var(--font-size-base)"}}>{pasta.name}</h3>}
+                      {!folderSlide && <h3 className="FolderListH3" style={{ fontSize: "var(--font-size-base)" }}>{pasta.name}</h3>}
                     </div>
                     {!folderSlide && (
                       <div className="folder-info">
@@ -269,12 +289,12 @@ function FoldersAction({
                           />
                         ) : null;
                       })()}
-                      <h3>
+                      <h4>
                         {(doc.templateName || doc.name).length > 25
                           ? (doc.templateName || doc.name).slice(0, 25) +
                           "..."
                           : doc.templateName || doc.name}
-                      </h3>
+                      </h4>
                     </>
 
                     <Icons.ArrowRight size={18} className="icons" />
@@ -283,6 +303,40 @@ function FoldersAction({
               </motion.div>
             ))}
         </AnimatePresence>
+      </div>
+
+      <div>
+        {/* Documentos recentes */}
+        <div className="flex-row recent-docs-header" onClick={() => setViewRecentDocs((prev) => !prev)}>
+          <h3>Documentos Recentes</h3>
+          <Icons.ArrowDown size={20} />
+        </div>
+
+        {viewRecentDocs && (
+          <motion.div
+            className="recent-docs"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="activity-list">
+              {recentDocuments.length ? recentDocuments.map((doc, index) => {
+                const date = new Date(doc.createdAt).toLocaleDateString("pt-BR");
+                return (
+                  <div key={index} className="recent-doc-item" onClick={() => handleDocumentClick(doc)} title={`Clique para ver detalhes de ${doc.templateName}`}>
+                    <div className="recent-doc-info">
+                      <span className="recent-doc-name">{doc.templateName}</span>
+                      <span className="recent-doc-date">{date}</span>
+                    </div>
+                    <Icons.ArrowRight size={14} />
+                  </div>
+                );
+              }) : <p className="no-docs">Nenhum documento recente</p>}
+            </div>
+          </motion.div>
+
+        )}
       </div>
     </motion.div>
   );

@@ -7,7 +7,7 @@ import axios from "axios";
 
 // tools
 import AnalyseDoc from "./tools/analyse/analyse";
-import Home from "./tools/home/home"; 
+import Home from "./tools/home/home";
 import EditModels from "./tools/models/edit-models";
 import Configurations from "./tools/configurations/configurations";
 import Account from "./tools/account/account";
@@ -27,11 +27,15 @@ function Block({
   tool,
   setTool,
   onVoltar,
+  pastasAbertas,
+  setPastasAbertas,
   user,
   setDarkMode,
   darkMode,
   barraLateral,
   setBarraLateral,
+  setOpenDocsVisible,
+  openDocsVisible,
 }) {
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -44,9 +48,6 @@ function Block({
   const [alert, setAlert] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [tags, setTags] = useState([]);
-
-  // novo state para abrir/fechar OpenDocs
-  const [openDocsVisible, setOpenDocsVisible] = useState(false);
 
   useEffect(() => {
     if (docSelecionado) {
@@ -121,6 +122,12 @@ function Block({
             showAlert={showAlert}
             setTool={setTool}
             setBarraLateral={setBarraLateral}
+            onClose={() => {
+              setOpenDocsVisible(false);
+              setDocSelecionado(null);
+              setIsResponse(false);
+              setEtapaAtual(1);
+            }}
           />
         );
 
@@ -173,10 +180,10 @@ function Block({
         );
 
       case 4:
-        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} setBarraLateral={setBarraLateral} barraLateral={barraLateral}/>
+        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} setBarraLateral={setBarraLateral} barraLateral={barraLateral} pastasAbertas={pastasAbertas} setPastasAbertas={setPastasAbertas} />
 
       case 5:
-        return <Account />;
+        return <Account user={user} />;
 
       case 6:
         return null;
@@ -221,9 +228,9 @@ function Block({
         >
           <div
             className="main-content"
-            style={{ opacity: openDocsVisible && tool !== 6 ? 0.5 : 1 }}
+            style={{ filter: openDocsVisible ? "blur(2px)" : "none" }}
           >
-            {openDocsVisible ? (<div className="blur"></div>) : null}
+            {openDocsVisible ? (<div className="blur-overlay"></div>) : null}
             {handleSelectTool(tool)}
           </div>
 
@@ -231,7 +238,10 @@ function Block({
             {openDocsVisible && docSelecionado && (
               <OpenDocs
                 docSelecionado={docSelecionado}
-                tags={docSelecionado.tags}
+                tags={docSelecionado.tags?.map(tag => ({
+                  ...tag,
+                  id: String(tag.id) // garante que seja string
+                })) || []}
                 setDocSelecionado={setDocSelecionado}
                 setSelectedModel={setSelectedModel}
                 setEtapaAtual={setEtapaAtual}
@@ -248,6 +258,7 @@ function Block({
                 onToggleExpand={toggleExpandDocs}
                 isExpanded={tool === 6}
               />
+
             )}
           </div>
         </div>

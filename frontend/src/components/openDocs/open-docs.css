@@ -1,5 +1,5 @@
 .copy {
-  transition: all 0.5s ease;
+  transition: all 0.3s ease;
 }
 .copy:hover {
   cursor: pointer;
@@ -8,24 +8,20 @@
 
 /* barra lateral */
 .lateral-bar {
-  background: var(--white);
+  background: var(--color-surface);
   display: flex;
   flex-direction: column;
   border-left: 2px solid var(--border-color);
   height: 100%;
-  width: 50%;
+  position: absolute;
+  z-index: 999;
+  right: 0;
+  top: 0;
+  min-width: 250px;
+  max-width: 500px;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-}
-
-.lateral-bar.expanded {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  border-radius: 0;
+  transition: width 0.3s ease;
 }
 
 .lateral-bar-header,
@@ -46,6 +42,8 @@
 .header {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .list-documents {
@@ -61,43 +59,13 @@
   padding: 15px;
 }
 
-.open-docs-bar,
-.moreOptions-bar {
-  padding: 15px;
-  box-sizing: border-box;
-  border-bottom: 2px solid var(--border-color);
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.open-docs-slide {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.open-docs-content {
-  padding: 10px;
-  box-sizing: border-box;
-  flex: 1; /* cresce dinamicamente */
-  width: 60%;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 .doc-title {
   margin-bottom: 20px;
 }
 
 .title {
   font-size: 18px;
-}
-
-.eachTag {
-  margin-block: 20px;
+  font-weight: 600;
 }
 
 .tags-label {
@@ -105,11 +73,11 @@
   flex-direction: row;
   justify-content: space-between;
   margin-block: 10px;
+  align-items: center;
 }
 
 .tags-section {
   display: flex;
-  /* flex-direction: column; fica em vertical */
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
@@ -120,34 +88,26 @@
   font-weight: 500;
 }
 
-.open-docs-content-main {
-  padding: 10px 0;
+.open-docs-tags {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 auto;
+  min-width: 180px;
 }
 
-.files-area {
-  margin: 10px;
-  width: 100%;
-  height: 100px;
-  gap: 10px;
-}
-
-.file {
-  border-radius: 10px;
-  min-height: 50px;
-  height: fit-content;
-  padding: 10px;
+.results {
   background-color: var(--deep-wall-color2);
-  border: 2px solid var(--border-color);
+  padding: 5px 10px;
+  min-width: 60px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  word-break: break-word;
+  font-size: 13px;
 }
 
-.open-docs-data {
-  padding: 10px;
-  box-sizing: border-box;
-  width: 100%;
-  flex-shrink: 0; /* mantém largura */
-  border-left: 2px solid var(--border-color);
-}
-
+/* Alternador */
 .view-switch ul {
   list-style: none;
   display: flex;
@@ -161,64 +121,71 @@
   cursor: pointer;
   padding: 5px;
   border-bottom: 2px solid transparent;
+  transition: 0.3s;
 }
-
+.view-switch li:hover {
+  color: var(--second-color-blue);
+}
 .view-switch li.active {
   border-bottom-color: var(--second-color-blue);
   font-weight: bold;
 }
 
-.open-docs-data-content {
-  padding: 10px;
-  box-sizing: border-box;
-  max-height: 100%;
-  width: 100%;
-  overflow-y: auto;
+/* Conteúdo dinâmico */
+.open-docs-content-main {
+  padding: 10px 0;
 }
 
 .div-resumo {
   overflow-y: auto;
-  height: fit-content;
   max-height: 300px;
-  background-color: var(--border-color);
-  border-radius: 10px;
+  background-color: var(--deep-wall-color2);
+  border-radius: 8px;
   padding: 10px;
   box-sizing: border-box;
 }
-
 .div-resumo p {
   font-size: 14px;
+  line-height: 1.4;
 }
+
 .div-json {
   overflow-y: auto;
-  max-width: 400px;
-  height: 300px;
-}
-
-.open-docs-data-feedback {
+  max-width: 100%;
+  max-height: 300px;
+  background: var(--deep-wall-color2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   padding: 10px;
-  box-sizing: border-box;
-  max-height: 50%; /* cuidado, depende do pai */
-  overflow-y: auto;
+  font-size: 13px;
 }
 
-.open-docs-tags {
+/* Documentos */
+.files-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.file {
+  border-radius: 8px;
+  padding: 10px;
+  background-color: var(--deep-wall-color2);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
 }
 
-.results {
-  background-color: var(--deep-wall-color2);
-  padding: 5px;
-  min-width: 50px;
-  text-align: center;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
+/* Rodapé */
+.lateral-bar-footer h3 {
+  margin: 0;
+  font-size: 14px;
 }
 
-/* parte dos graficos */
+/* Gráficos */
 .graphics-container {
   margin-top: 20px;
 }
@@ -226,7 +193,7 @@
 .div-porcentagem {
   background-color: var(--light-grey);
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 .barra-porcentagem-bg {

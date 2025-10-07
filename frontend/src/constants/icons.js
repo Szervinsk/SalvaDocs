@@ -1,126 +1,137 @@
-//icons utilizados tendeu
-import { LuCircleDashed } from "react-icons/lu";
-import { FaTags } from "react-icons/fa";
-import { FiFileText } from "react-icons/fi";
-import { MdOutlineMoreHoriz } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
-import { LuFileSearch } from "react-icons/lu";
-import { MdOutlineDocumentScanner } from "react-icons/md";
-import { FaRegLightbulb } from "react-icons/fa";
-import { MdOutlineEditNote } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
-import { PiFilePdf } from "react-icons/pi";
-import { MdFileUpload } from "react-icons/md";
-import { FaCheck } from "react-icons/fa6";
-import { BiArchive } from "react-icons/bi";
-import { RiExpandDiagonalLine } from "react-icons/ri";
-import { LuDoorOpen } from "react-icons/lu";
-import { LuTextSearch } from "react-icons/lu";
-import { BsTrash } from "react-icons/bs";
-import { HiDownload } from "react-icons/hi";
-import { TbBrowserMaximize } from "react-icons/tb";
-import { TbLayoutSidebarRight } from "react-icons/tb";
-import { HiOutlineDocumentText } from "react-icons/hi";
-import { FaRegFolder } from "react-icons/fa";
-import { LuLayoutPanelLeft } from "react-icons/lu";
-import { IoIosArrowDown, IoIosArrowUp, IoIosArrowForward , IoIosArrowBack} from "react-icons/io";
+// ==========================================================================
+// IMPORTAÇÕES DOS ÍCONES (CORRIGIDO)
+// Ícones importados diretamente de seus pacotes específicos.
+// ==========================================================================
 
-import { FaQuestion } from "react-icons/fa6";
-import { MdOutlineSearch } from "react-icons/md";
-import { RiArchiveLine } from "react-icons/ri";
-import { LuCalendarDays } from "react-icons/lu";
-import { HiOutlineUserCircle } from "react-icons/hi";
-import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
-import { TbDeviceDesktopAnalytics } from "react-icons/tb";
-import { FiSend } from "react-icons/fi";
-import { FaPenNib } from "react-icons/fa6";
-import { MdOutlineSubtitles } from "react-icons/md";
-import { TbNumber123 } from "react-icons/tb";
-import { VscLaw } from "react-icons/vsc";
-import { ImHammer2 } from "react-icons/im";
+// Ant Design Icons (ai)
+import { AiOutlineHome, AiOutlineReload } from "react-icons/ai";
+
+// BoxIcons (bi)
+import { BiArchive, BiSolidBusiness } from "react-icons/bi";
+
+// Bootstrap Icons (bs) - Nenhum ícone BsTrash existe, usei FaTrash de Font Awesome
+// import { BsTrash } from "react-icons/bs"; 
+
+// Font Awesome (fa)
+import { FaArrowLeftLong, FaCheck, FaClockRotateLeft, FaPenNib, FaQuestion, FaRegFolder, FaRegLightbulb, FaTags, FaTrash } from "react-icons/fa6"; // BsTrash não existe, usei FaTrash
+
+// Feather (fi)
+import { FiFileText, FiSend, FiSun, FiMoon } from "react-icons/fi";
+
+// Grit Icons (gr)
 import { GrScorecard } from "react-icons/gr";
-import { TbPigMoney } from "react-icons/tb";
-import { MdPeopleAlt } from "react-icons/md";
-import { BiSolidBusiness } from "react-icons/bi";
+
+// Heroicons (hi)
+import {HiOutlineAdjustmentsHorizontal, HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck, HiOutlineClipboardDocumentList, HiOutlineDocumentText, HiOutlineUserCircle } from "react-icons/hi2";
+
+// IcoMoon Free (im)
+import { ImFontSize, ImHammer2 } from "react-icons/im";
+
+// Ionicons (io)
+import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward, IoIosArrowUp, IoMdAdd, IoMdClose } from "react-icons/io";
+
+// Lucide (lu)
+import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutPanelLeft, LuTextSearch } from "react-icons/lu";
+
+// Material Design (md)
+import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSubtitles, MdPeopleAlt } from "react-icons/md";
+
+// Phosphor Icons (pi)
+import { PiFilePdf } from "react-icons/pi";
+
+// Remix Icon (ri)
+import { RiArchiveLine, RiExpandDiagonalLine } from "react-icons/ri";
+
+// Simple Line Icons (sl)
 import { SlGraph } from "react-icons/sl";
-import { BsQuestionCircleFill } from "react-icons/bs";
-import { AiOutlineHome } from "react-icons/ai";
-import { AiOutlineReload } from "react-icons/ai";
 
-import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
-import { HiOutlineClipboardDocument } from "react-icons/hi2";
-import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+// Tabler Icons (tb)
+import { TbDeviceDesktopAnalytics, TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
 
-import { FaArrowLeftLong } from "react-icons/fa6";
-import { FaClockRotateLeft } from "react-icons/fa6";
+// VS Code Icons (vsc)
+import { VscLaw } from "react-icons/vsc";
 
-// centralizar todos os ícones que você usa
+
+// ==========================================================================
+// OBJETO DE ÍCONES CENTRALIZADO
+// ==========================================================================
 export const Icons = {
-  Add: IoMdAdd, // + de adicionar
-  MdOutlineMoreHoriz: MdOutlineMoreHoriz, // sla q porra é isso
-  FiFileText: FiFileText,
-  Tags: FaTags, // tags
-  Selected: LuCircleDashed, // bolinha de selecionado
-  SearchFile: LuFileSearch, // lupa de pesquisar
-  Search: MdOutlineSearch,
-  Lamp: FaRegLightbulb, // lampada para modelos
-  ScannerDocument: MdOutlineDocumentScanner, // scanner de documentos
+  // ============================
+  // Ações Gerais
+  // ============================
+  Add: IoMdAdd,                      // Sinal de mais (+) para adicionar ou criar.
+  EditNote: MdOutlineEditNote,       // Lápis para editar.
+  Delete: FaTrash,                   // Lixeira para excluir (BsTrash não encontrado, substituído).
+  Check: FaCheck,                    // Visto para confirmar ou sucesso.
+  Upload: MdFileUpload,              // Seta para cima para upload de arquivo.
+  Send: FiSend,                      // Avião de papel para enviar.
+  Retry: AiOutlineReload,            // Seta circular para tentar novamente.
 
-  // voltar
-  Close: IoMdClose,
-  BackIn: TbLayoutSidebarRight,
-  BackInSeta: FaArrowLeftLong,
-  Retry: AiOutlineReload,
+  // ============================
+  // Navegação e Layout
+  // ============================
+  Home: AiOutlineHome,               // Casa para a página inicial.
+  Close: IoMdClose,                  // 'X' para fechar modais ou alertas.
+  BackIn: TbLayoutSidebarRight,      // Seta entrando em um container, para retornar.
+  BackInSeta: FaArrowLeftLong,       // Seta longa para a esquerda, para voltar.
+  DoorOpen: LuDoorOpen,              // Porta aberta, geralmente para logout ou sair.
+  Expandir: RiExpandDiagonalLine,    // Setas diagonais para expandir para tela cheia.
+  Layout: LuLayoutPanelLeft,         // Painel para representar layout ou sidebar.
+  ArrowDown: IoIosArrowDown,        // Seta para baixo.
+  ArrowUp: IoIosArrowUp,            // Seta para cima.
+  ArrowRight: IoIosArrowForward,     // Seta para a direita.
+  ArrowLeft: IoIosArrowBack,         // Seta para a esquerda.
 
-  Pdf_file: PiFilePdf,
-  Upload: MdFileUpload,
-  Check: FaCheck,
-  EditNote: MdOutlineEditNote,
-  DoorOpen: LuDoorOpen,
-  TextSearch: LuTextSearch,
-  Expandir: RiExpandDiagonalLine,
-  Process: BiArchive,
-  Delete: BsTrash,
-  Download: HiDownload,
-  DocumentText: HiOutlineDocumentText,
-  Folder: FaRegFolder,
+  // ============================
+  // UI e Controles de Interface
+  // ============================
+  Search: MdOutlineSearch,           // Lupa para pesquisa geral.
+  SearchFile: LuFileSearch,          // Lupa sobre um arquivo para pesquisa de documentos.
+  TextSearch: LuTextSearch,          // Lupa sobre linhas de texto.
+  MdOutlineMoreHoriz: MdOutlineMoreHoriz, // Três pontos para menu de "mais opções".
+  Adjustments: HiOutlineAdjustmentsHorizontal, // Controles deslizantes para configurações ou filtros.
+  Selected: LuCircleDashed,          // Círculo tracejado para indicar seleção.
+  Sun: FiSun,                        // Sol, para tema claro.
+  Moon: FiMoon,                      // Lua, para tema escuro.
+  FontSize: ImFontSize,              // Ícone 'A' para ajuste de fonte.
+  Interface: HiOutlineAdjustmentsHorizontal, // Ícone para seções de Interface. (Reutilizado)
+
+  // ============================
+  // Documentos e Arquivos
+  // ============================
+  FileText: FiFileText,              // Documento genérico com texto.
+  DocumentText: HiOutlineDocumentText, // Outra variação de documento de texto.
+  ScannerDocument: MdOutlineDocumentScanner, // Documento sendo escaneado.
+  Pdf_file: PiFilePdf,               // Ícone específico para arquivos PDF.
+  Folder: FaRegFolder,               // Pasta de arquivos.
+  Archive: RiArchiveLine,            // Caixa de arquivo.
+  Process: BiArchive,                // Variação de caixa de arquivo.
+  Despacho: HiOutlineClipboardDocument, // Prancheta para modelo "Despacho".
+  Parecer: HiOutlineClipboardDocumentList, // Prancheta com lista para "Parecer".
+  Programas: HiOutlineClipboardDocumentCheck, // Prancheta com visto para "Programas".
   
-  // setas para voltar
-  ArrowDown: IoIosArrowDown,
-  ArrowUp: IoIosArrowUp,
-  ArrowRight: IoIosArrowForward,
-  ArrowLeft: IoIosArrowBack,
-
-  // duvida
-  Question:FaQuestion,
-  CircleQuestion:BsQuestionCircleFill,
-
-  // arquivos
-  Archive: RiArchiveLine,
-  Calendar: LuCalendarDays,
-  User: HiOutlineUserCircle,
-  Adjustments: HiOutlineAdjustmentsHorizontal,
-  Clock: FaClockRotateLeft,
-
-  Model: TbDeviceDesktopAnalytics,
-
-  // tags
-  Send: FiSend,
-  Summarize: FaPenNib,
-  Title: MdOutlineSubtitles,
-  Number: TbNumber123,
-  Law: VscLaw,
-  Hammer: ImHammer2,
-  Score: GrScorecard,
-  PigMoney: TbPigMoney,
-  People: MdPeopleAlt,
-  Business: BiSolidBusiness,
-  Graphics: SlGraph,
-  Home: AiOutlineHome,
-
-  Layout: LuLayoutPanelLeft,
-
-  Programas: HiOutlineClipboardDocumentCheck,
-  Despacho: HiOutlineClipboardDocument,
-  Parecer: HiOutlineClipboardDocumentList,
+  // ============================
+  // Ícones Temáticos e de Dados
+  // ============================
+  Model: TbDeviceDesktopAnalytics,   // Monitor com gráfico, para "Modelos".
+  Graphics: SlGraph,                 // Gráfico de linha.
+  Tags: FaTags,                      // Etiqueta para tags.
+  Lamp: FaRegLightbulb,              // Lâmpada para dicas ou modelos.
+  User: HiOutlineUserCircle,         // Círculo com usuário para perfil ou conta.
+  Calendar: LuCalendarDays,          // Calendário para datas.
+  Clock: FaClockRotateLeft,          // Relógio com seta, para histórico ou recentes.
+  Question: FaQuestion,              // Ponto de interrogação para ajuda.
+  
+  // ============================
+  // Tags Específicas
+  // ============================
+  Summarize: FaPenNib,               // Pena para resumir texto.
+  Title: MdOutlineSubtitles,         // Ícone de título ou cabeçalho.
+  Number: TbNumber123,               // Números para extração de dados numéricos.
+  Law: VscLaw,                       // Balança da justiça para temas legais.
+  Hammer: ImHammer2,                 // Martelo do juiz.
+  Score: GrScorecard,                // Cartão de pontuação.
+  PigMoney: TbPigMoney,              // Porco-cofrinho para finanças.
+  People: MdPeopleAlt,               // Múltiplos usuários para partes envolvidas.
+  Business: BiSolidBusiness,         // Prédio para empresas ou negócios.
 };

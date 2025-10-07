@@ -66,39 +66,6 @@
   transition: all 0.3s ease-in-out;
 }
 
-/* Cards de Modelo */
-.model-list {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-md);
-}
-
-.Models-btn {
-  display: flex;
-  min-width: 160px;
-  padding: var(--spacing-sm) var(--spacing-xl);
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  border-radius: var(--border-radius-md);
-  border: var(--border-width-md) solid transparent;
-  background: var(--color-surface);
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.Models-btn:hover {
-  border-color: var(--color-accent);
-}
-
-.Models-text {
-  max-width: 550px;
-  min-height: 60px;
-  max-height: 90px;
-  overflow-y: auto;
-  font-size: var(--font-size-sm);
-}
-
 /* Alertas e Pop-ups */
 .alert {
   background-color: var(--color-surface);
@@ -245,4 +212,108 @@ input:checked + .slider:before {
   width: 30px;
   height: 30px;
   border-radius: 100%;
+}
+
+.status-bar {
+  background: var(--color-surface);
+  height: 80px;
+  width: 90%;
+  position: absolute;
+  bottom: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  align-items: center;
+  display: flex;
+  border-top: var(--border-width-md) solid var(--color-border);
+}
+
+.action-bts {
+  display: flex;
+  gap: 10px;
+  height: 50px;
+  top: 0;
+  align-items: center;
+  position: absolute;
+  right: 20px;
+}
+
+/* ==========================================================================
+   1. LAYOUT PRINCIPAL DA ACTION BAR
+   ========================================================================== */
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  gap: var(--spacing-lg);
+  width: 100%;
+  height: 50px;
+  padding: 0 var(--spacing-lg);
+  background: var(--color-surface);
+  border-bottom: var(--border-width-md) solid var(--color-border);
+}
+
+.action-bar__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.action-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ==========================================================================
+   2. COMPONENTE INFOBLOCK
+   ========================================================================== */
+.info-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-block__title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+  text-transform: uppercase;
+}
+
+.info-block__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: 4px; /* Equivalente ao seu marginTop: 5 antigo */
+}
+
+.info-block__value {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.info-block__placeholder {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Espaçador para quando não há nada a ser exibido mas a altura precisa ser mantida */
+.info-block__placeholder--spacer {
+  height: 38px; /* Altura aproximada do InfoBlock para evitar que a barra pule */
+}
+
+
+/* ==========================================================================
+   3. ESTILOS DE ÍCONES (REUTILIZÁVEIS)
+   ========================================================================== */
+.icon--accent {
+  color: var(--color-accent);
+}
+
+.icon--default {
+  color: var(--color-text-secondary);
 }

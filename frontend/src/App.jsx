@@ -22,7 +22,10 @@ function Abas() {
   const [tool, setTool] = useState(null);
   const [user, setUser] = useState(null);
   const [barraLateral, setBarraLateral] = useState(true);
-  
+
+  // novo state para abrir/fechar OpenDocs
+  const [openDocsVisible, setOpenDocsVisible] = useState(false);
+
   //efeito darkmode
   const [darkMode, setDarkMode] = useState(false);
 
@@ -106,21 +109,23 @@ function Abas() {
 
         <div className="background-block">
           {/* Pasta sempre aparece */}
-          <div
-            className={`folders-container ${pastasAbertas ? "open" : "closed"}`}
-          >
-            <FoldersAction
-              pastas={PASTAS}
-              documentos={documentos}
-              setDocumentos={setDocumentos}
-              docSelecionado={docSelecionado}
-              setDocSelecionado={setDocSelecionado}
-              onToggle={() => setPastasAbertas(!pastasAbertas)}
-              setTool={setTool}
-              setBarraLateral={setBarraLateral}
-              barraLateral={barraLateral}
-            />
-          </div>
+
+          <FoldersAction
+            pastas={PASTAS}
+            documentos={documentos}
+            setDocumentos={setDocumentos}
+            docSelecionado={docSelecionado}
+            setDocSelecionado={setDocSelecionado}
+            onToggle={() => setPastasAbertas(!pastasAbertas)}
+            setTool={setTool}
+            setBarraLateral={setBarraLateral}
+            barraLateral={barraLateral}
+            onClose={() => {
+              setOpenDocsVisible(false);
+              setDocSelecionado(null);
+            }}
+            openDocsVisible={openDocsVisible}
+          />
 
           {/* Aqui variam os outros blocos */}
           <Block
@@ -132,6 +137,8 @@ function Abas() {
             setDocumentos={setDocumentos}
             docSelecionado={docSelecionado}
             setDocSelecionado={setDocSelecionado}
+            pastasAbertas={pastasAbertas}
+            setPastasAbertas={setPastasAbertas}
             onVoltar={() => setTool(null)}
             tool={tool}
             setTool={setTool}
@@ -140,6 +147,8 @@ function Abas() {
             setBarraLateral={setBarraLateral}
             setDarkMode={setDarkMode}
             darkMode={darkMode}
+            openDocsVisible={openDocsVisible}
+            setOpenDocsVisible={setOpenDocsVisible}
           />
         </div>
       </div>

@@ -1,10 +1,99 @@
 /* ==========================================================================
-   2. ANALYSIS.CSS (Conteúdo de Análise e Edição)
+   1. LAYOUTS PRINCIPAIS DO COMPONENTE
    ========================================================================== */
 
+/* Container da TELA DE SELEÇÃO (quando nenhum modelo foi escolhido) */
+.AnalisaArquivos {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+/* Container da TELA DE EDIÇÃO (após selecionar um modelo) */
+.analyse-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
 
 
-/* --- Container Principal de Edição --- */
+/* ==========================================================================
+   2. TELA DE SELEÇÃO DE MODELO
+   ========================================================================== */
+
+.AnalisaArquivos h2 {
+  font-size: var(--font-size-h2);
+  margin-bottom: 0;
+}
+
+.AnalisaArquivos h3 {
+  font-size: var(--font-size-h4);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+  margin: 0;
+  max-width: 450px;
+}
+
+.model-list {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.Models-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-width: 160px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.Models-btn:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+  box-shadow: var(--box-shadow-light);
+}
+
+.Models-btn h3 {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.Models-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  max-width: 550px;
+  min-height: 60px;
+  padding: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.Models-text p {
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   3. TELA DE EDIÇÃO (LAYOUT DE DUAS COLUNAS)
+   ========================================================================== */
+
+/* Coluna Esquerda: Variáveis e Upload */
 .edit-content {
   width: 60%;
   height: 100%;
@@ -14,56 +103,110 @@
   overflow-y: auto;
 }
 
-.edit-p {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  word-wrap: break-word;
-  margin-bottom: var(--spacing-lg);
-}
-
-/* --- Sistema de Etapas --- */
+/* Coluna Direita: Etapas */
 .edit-etapas-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   width: 40%;
   height: 100%;
-  position: relative;
+  padding: var(--spacing-lg);
+  background-color: var(--color-background);
 }
 
+
+/* ==========================================================================
+   4. COMPONENTES DA TELA DE EDIÇÃO
+   ========================================================================== */
+
+/* --- Componente de Upload de Arquivo --- */
+.edit-dropzone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  height: 250px;
+  padding: var(--spacing-lg);
+  background-color: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.edit-dropzone:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.edit-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px;
+  padding: var(--spacing-sm);
+  background-color: var(--color-background);
+  border: var(--border-width-md) solid transparent;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.edit-file:hover {
+  border-color: var(--color-accent);
+}
+
+.box-icon-pdf {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-right: var(--spacing-md);
+  background-color: var(--color-danger);
+  color: var(--color-surface);
+  border-radius: var(--border-radius-sm);
+  flex-shrink: 0;
+}
+
+
+/* --- Componente de Etapas --- */
 .edit-etapas {
   background-color: var(--color-surface);
   border: var(--border-width-sm) solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   text-align: center;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .etapa-ativa {
-  border: var(--border-width-md) solid var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   font-weight: var(--font-weight-bold);
+  box-shadow: 0 0 8px rgba(89, 125, 255, 0.2);
 }
 
 .edit-etapas.etapa-disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
-  pointer-events: auto; /* Mantém eventos para animação */
+  pointer-events: auto; /* Mantém eventos para animação de erro */
 }
 
-/* --- Tags de Edição --- */
+
+/* --- Componente de Tags --- */
 .all-tags,
 .show-edit-tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
-  margin: var(--spacing-lg);
-}
-
-.show-edit-tags {
-  margin-top: 30px;
+  margin-top: var(--spacing-lg);
 }
 
 .edit-tags {
@@ -71,9 +214,9 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-md);
-  border: var(--border-width-md) solid;
-  border-radius: 25px;
-  transition: all 0.2s ease;
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: 999px; /* Formato de pílula */
+  transition: all 0.15s ease;
 }
 
 .edit-tags input[type="checkbox"] {
@@ -81,98 +224,17 @@
 }
 
 .edit-tags label {
-  color: var(--color-text-primary);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
   font-size: var(--font-size-xs);
   cursor: pointer;
   user-select: none;
 }
 
-/* Estilo da tag quando selecionada */
 .edit-tags:has(input[type="checkbox"]:checked) {
-  background: var(--color-text-primary);
-}
-
-.edit-tags:has(input[type="checkbox"]:checked) label {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
   color: var(--color-surface);
 }
 
-.box-icon-pdf {
-  background-color: var(--color-danger);
-  padding: 10px;
-  margin-inline: 10px;
-  border-radius: 10px;
-  color: var(--color-background);
-  opacity: 0.8;
-}
-
-.edit-file {
-  background-color: var(--color-background);
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 80px;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease-in;
-}
-
-.edit-file:hover {
-  border: 2px solid var(--color-danger)
-}
-
-.edit-dropzone {
-  background-color: var(--color-switch-inactive);
-  width: 98%;
-  height: 250px;
-  display: flex;
-  border-radius: 10px;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* --- Input de Tags --- */
-.alterName-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  width: 100%;
-  background-color: var(--color-surface);
-  border: var(--border-width-md) solid var(--color-border);
-  border-radius: 16px;
-  padding: var(--spacing-sm);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-xs);
-  width: 100%;
-}
-
-.tags-input input {
-  flex: 1;
-  min-width: 120px;
-  border: none;
-  outline: none;
-  font-size: var(--font-size-sm);
-  padding: var(--spacing-xs);
-}
-
-.tag {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background-color: var(--color-background); /* Usando uma cor de fundo do tema */
-  color: var(--color-text-primary);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.edit-tags:has(input[type="checkbox"]:checked) label {
+  color: inherit;
 }
