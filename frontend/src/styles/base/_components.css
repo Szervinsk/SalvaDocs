@@ -1,6 +1,129 @@
- /* COMPONENTES */
+/* ==========================================================================
+    BARRAS (NAVBAR, ACTION, STATUS)
+   ========================================================================== */
 
-/* Botões */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  height: var(--header-height);
+  background: var(--color-surface);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   LAYOUT PRINCIPAL DA ACTION BAR E DA STATUS BAR
+   ========================================================================== */
+.action-bar,
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.action-bar {
+  height: 50px;
+  border-bottom: var(--border-width-md) solid var(--color-border);
+}
+
+.status-bar {
+  height: 60px;
+  border-top: var(--border-width-md) solid var(--color-border);
+}
+
+.action-bar__info,
+.status-bar__info {
+  display: flex;
+  align-items: center;
+}
+
+.action-bar__actions,
+.status-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ==========================================================================
+  COMPONENTE INFOBLOCK (REUTILIZÁVEL)
+   ========================================================================== */
+.info-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-block__title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-block__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: 4px;
+}
+
+.info-block__value {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.info-block__placeholder {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Espaçador para quando não há nada a ser exibido mas a altura precisa ser mantida */
+.info-block__placeholder--spacer {
+  height: 38px;
+}
+
+/* ==========================================================================
+ ESTILOS DE ÍCONES (REUTILIZÁVEIS)
+   ========================================================================== */
+.icon--accent {
+  color: var(--color-accent);
+}
+
+.icon--default {
+  color: var(--color-text-secondary);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--color-accent);
+  background-color: rgba(var(--color-accent-rgb), 0.1);
+}
+
+/* ==========================================================================
+   2. BOTÕES
+   ========================================================================== */
+
 .btn {
   display: inline-flex;
   justify-content: center;
@@ -12,21 +135,16 @@
   font-family: var(--font-family-base);
 }
 
-.btn:active {
-  transform: translateY(1px);
-  opacity: 0.9;
-}
-
 .btn-primary {
   width: 150px;
   height: 40px;
-  border-radius: 5px;
-  border: var(--border-width-md) solid var(--color-accent);
-  padding: var(--spacing-sm) var(--spacing-sm);
+  padding: var(--spacing-sm);
   gap: 12px;
   color: var(--color-surface);
   background: var(--color-accent);
+  border: var(--border-width-md) solid var(--color-accent);
   box-shadow: 0 2px #999;
+  border-radius: 10px;
 }
 
 .btn-primary:active {
@@ -36,96 +154,85 @@
 
 .btn-secondary {
   background-color: var(--color-surface);
-  border-radius: 5px;
   border: var(--border-width-md) solid var(--color-border);
   box-shadow: var(--box-shadow-light);
-  min-width: 40px;
-  align-items: center;
-  width: 32px;
-  height: 32px;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:active {
-  box-shadow: 0 1px #888;
-  transform: translateY(2px);
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
 }
 
 .btn-secondary:hover {
   color: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 0 4px var(--color-accent);
 }
 
-.btn-toggle {
-  color: var(--color-text-primary);
-}
-
-.btn-toggle:hover {
-  color: var(--color-accent);
-  transition: all 0.3s ease-in-out;
-}
-
-/* Alertas e Pop-ups */
-.alert {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-sm);
-  border-left: 10px solid var(--color-danger);
-  padding: var(--spacing-sm) var(--spacing-md);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  animation: slide-in 0.3s ease forwards;
-  opacity: 0;
-}
-
-.alert.success {
-  background: var(--color-success-bg);
-  color: var(--color-success-text);
-  border-color: var(--color-success-text);
-}
-
-.alert.error {
-  background: var(--color-error-bg);
-  color: var(--color-error-text);
-  border-color: var(--color-error-text);
-}
-
-.moreOptions {
+.btn-danger {
   background-color: var(--color-surface);
   border: var(--border-width-md) solid var(--color-border);
   box-shadow: var(--box-shadow-light);
-  border-radius: var(--border-radius-sm);
-  padding: var(--spacing-xs);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: absolute;
-  top: 100px;
-  right: var(--spacing-lg);
-  animation: slide-in-down 0.3s ease forwards;
-  opacity: 0;
+  color: var(--color-danger);
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
-/* Ícones */
-.icon {
-  color: var(--color-text-primary);
-}
-
-.icon-accent {
+.btn-danger:hover {
   color: var(--color-surface);
-  background-color: var(--color-accent);
-  width: 28px;
-  height: 28px;
-  padding: var(--spacing-xs);
-  border-radius: var(--border-radius-sm);
-  margin: 0 var(--spacing-sm);
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
-/* Switch (Toggle) */
+.btn-mini {
+  background-color: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+}
+
+.btn-mini:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ==========================================================================
+   3. OUTROS COMPONENTES
+   ========================================================================== */
+
+/* --- Alertas --- */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  min-width: 200px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  box-shadow: var(--box-shadow-medium);
+  border-radius: var(--border-radius-md);
+  z-index: 1000;
+  animation: fadeIn 0.4s ease;
+}
+
+.alert.success {
+  border-left: 4px solid var(--color-success-text);
+}
+.alert.error {
+  border-left: 4px solid var(--color-error-text);
+}
+.alert.warning {
+  border-left: 4px solid var(--color-warning-border);
+}
+
+/* --- Switch (Toggle) --- */
 .switch {
   position: relative;
   display: inline-block;
@@ -164,156 +271,18 @@
 input:checked + .slider {
   background-color: var(--color-accent);
 }
-
 input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-/* Outros Componentes */
-.documents {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  width: 100%;
-}
-
-.lengthDocs {
-  background-color: var(--color-text-primary);
-  opacity: 0.75;
-  color: var(--color-surface);
-  border-radius: var(--border-radius-md);
-  min-width: 20px;
-  min-height: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: var(--font-size-xs);
-}
-
-.tags {
-  width: 100%;
-  min-height: 32px;
-  align-items: center;
-  justify-content: space-between;
-  display: flex;
-  cursor: pointer;
-  gap: var(--spacing-lg);
-  transition: color 0.3s ease-in;
-}
-
-.tags:hover {
-  color: var(--color-accent);
-}
-
-.account-img {
-  background-color: var(--color-accent);
-  width: 30px;
-  height: 30px;
-  border-radius: 100%;
-}
-
-.status-bar {
-  background: var(--color-surface);
-  height: 80px;
-  width: 90%;
-  position: absolute;
-  bottom: 0;
-  padding: 10px;
-  box-sizing: border-box;
-  align-items: center;
-  display: flex;
-  border-top: var(--border-width-md) solid var(--color-border);
-}
-
-.action-bts {
-  display: flex;
-  gap: 10px;
-  height: 50px;
-  top: 0;
-  align-items: center;
-  position: absolute;
-  right: 20px;
-}
-
-/* ==========================================================================
-   1. LAYOUT PRINCIPAL DA ACTION BAR
-   ========================================================================== */
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  gap: var(--spacing-lg);
-  width: 100%;
-  height: 50px;
-  padding: 0 var(--spacing-lg);
-  background: var(--color-surface);
-  border-bottom: var(--border-width-md) solid var(--color-border);
-}
-
-.action-bar__info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.action-bar__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-/* ==========================================================================
-   2. COMPONENTE INFOBLOCK
-   ========================================================================== */
-.info-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.info-block__title {
-  margin: 0;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-normal);
-  text-transform: uppercase;
-}
-
-.info-block__content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  margin-top: 4px; /* Equivalente ao seu marginTop: 5 antigo */
-}
-
-.info-block__value {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.info-block__placeholder {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-/* Espaçador para quando não há nada a ser exibido mas a altura precisa ser mantida */
-.info-block__placeholder--spacer {
-  height: 38px; /* Altura aproximada do InfoBlock para evitar que a barra pule */
-}
-
-
-/* ==========================================================================
-   3. ESTILOS DE ÍCONES (REUTILIZÁVEIS)
-   ========================================================================== */
-.icon--accent {
-  color: var(--color-accent);
-}
-
-.icon--default {
-  color: var(--color-text-secondary);
+/* --- Animações --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

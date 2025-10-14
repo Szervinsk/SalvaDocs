@@ -19,7 +19,11 @@ export default (sequelize) => {
       hooks: true,
     });
 
-    // se quiser, associar outro relacionamento aqui
+    // Um Documento pertence a uma Pasta (belongsTo)
+    Document.belongsTo(models.Folder, {
+      foreignKey: "folderId",
+      as: "folder",
+    });
   };
 
   return Document;

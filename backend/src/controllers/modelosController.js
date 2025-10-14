@@ -1,31 +1,36 @@
-// controllers/modelosController.js
 import models from "../models/index.js";
 
+// GET /api/modelos -> Retorna TODOS os modelos com suas tags
 export const getAllModelos = async (req, res) => {
   try {
-    const modelo = await models.Modelo.findAll({
-      attributes: ["id","name","description"],
+    const modelos = await models.Modelo.findAll({
+      attributes: ["id", "name", "description"],
+      include: [{
+        model: models.TagBase,
+        as: "tagsBase",
+        attributes: ["id", "name"],
+        through: { attributes: [] }
+      }],
+      order: [['name', 'ASC']],
     });
-
-    res.json(modelo)
+    res.json(modelos);
   } catch (err) {
-    console.error("Erro ao buscar os modelos", err)
-    res.status(500 ).json({error: "Erro interno do servidor"})
+    console.error("Erro ao buscar os modelos:", err);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
-}
+};
 
-// GET /api/models/:id -> retorna o modelo e suas tags associadas
+// GET /api/modelos/:id -> Retorna UM modelo específico com suas tags
 export const getModelos = async (req, res) => {
   try {
-    const { id } = req.params; // <-- aqui está o id da URL
-
+    const { id } = req.params;
     const modelo = await models.Modelo.findByPk(id, {
-      include: [
-        {
-          model: models.TagBase,
-          as: "tagsBase", // ✅ tem que bater com o alias do Modelo
-        },
-      ],
+      include: [{
+        model: models.TagBase,
+        as: "tagsBase",
+        attributes: ["id", "name", "type", "icon", "regex", "prompt", "category"],
+        through: { attributes: [] },
+      }],
     });
 
     if (!modelo) {
@@ -39,35 +44,68 @@ export const getModelos = async (req, res) => {
   }
 };
 
-// POST /api/models -> cria novo modelo
+// POST /api/modelos/create -> Cria um novo modelo
 export const createModelo = async (req, res) => {
   try {
-    const modelo = await models.Modelo.create(req.body);
-    res.status(201).json(modelo);
+    const { name, description, tagIds } = req.body;
+    const newModelo = await models.Modelo.create({ name, description });
+
+    if (tagIds && tagIds.length > 0) {
+      await newModelo.setTagsBase(tagIds);
+    }
+
+    // Retorna o modelo recém-criado com suas associações
+    const result = await models.Modelo.findByPk(newModelo.id, {
+        include: [{ model: models.TagBase, as: 'tagsBase', through: { attributes: [] } }]
+    });
+
+    res.status(201).json(result);
   } catch (err) {
     console.error("Erro ao criar modelo:", err);
     res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
-// PUT /api/models/:id/tags -> atualiza as tags do modelo
-export const updateModeloTags = async (req, res) => {
+// PUT /api/modelos/:id -> Atualiza um modelo existente
+export const updateModelo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { tagIds } = req.body; // array de ids de tags
+    const { name, description, tagIds } = req.body;
 
     const modelo = await models.Modelo.findByPk(id);
-    if (!modelo)
+    if (!modelo) {
       return res.status(404).json({ error: "Modelo não encontrado" });
+    }
 
-    await modelo.setTags(tagIds); // Sequelize cria/atualiza as relações
-    const modeloComTags = await models.Modelo.findByPk(id, {
-      include: [{ model: models.Tag, through: { attributes: [] } }],
+    await modelo.update({ name, description });
+
+    if (Array.isArray(tagIds)) {
+      await modelo.setTagsBase(tagIds);
+    }
+    
+    const updatedModelo = await models.Modelo.findByPk(id, {
+        include: [{ model: models.TagBase, as: 'tagsBase', through: { attributes: [] } }]
     });
 
-    res.json(modeloComTags);
+    res.json(updatedModelo);
   } catch (err) {
-    console.error("Erro ao atualizar tags do modelo:", err);
+    console.error("Erro ao atualizar modelo:", err);
     res.status(500).json({ error: "Erro interno do servidor" });
   }
+};
+
+// DELETE /api/modelos/:id -> Exclui um modelo
+export const deleteModelo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const modelo = await models.Modelo.findByPk(id);
+        if (!modelo) {
+            return res.status(404).json({ error: "Modelo não encontrado" });
+        }
+        await modelo.destroy();
+        res.status(200).json({ message: "Modelo excluído com sucesso." });
+    } catch (err) {
+        console.error("Erro ao excluir modelo:", err);
+        res.status(500).json({ error: "Erro interno do servidor" });
+    }
 };

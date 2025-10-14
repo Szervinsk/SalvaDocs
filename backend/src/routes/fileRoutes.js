@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { uploadFileAndAnalyze, getAllDocuments, DeleteDoc } from "../controllers/fileController.js";
+import { uploadFileAndAnalyze, getAllDocuments, deleteDoc } from "../controllers/fileController.js";
 
 const router = express.Router();
 
@@ -22,6 +22,6 @@ const upload = multer({ storage });
 
 router.post("/upload", upload.single("file"), uploadFileAndAnalyze);
 router.get("/documentos", getAllDocuments);
-router.delete("/documentos/:id", DeleteDoc); // melhor usar DELETE do que POST
+router.delete("/documentos/:id", deleteDoc);
 
 export default router;

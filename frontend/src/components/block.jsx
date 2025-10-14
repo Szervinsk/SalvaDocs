@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
-
 import { Icons } from "../constants/icons";
 import { ETAPAS } from "../constants/constants";
 import ActionBar from "./bars/actionStatusBars/action-bar";
 import axios from "axios";
+import { AnimatePresence } from "framer-motion";
 
-// tools
+// Tools
 import AnalyseDoc from "./tools/analyse/analyse";
 import Home from "./tools/home/home";
 import EditModels from "./tools/models/edit-models";
 import Configurations from "./tools/configurations/configurations";
 import Account from "./tools/account/account";
 import OpenDocs from "./openDocs/open-docs";
-
 import StatusBar from "./bars/actionStatusBars/status-bar";
 
 function Block({
@@ -26,69 +25,42 @@ function Block({
   setDocSelecionado,
   tool,
   setTool,
-  onVoltar,
-  pastasAbertas,
-  setPastasAbertas,
   user,
+  pastas,
   setDarkMode,
   darkMode,
-  barraLateral,
-  setBarraLateral,
-  setOpenDocsVisible,
-  openDocsVisible,
+  showAlert, // Recebendo showAlert para passar para OpenDocs
 }) {
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
   const [erroArquivo, setErroArquivo] = useState(false);
   const [tremer, setTremer] = useState(false);
-  const [closeAlert, setCloseAlert] = useState(false);
   const [more, setMore] = useState(false);
   const [isResponse, setIsResponse] = useState(false);
-  const [alert, setAlert] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [tags, setTags] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
+  // Limpa o estado da análise quando o 'tool' principal muda
   useEffect(() => {
-    if (docSelecionado) {
-      setOpenDocsVisible(true);
-    }
-  }, [docSelecionado]);
-
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/tags/")
-      // endpoint retorna modelo com suas tags
-      .then((res) => {
-        const tagsDoModelo = res.data || [];
-        setTags(tagsDoModelo);
-      });
-  }, []);
-
-  const [lastTool, setLastTool] = useState(null);
-
-  // função pra alternar expansão
-  const toggleExpandDocs = () => {
-    if (tool === 6) {
-      // volta ao tool antigo
-      if (lastTool) setTool(lastTool);
-    } else {
-      // guarda o tool atual e expande
-      setLastTool(tool);
-      setTool(6);
-    }
-  };
-
-
-  const showAlert = (type, message) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
-
-  useEffect(() => {
-    if (tool === 2) {
+    if (tool !== 2) {
+      setSelectedModel(null);
+      setSelectedTags([]);
+      setFile(null);
       setEtapaAtual(1);
     }
-  }, [tool]);
+  }, [tool, setSelectedModel, setSelectedTags, setFile, setEtapaAtual]);
+
+  // Busca todas as tags disponíveis ao montar o componente
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/tags/")
+      .then((res) => {
+        setTags(res.data || []);
+      })
+      .catch(err => console.error("Erro ao buscar todas as tags:", err));
+  }, []);
+
+  const toggleExpandDocs = () => setIsExpanded(prev => !prev);
 
   const triggerShake = () => {
     setErroArquivo(true);
@@ -100,8 +72,7 @@ function Block({
 
   const isEtapaDisabled = (id) => {
     if (id <= etapaAtual) return false;
-    if (id === 2) return false;
-    if (id === 3) return !file;
+    if (id === 3 && !file) return true;
     return false;
   };
 
@@ -111,30 +82,17 @@ function Block({
         return (
           <Home
             documentos={documentos}
-            modelos={modelos}
             user={user}
             setDocSelecionado={setDocSelecionado}
             docSelecionado={docSelecionado}
-            onVoltar={onVoltar}
-            setDocumentos={setDocumentos}
+            setTool={setTool}
             setSelectedModel={setSelectedModel}
             setEtapaAtual={setEtapaAtual}
-            showAlert={showAlert}
-            setTool={setTool}
-            setBarraLateral={setBarraLateral}
-            onClose={() => {
-              setOpenDocsVisible(false);
-              setDocSelecionado(null);
-              setIsResponse(false);
-              setEtapaAtual(1);
-            }}
           />
         );
-
       case 2:
         return (
           <AnalyseDoc
-            openDocsVisible={openDocsVisible}
             setModelos={setModelos}
             modelos={modelos}
             selectedModel={selectedModel}
@@ -147,136 +105,95 @@ function Block({
             file={file}
             setFile={setFile}
             erroArquivo={erroArquivo}
-            setErroArquivo={setErroArquivo}
             tremer={tremer}
-            setTremer={setTremer}
-            closeAlert={closeAlert}
-            setCloseAlert={setCloseAlert}
-            more={more}
-            setMore={setMore}
-            isResponse={isResponse}
             setIsResponse={setIsResponse}
-            documentos={documentos}
-            setDocumentos={setDocumentos}
-            docSelecionado={docSelecionado}
             setDocSelecionado={setDocSelecionado}
-            onVoltar={onVoltar}
             triggerShake={triggerShake}
             isEtapaDisabled={isEtapaDisabled}
             showAlert={showAlert}
             user={user}
             setTool={setTool}
+            tags={tags}
             setTags={setTags}
-            tags={tags}
+            setDocumentos={setDocumentos}
+            pastas={pastas}
           />
         );
-
       case 3:
-        return (
-          <EditModels
-            modelos={modelos}
-            tags={tags}
-          />
-        );
-
+        return <EditModels modelos={modelos} tags={tags} pastas={pastas} showAlert={showAlert}/>;
       case 4:
-        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} setBarraLateral={setBarraLateral} barraLateral={barraLateral} pastasAbertas={pastasAbertas} setPastasAbertas={setPastasAbertas} />
-
+        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} />;
       case 5:
         return <Account user={user} />;
-
-      case 6:
-        return null;
-
       default:
-        setTool(1);
+        // Se nenhuma ferramenta estiver selecionada (tool === null), renderiza Home
+        if (tool === null) {
+          return (
+            <Home
+              documentos={documentos}
+              user={user}
+              setDocSelecionado={setDocSelecionado}
+              docSelecionado={docSelecionado}
+              setTool={setTool}
+              setSelectedModel={setSelectedModel}
+              setEtapaAtual={setEtapaAtual}
+            />
+          );
+        }
+        return null;
     }
   };
 
   return (
-    <>
-      {alert && (
-        <div className={`alert ${alert.type}`}>
-          {alert.message}
-          <Icons.Close size={20} onClick={() => setAlert(null)} />
-        </div>
-      )}
+    <main className="switch-area">
+      <ActionBar
+        docSelecionado={docSelecionado}
+        selectedModel={selectedModel}
+        setDocSelecionado={setDocSelecionado}
+        selectedTags={selectedTags}
+        etapaAtual={etapaAtual}
+        file={file}
+        setMore={setMore}
+        more={more}
+        tool={tool}
+        setTool={setTool}
+        pastas={pastas}
+      />
 
-      <main className="switch-area">
-        {/* Action Bar */}
-        <ActionBar
-          docSelecionado={docSelecionado}
-          selectedModel={selectedModel}
-          selectedTags={selectedTags}
-          etapaAtual={etapaAtual}
-          file={file}
-          setMore={setMore}
-          more={more}
-          tool={tool}
-          setTool={setTool}
-          setDocSelecionado={setDocSelecionado}
-          setSearchQuery={setSearchQuery}
-          searchQuery={searchQuery}
-          setOpenDocsVisible={setOpenDocsVisible} // passa controle pro actionbar se quiser abrir
-        />
-
-        {/* Middle Area */}
-        <div
-          className={`middle-area 
-    ${openDocsVisible ? "with-open-docs" : ""} 
-    ${tool === 6 ? "expanded" : ""}`}
-        >
-          <div
-            className="main-content"
-            style={{ filter: openDocsVisible ? "blur(2px)" : "none" }}
-          >
-            {openDocsVisible ? (<div className="blur-overlay"></div>) : null}
-            {handleSelectTool(tool)}
-          </div>
-
-          <div className="open-docs-wrapper">
-            {openDocsVisible && docSelecionado && (
-              <OpenDocs
-                docSelecionado={docSelecionado}
-                tags={docSelecionado.tags?.map(tag => ({
-                  ...tag,
-                  id: String(tag.id) // garante que seja string
-                })) || []}
-                setDocSelecionado={setDocSelecionado}
-                setSelectedModel={setSelectedModel}
-                setEtapaAtual={setEtapaAtual}
-                setDocumentos={setDocumentos}
-                setIsResponse={setIsResponse}
-                showAlert={showAlert}
-                setTool={setTool}
-                onClose={() => {
-                  setOpenDocsVisible(false);
-                  setDocSelecionado(null);
-                  setIsResponse(false);
-                  setEtapaAtual(1);
-                }}
-                onToggleExpand={toggleExpandDocs}
-                isExpanded={tool === 6}
-              />
-
-            )}
-          </div>
+      <div className="middle-area">
+        {/* O conteúdo principal (Home, AnalyseDoc, etc.) é renderizado aqui */}
+        <div className="main-content">
+          {handleSelectTool(tool)}
         </div>
 
+        {/* O OpenDocs (modal) é renderizado por cima quando um doc está selecionado */}
+        <AnimatePresence>
+          {docSelecionado && (
+            <OpenDocs
+              docSelecionado={docSelecionado}
+              setDocumentos={setDocumentos}
+              showAlert={showAlert}
+              onClose={() => setDocSelecionado(null)}
+              onToggleExpand={toggleExpandDocs}
+              isExpanded={isExpanded}
+            />
+          )}
+        </AnimatePresence>
+      </div>
 
+      {/* A StatusBar aparece condicionalmente na parte inferior */}
+      {(tool === 2 && selectedModel) && (
         <StatusBar
           selectedModel={selectedModel}
-          setEtapaAtual={setEtapaAtual}
           setSelectedModel={setSelectedModel}
           etapaAtual={etapaAtual}
+          setEtapaAtual={setEtapaAtual}
           file={file}
           triggerShake={triggerShake}
-          docSelecionado={docSelecionado}
           setSelectedTags={setSelectedTags}
-          tool={tool}
         />
-      </main>
-    </>
+      )}
+    </main>
   );
 }
 

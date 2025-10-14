@@ -1,131 +1,120 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Login from "./login";
 import Cadastro from "./sign";
-import "./auth.css"
+import "./auth.css";
 
-function AuthForm({ isLogged, setIsLogged, user, setUser }) {
+function AuthForm({ setIsLogged, setUser }) {
   const [mode, setMode] = useState("login"); // 'login' ou 'signup'
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
+  const [error, setError] = useState("");
 
-  // Função para buscar dados do usuário com token
-  const fetchMe = async (accessToken) => {
+  // Função unificada para realizar a autenticação e definir o usuário
+  const authenticateAndSetUser = async (token) => {
     try {
       const res = await fetch("http://localhost:5000/api/auth/me", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        credentials: "include", // envia cookies se houver
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok)
-        throw new Error("Não foi possível obter os dados do usuário");
-
-      const data = await res.json();
-      return data; // { id, username, email }
+      if (!res.ok) throw new Error("Sessão inválida. Por favor, entre novamente.");
+      const userInfo = await res.json();
+      setUser(userInfo);
+      setIsLogged(true);
     } catch (err) {
-      console.error("Erro fetchMe:", err);
-      return null;
+      localStorage.removeItem("accessToken");
+      setError(err.message);
     }
   };
 
-  // Checa se já existe token no localStorage ao montar componente
+  // Checa o token ao montar o componente
   useEffect(() => {
-    const init = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        const userInfo = await fetchMe(token);
-        if (userInfo) {
-          setUser(userInfo);
-          setIsLogged(true);
-        } else {
-          localStorage.removeItem("accessToken"); // token inválido
-        }
-      }
-    };
-    init();
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      authenticateAndSetUser(token);
+    }
   }, [setUser, setIsLogged]);
 
-  // Login
-  const handleLogin = async ({ email, password }) => {
+  // Função para lidar com o login
+  const handleLogin = async (credentials) => {
     setLoading(true);
-    setErr("");
+    setError("");
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
+        body: JSON.stringify(credentials),
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro no login");
-
-      // Salva token
+      if (!res.ok) throw new Error(data.error || "Erro no login.");
+      
       localStorage.setItem("accessToken", data.accessToken);
-
-      // Usa diretamente o usuário que veio do backend
       setUser(data.user);
       setIsLogged(true);
     } catch (err) {
-      console.error(err);
-      setErr(err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Cadastro
-  const handleSignup = async ({ name, email, password, forWork }) => {
+  // Função para lidar com o cadastro
+  const handleSignup = async (details) => {
     setLoading(true);
-    setErr("");
+    setError("");
     try {
       const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name, email, password, forWork }),
+        body: JSON.stringify(details),
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao cadastrar");
+      if (!res.ok) throw new Error(data.error || "Erro ao cadastrar.");
 
-      // Se o backend já retornar token no cadastro
-      if (data.accessToken)
-        localStorage.setItem("accessToken", data.accessToken);
+      // Após o cadastro, faz o login automaticamente
+      await handleLogin({ email: details.email, password: details.password });
 
-      const token = data.accessToken || localStorage.getItem("accessToken");
-      const userInfo = await fetchMe(token);
-      setUser(userInfo || data.user);
-      setIsLogged(true);
     } catch (err) {
-      console.error(err);
-      setErr(err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (isLogged) {
-    return <h2>Bem-vindo, {user?.email || user?.username}!</h2>;
-  }
+  const formVariants = {
+    hidden: { opacity: 0, x: mode === 'login' ? -100 : 100 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: mode === 'login' ? 100 : -100 },
+  };
 
-  return mode === "login" ? (
-    <Login
-      onSubmit={handleLogin}
-      loading={loading}
-      err={err}
-      switchToSignup={() => setMode("signup")}
-    />
-  ) : (
-    <Cadastro
-      onSubmit={handleSignup}
-      err={err}
-      loading={loading}
-      switchToLogin={() => setMode("login")}
-    />
+  return (
+    <main className="auth-container">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={mode}
+          className="auth-card"
+          variants={formVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          {mode === "login" ? (
+            <Login
+              onSubmit={handleLogin}
+              loading={loading}
+              err={error}
+              switchToSignup={() => setMode("signup")}
+            />
+          ) : (
+            <Cadastro
+              onSubmit={handleSignup}
+              loading={loading}
+              err={error}
+              switchToLogin={() => setMode("login")}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </main>
   );
 }
 

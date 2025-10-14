@@ -53,14 +53,14 @@ function Account({ user }) {
             <div className="details-card__body">
               <div className="info-row">
                 <div className="info-row__label">
-                  <Icons.User size={16} />
+                  <Icons.People size={16} />
                   <span>Nome de Usuário</span>
                 </div>
                 <span className="info-row__value">{user?.username || "-"}</span>
               </div>
               <div className="info-row">
                 <div className="info-row__label">
-                  <Icons.Interface size={16} /> {/* Reutilizando ícone de e-mail */}
+                  <Icons.Model size={16} /> {/* Reutilizando ícone de e-mail */}
                   <span>Email</span>
                 </div>
                 <span className="info-row__value">{user?.email || "-"}</span>

@@ -1,54 +1,48 @@
-import { useState , useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Icons } from "../../../../constants/icons";
-import { TAGS } from "../../../../constants/constants";
-function AlterNameWithTags({ selectedTags, selectedModel, setFileName }) {
+
+function AlterNameWithTags({ selectedTags, selectedModel, setFileName, tags }) {
   const [inputValue, setInputValue] = useState("");
 
-  // sempre que inputValue mudar, sincroniza com o pai
+  // Efeito para atualizar o nome do arquivo no componente pai
   useEffect(() => {
     setFileName(inputValue);
   }, [inputValue, setFileName]);
 
-  const tagsSelecionadas = TAGS.todasTags.filter((tag) =>
-    selectedTags.includes(tag.id)
-  );
+  // CORREÇÃO: Filtra o array `tags` para encontrar os objetos
+  // correspondentes aos IDs em `selectedTags`.
+  const tagsSelecionadas = selectedTags;
 
-  const adicionarTagNoInput = (tagContent) => {
-    setInputValue((prev) =>
-      prev ? `${prev} {${tagContent}}` : `{${tagContent}}`
-    );
+  // Função para adicionar uma tag ao campo de input
+  const adicionarTagAoInput = (tagName) => {
+    const tagFormatada = `{${tagName}}`;
+    // Adiciona com um espaço se o campo não estiver vazio
+    setInputValue((prev) => (prev ? `${prev} ${tagFormatada}` : tagFormatada));
   };
 
   return (
-    <div className="alterName-container" style={{ marginTop: 10 }}>
-      <div className="tags-input , flex-down-top">
-        <input
-          type="text"
-          placeholder="Digite o nome ou clique nas tags..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          style={{ marginBottom: "10px", width: "100%" }}
-        />
+    <div className="alterName-container">
+      <input
+        type="text"
+        className="text-input"
+        placeholder="Digite o nome ou clique nas tags..."
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      />
+      <div className="tag-list-sm">
+        {/* Botão para adicionar o nome do modelo */}
+        {selectedModel?.name && (
+          <button className="tag-pill-sm" onClick={() => adicionarTagAoInput(selectedModel.name)}>
+            {selectedModel.name} <Icons.Add size={12} />
+          </button>
+        )}
 
-        <div className="tags-list">
-          {selectedModel?.name && (
-            <span
-              className="tag"
-              onClick={() => adicionarTagNoInput(selectedModel.name)}
-            >
-              {selectedModel.name} <Icons.Add size={15} />
-            </span>
-          )}
-          {tagsSelecionadas.map((tag) => (
-            <span
-              key={tag.id}
-              className="tag"
-              onClick={() => adicionarTagNoInput(tag.content)}
-            >
-              {tag.content} <Icons.Add size={15} />
-            </span>
-          ))}
-        </div>
+        {/* Botões para cada tag selecionada */}
+        {tagsSelecionadas.map((tag) => (
+          <button key={tag.id} className="tag-pill-sm" onClick={() => adicionarTagAoInput(tag.name)}>
+            {tag.name} <Icons.Add size={12} />
+          </button>
+        ))}
       </div>
     </div>
   );

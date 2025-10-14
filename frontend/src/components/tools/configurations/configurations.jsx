@@ -41,7 +41,7 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
         {/* Card de Interface */}
         <div className="config-card">
           <div className="config-card__info">
-            <Icons.Interface size={20} />
+            <Icons.Model size={20} />
             <div>
               <h3>Interface</h3>
               <p>Escolha entre o tema claro ou escuro.</p>
@@ -101,7 +101,7 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
         {/* Card de Layout */}
         <div className="config-card">
           <div className="config-card__info">
-            <Icons.Layout size={20} />
+            <Icons.FileList size={20} />
             <div>
               <h3>Painel de Pastas</h3>
               <p>Exibir ou ocultar o painel lateral de pastas.</p>

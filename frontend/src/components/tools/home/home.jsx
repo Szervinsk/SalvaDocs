@@ -1,282 +1,307 @@
-import { useState } from "react";
-import { PASTAS } from "../../../constants/constants";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "../../../constants/icons";
 import "./home.css";
 import SearchBar from "../../bars/searchBar/searchbar";
+import axios from "axios";
 
-// Funções auxiliares para gráficos de pizza
-const polarToCartesian = (cx, cy, r, angle) => {
-  const rad = ((angle - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+// ==========================================================================
+// SUB-COMPONENTES PARA CADA ABA
+// ==========================================================================
+
+// --- ABA 1: ACESSO RÁPIDO ---
+const AcessoRapido = ({ documentos, setTool, setSelectedModel }) => (
+  <motion.div
+    key="acesso-rapido"
+    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+    className="home-section-container"
+  >
+    {/* Nova Seção de Ações Recomendadas */}
+    <section className="home-section">
+      <h4>Ações Recomendadas</h4>
+      <div className="action-cards-container">
+        <div className="action-card">
+          <div className="action-card__icon" style={{backgroundColor: 'rgba(255, 193, 7, 0.1)', color: '#FFC107'}}><Icons.Retry size={20}/></div>
+          <div className="action-card__info">
+            <h5>1 Documento com Erro</h5>
+            <p>Um documento falhou na última análise. Tente novamente.</p>
+          </div>
+          <button className="icon-btn"><Icons.ArrowRight size={16}/></button>
+        </div>
+        {/* Adicione mais cards de ação aqui baseados em dados reais */}
+      </div>
+    </section>
+
+    <section className="home-section">
+      <h4>Atalhos Rápidos</h4>
+      <div className="atalhos-container">
+        <div className="atalho-card" onClick={() => setTool(3)}><Icons.Model size={25} /><h5>Gerenciar Conteúdo</h5><p>Edite modelos, tags e pastas.</p></div>
+        <div className="atalho-card" onClick={() => setTool(2)}><Icons.ScannerDocument size={25} /><h5>Analisar Documento</h5><p>Inicie uma nova análise.</p></div>
+        <div className="atalho-card" onClick={() => { setTool(2); setSelectedModel({ name: "Despacho" }); }}><Icons.Send size={25} /><h5>Analisar Despacho</h5><p>Use o modelo mais popular.</p></div>
+        <div className="atalho-card" onClick={() => setTool(4)}><Icons.Adjustments size={25} /><h5>Configurações</h5><p>Personalize sua experiência.</p></div>
+      </div>
+    </section>
+
+    <section className="home-section">
+      <h4>Atividade Recente</h4>
+      <div className="activity-list">
+        {documentos.length > 0 ? (
+          documentos.slice(0, 3).map((doc) => (
+            <div key={doc.id} className="activity-item">
+              <div className="activity-icon"><Icons.Archive size={16} /></div>
+              <div className="activity-content">
+                <p><strong>{doc.templateName || doc.name}</strong> foi analisado</p>
+                <span>{new Date(doc.createdAt).toLocaleString("pt-BR", { dateStyle: 'short', timeStyle: 'short' })}</span>
+              </div>
+            </div>
+          ))
+        ) : <p className="empty-text">Nenhuma atividade recente.</p>}
+      </div>
+    </section>
+  </motion.div>
+);
+
+// --- ABA 2: GRÁFICOS ---
+const Graficos = ({ documentos, modelos }) => {
+  const COLORS = ["#0d6efd", "#198754", "#ffc107", "#dc3545", "#6f42c1"];
+
+  // Dados para Gráfico 1: Documentos nos últimos 7 dias
+  const docsPorDia = Array(7).fill(0);
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  documentos.forEach(doc => {
+    const dataDoc = new Date(doc.createdAt);
+    dataDoc.setHours(0, 0, 0, 0);
+    const diffTime = hoje - dataDoc;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays < 7) {
+      docsPorDia[6 - diffDays]++;
+    }
+  });
+  const maxDocsDia = Math.max(...docsPorDia) || 1;
+
+  // Dados para Gráfico 2: Uso de Modelos
+  const modelData = modelos.map(modelo => ({
+    name: modelo.name,
+    value: documentos.filter(doc => doc.model === modelo.name).length
+  })).filter(p => p.value > 0).sort((a,b) => b.value - a.value);
+
+  return (
+    <motion.div
+      key="graficos"
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="charts-grid"
+    >
+      <div className="chart-card">
+        <h4>Documentos por Dia (Últimos 7 dias)</h4>
+        <div className="bar-chart">
+          {docsPorDia.map((value, index) => (
+            <div key={index} className="bar-chart__item">
+              <div className="bar-chart__bar-wrapper" title={`${value} documentos`}>
+                <div className="bar-chart__bar" style={{ height: `${(value / maxDocsDia) * 100}%` }}/>
+              </div>
+              <span className="bar-chart__label">
+                {new Date(hoje.getTime() - (6 - index) * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR', { weekday: 'short' })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="chart-card">
+        <h4>Uso de Modelos</h4>
+        <div className="legend-list">
+          {modelData.map((item, index) => (
+            <div key={item.name} className="legend-item">
+              <div className="legend-color" style={{backgroundColor: COLORS[index % COLORS.length]}}></div>
+              <span className="legend-label">{item.name}</span>
+              <span className="legend-value">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
 };
 
-const describeArc = (cx, cy, r, startAngle, endAngle) => {
-  const start = polarToCartesian(cx, cy, r, endAngle);
-  const end = polarToCartesian(cx, cy, r, startAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-  return ["M", cx, cy, "L", start.x, start.y, "A", r, r, 0, largeArcFlag, 0, end.x, end.y, "Z"].join(" ");
+// --- ABA 3: DOCUMENTOS ---
+const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, searchQuery }) => {
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'descending' });
+    const [filterPasta, setFilterPasta] = useState('');
+    const [filterModelo, setFilterModelo] = useState('');
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedAndFilteredDocuments = [...documentos]
+        .filter(doc => {
+            const searchMatch = (doc.templateName || doc.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+            const pastaMatch = filterPasta ? doc.folder?.id === parseInt(filterPasta) : true;
+            const modeloMatch = filterModelo ? doc.model === filterModelo : true;
+            return searchMatch && pastaMatch && modeloMatch;
+        })
+        .sort((a, b) => {
+            if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
+            if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
+            return 0;
+        });
+
+    return (
+        <motion.div
+            key="listas"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="list-documents-container"
+        >
+            <div className="list-filters">
+                <div className="custom-select-wrapper">
+                    <select value={filterPasta} onChange={e => setFilterPasta(e.target.value)}>
+                        <option value="">Todas as Pastas</option>
+                        {pastas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                </div>
+                <div className="custom-select-wrapper">
+                    <select value={filterModelo} onChange={e => setFilterModelo(e.target.value)}>
+                        <option value="">Todos os Modelos</option>
+                        {modelos.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
+                    </select>
+                </div>
+            </div>
+            <div className="table-wrapper">
+                <table className="documents-table">
+                    <thead>
+                        <tr>
+                            <th onClick={() => requestSort('templateName')}>Nome</th>
+                            <th onClick={() => requestSort('folder')}>Pasta</th>
+                            <th>Tags</th>
+                            <th onClick={() => requestSort('createdAt')}>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedAndFilteredDocuments.map((doc) => (
+                            <tr key={doc.id} onClick={() => handleDocumentClick(doc)}>
+                                <td className="doc-name">{doc.templateName || doc.name}</td>
+                                <td>{doc.folder ? <span className="doc-folder">{doc.folder.name}</span> : "-"}</td>
+                                <td><span className="tag-count">{doc.tags.length} tags</span></td>
+                                <td>{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</td>
+                                <td>
+                                    <button className="icon-btn" onClick={(e) => { e.stopPropagation(); handleDocumentClick(doc); }} title="Ver detalhes">
+                                        <Icons.ArrowRight size={16} />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </motion.div>
+    );
 };
 
-function Home({
-  documentos,
-  onClose,
-  user,
-  setDocSelecionado,
-  docSelecionado,
-  setDocumentos,
-  setSelectedModel,
-  setEtapaAtual,
-  setTool,
-  setBarraLateral,
-}) {
+
+// ==========================================================================
+// COMPONENTE PRINCIPAL HOME
+// ==========================================================================
+
+function Home({ user, setDocSelecionado, docSelecionado, setTool, setSelectedModel }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [modelGraph, setModelGraph] = useState(null);
-  const [stroke, setStroke] = useState(null);
   const [option, setOption] = useState(1);
+  const [documentos, setDocumentos] = useState([]);
+  const [modelos, setModelos] = useState([]);
+  const [pastas, setPastas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleMouseOver = (id) => {
-    setModelGraph(id);
-    setStroke(id);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [docsRes, modelsRes, pastasRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/documents"),
+          axios.get("http://localhost:5000/api/modelos"),
+          axios.get("http://localhost:5000/api/folders"),
+        ]);
+        const sortedDocs = docsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setDocumentos(sortedDocs);
+        setModelos(modelsRes.data);
+        setPastas(pastasRes.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  
+  const handleDocumentClick = (doc) => {
+    setDocSelecionado(prev => (prev?.id === doc.id ? null : doc));
+  };
+  
+  const getFriendlyDate = () => {
+    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A020F0", "#FF69B4"];
-
   const HOME_TYPES = [
-    { id: 1, name: "Acesso rápido", icon: <Icons.Adjustments size={16} /> },
+    { id: 1, name: "Acesso Rápido", icon: <Icons.Clock size={16} /> },
     { id: 2, name: "Gráficos", icon: <Icons.Graphics size={16} /> },
-    { id: 3, name: "Listas", icon: <Icons.Lamp size={16} /> },
+    { id: 3, name: "Documentos", icon: <Icons.DocumentText size={16} /> },
   ];
 
-  const handleDocumentClick = (doc) => {
-    if (docSelecionado === doc) {
-      setDocSelecionado(null);
-      setBarraLateral(false);
-      onClose(false);
-    } else {
-      setDocSelecionado(doc);
-      setBarraLateral(false);
+  const renderContent = () => {
+    if (loading) return <p className="loading-text">Carregando informações...</p>;
+    switch(option) {
+      case 1:
+        return <AcessoRapido documentos={documentos} setTool={setTool} setSelectedModel={setSelectedModel} />;
+      case 2:
+        return <Graficos documentos={documentos} modelos={modelos} />;
+      case 3:
+        return <ListaDocumentos documentos={documentos} pastas={pastas} modelos={modelos} handleDocumentClick={handleDocumentClick} searchQuery={searchQuery} />;
+      default:
+        return null;
     }
   };
 
-  // Dados agregados por pasta
-  const pastaData = PASTAS.map((pasta) => ({
-    id: pasta.id,
-    name: pasta.name,
-    value: documentos.filter((doc) => pasta.name === doc.model).length,
-  })).filter((p) => p.value > 0);
-
-  const total = pastaData.reduce((sum, p) => sum + p.value, 0);
-  const maisUsado = pastaData.length ? pastaData.reduce((a, b) => (a.value > b.value ? a : b)).name : "Nenhum";
-  const maxValue = pastaData.length ? Math.max(...pastaData.map((item) => item.value)) : 0;
-
   return (
-    <div className="home">
-      {/* Boas-vindas */}
-      <div className="welcome">
-        <div className="account-img"></div>
-        <div>
-          <h2>Olá {user.username}, tudo bem?</h2>
-          <h3>Bem-vindo de volta ao painel</h3>
-        </div>
-      </div>
-
-      <main>
-        {/* Botões de opções e Search */}
-        <div className="home-options">
-          <div className="home-types">
-            {HOME_TYPES.map((type) => (
-              <div
-                key={type.id}
-                className={`home-type ${option === type.id ? "active" : ""}`}
-                onClick={() => setOption(type.id)}
-              >
-                {type.icon}
-                <span>{type.name}</span>
-              </div>
-            ))}
+    <div className="home-container">
+      <header className="home-header">
+        <div className="welcome">
+          <div className="account-img"></div>
+          <div>
+            <h2>Olá, {user.username}!</h2>
+            <h3>{getFriendlyDate()}</h3>
           </div>
-
+        </div>
+        {option === 3 && ( // Mostra a busca apenas na aba de documentos
           <div className="home-search">
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Pesquisar documentos..." />
-          </div>
-        </div>
-
-        {/* Opção 1: Acesso rápido */}
-        {option === 1 && (
-          // MODIFICAÇÃO: Container adicionado para o layout flex funcionar
-          <div className="acesso-rapido-container"> 
-            <div className="scroll">
-              <div className="atalhos-container">
-                <div className="atalho-card" onClick={() => setTool(3)}>
-                  <Icons.Model size={32} />
-                  <h3>Ver Modelos</h3>
-                  <p>Explore todos os modelos disponíveis</p>
-                </div>
-                <div className="atalho-card" onClick={() => setTool(2)}>
-                  <Icons.DocumentText size={32} />
-                  <h3>Analisar Documentos</h3>
-                  <p>Inicie uma nova análise</p>
-                </div>
-                <div className="atalho-card" onClick={() => { setTool(2); setEtapaAtual(1); setSelectedModel("Despacho"); }}>
-                  <Icons.Folder size={32} />
-                  <h3>Analisar modelo Despacho</h3>
-                  <p>Use o modelo mais popular</p>
-                </div>
-                <div className="atalho-card" onClick={() => setTool(4)}>
-                  <Icons.Adjustments size={32} />
-                  <h3>Configurações</h3>
-                  <p>Personalize sua experiência</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="recent-activity">
-              <h3>Atividade Recente</h3>
-              <div className="activity-list">
-                {documentos.slice(0, 3).map((doc, index) => {
-                  const date = new Date(doc.createdAt);
-                  const formattedDate = date.toLocaleDateString("pt-BR");
-                  const formattedTime = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-                  return (
-                    <div key={index} className="activity-item">
-                      <div className="activity-icon"><Icons.Archive size={16} /></div>
-                      <div className="activity-content">
-                        <p><strong>{doc.templateName}</strong> foi analisado</p>
-                        <span>{formattedDate} às {formattedTime}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Pesquisar por nome ou pasta..." />
           </div>
         )}
+      </header>
 
-        {/* Opção 2: Gráficos */}
-        {option === 2 && (
-          <div className="charts-container">
-            {/* Total de envios */}
-            <div className="data-content">
-              <header>
-                <Icons.Graphics size={20} />
-                <h3>Total de envios</h3>
-              </header>
-              <div className="areas">
-                <h2 className="text-area">
-                  <span className="docs-length">{documentos.length}</span> {documentos.length !== 1 ? "documentos analisados" : "documento analisado"}
-                </h2>
-                <div className="grafico-area">
-                  {pastaData.map((item, index) => (
-                    <div className="column-area" key={item.name}>
-                      <div
-                        className="column"
-                        style={{
-                          background: COLORS[index % COLORS.length],
-                          height: maxValue ? `${(item.value / maxValue) * 70}px` : "0px",
-                        }}
-                        title={`${item.name}: ${item.value} documentos`}
-                      ></div>
-                      <h4>{item.value}</h4>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+      <nav className="home-nav">
+        {HOME_TYPES.map((type) => (
+          <button
+            key={type.id}
+            className={`home-nav-btn ${option === type.id ? "active" : ""}`}
+            onClick={() => setOption(type.id)}
+          >
+            {type.icon}
+            <span>{type.name}</span>
+          </button>
+        ))}
+      </nav>
 
-            {/* Uso dos modelos */}
-            <div className="data-content">
-              <header>
-                <Icons.Graphics size={20} />
-                <h3>Uso dos modelos</h3>
-              </header>
-              <div className="areas">
-                <div className="grafico-area">
-                  <svg width="100" height="100" viewBox="0 0 100 100">
-                    {(() => {
-                      let currentAngle = 0;
-                      return pastaData.map((item, index) => {
-                        const sliceAngle = total > 0 ? (item.value / total) * 360 : 0;
-                        const startAngle = currentAngle;
-                        const endAngle = currentAngle + sliceAngle;
-                        currentAngle = endAngle;
-                        return (
-                          <path
-                            key={item.id}
-                            d={describeArc(50, 50, 50, startAngle, endAngle)}
-                            fill={COLORS[index % COLORS.length]}
-                            strokeWidth={stroke === item.id ? 2 : 6}
-                            onMouseOver={() => handleMouseOver(item.id)}
-                            onMouseLeave={() => handleMouseOver(null)}
-                          />
-                        );
-                      });
-                    })()}
-                    <circle cx="50" cy="50" r="35" fill="var(--color-surface)" />
-                    <text x="50" y="55" textAnchor="middle" fontSize="12" fill="var(--color-text-primary)" fontWeight="bold">%</text>
-                  </svg>
-                </div>
-
-                <div>
-                  {modelGraph ? (
-                    <>
-                      <h3>Modelo: {pastaData.find(p => p.id === modelGraph)?.name}</h3>
-                      <h4>{pastaData.find(p => p.id === modelGraph)?.value} chamadas</h4>
-                    </>
-                  ) : (
-                    <>
-                      <h2><b style={{ color: "var(--color-accent)" }}>{maisUsado}</b></h2>
-                      <h3>Modelo mais usado</h3>
-                      <h4>{pastaData.length} modelos ativos</h4>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Opção 3: Listas */}
-        {option === 3 && (
-          <div className="list-documents">
-            <header>
-              <h3>Documentos</h3>
-              <span className="doc-count">{documentos.length} documentos</span>
-            </header>
-            <div className="table-container">
-              <table className="documents-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Nome</th>
-                    <th>Categoria</th>
-                    <th>Qtd Tags</th>
-                    <th>Criado</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {documentos.map((doc, index) => {
-                    const date = new Date(doc.createdAt).toLocaleDateString("pt-BR");
-                    return (
-                      <tr key={index} onClick={() => handleDocumentClick(doc)}>
-                        <td>{index + 1}</td>
-                        <td className="doc-name">{doc.templateName}</td>
-                        <td><span className="doc-category">{doc.model}</span></td>
-                        <td><span className="tag-count">{doc.tags.length} tags</span></td>
-                        <td>{date}</td>
-                        <td>
-                          <button className="icon-button" onClick={(e) => { e.stopPropagation(); handleDocumentClick(doc); }} title="Ver detalhes">
-                            <Icons.Add size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+      <main className="home-main">
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
       </main>
     </div>
   );

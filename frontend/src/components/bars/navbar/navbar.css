@@ -1,40 +1,36 @@
-/*  NAVBAR */
+/* ==========================================================================
+   1. CONTAINER PRINCIPAL DA NAVBAR
+   ========================================================================== */
 
-.sidebar-navbar {
+.navbar {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  min-height: 100vh;
-  background: var(--color-background);
-  transition: all 0.3s ease;
-  position: relative;
+  height: 100vh;
+  background-color: var(--color-background);
+  border-right: 2px solid var(--color-border);
+  padding: var(--spacing-md) 0;
+  flex-shrink: 0;
+  overflow-x: hidden; /* Esconde conteúdo durante a animação */
 }
 
-.sidebar-navbar-header {
+.navbar-top {
   display: flex;
+  flex-direction: column;
   width: 100%;
+}
+
+/* ==========================================================================
+   2. CABEÇALHO (LOGO E TÍTULO)
+   ========================================================================== */
+
+.navbar-header {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 10px;
-  border-bottom: var(--border-width-md) solid var(--color-border);
-  margin-bottom: 10px;
-}
-
-.sidebar-navbar-date {
-  display: flex;
+  padding: 0 var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   width: 100%;
-  justify-content: center;
-  padding-bottom: 10px;
-  border-bottom: var(--border-width-md) solid var(--color-border);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.sidebar-navbar-date h4 {
-  font-size: var(--font-size-base);
 }
 
 .logo-wrapper {
@@ -43,69 +39,152 @@
   gap: var(--spacing-sm);
 }
 
-.logo {
-  width: 36px;
-  height: 36px;
+.logo-icon {
+  width: 32px;
+  height: 32px;
   padding: var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   background-color: var(--color-accent);
 }
 
 .app-title {
-  font-size: 1.125rem; /* 18px */
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+  white-space: nowrap; /* Impede quebra de linha durante a animação */
 }
 
 .toggle-btn {
-  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
 }
 
-.toggle-btn.rotated {
+.toggle-btn:hover {
+  color: var(--color-accent);
+  background-color: var(--color-hover);
+}
+
+.navbar.collapsed .toggle-btn {
   transform: rotate(180deg);
 }
 
-/* --- Ferramentas/Links da Navbar --- */
-.sidebar-navbar-tools {
+/* ==========================================================================
+   3. BUSCA E FERRAMENTAS
+   ========================================================================== */
+
+.navbar-search {
+  padding: 0 var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.search-icon-wrapper {
+  display: grid;
+  place-items: center;
+  height: 38px; /* Mesma altura do SearchBar */
+  color: var(--color-text-secondary);
+}
+
+.navbar-tools {
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
+  width: 100%;
 }
 
 .tool-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: var(--spacing-sm) 12px;
-  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
-  border-left: 7.5px solid transparent;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
 }
 
 .tool-item:hover {
-  color: var(--color-accent);
-  border-left-color: var(--color-accent);
+  background-color: var(--color-hover);
+  border-left-color: var(--color-border);
+  color: var(--color-text-primary);
 }
 
-.tool-label {
-  font-size: var(--font-size-sm);
+.tool-item.selected {
+  background-color: rgba(var(--color-accent-rgb), 0.1);
+  border-left-color: var(--color-accent);
+  color: var(--color-accent);
   font-weight: var(--font-weight-semibold);
 }
 
-.navbar-account-div {
+.tool-icon {
+  flex-shrink: 0;
+}
+
+.navbar.collapsed .tool-item {
+  justify-content: center;
+  padding: var(--spacing-sm);
+}
+
+/* ==========================================================================
+   4. RODAPÉ (CONTA E LOGOUT)
+   ========================================================================== */
+
+.navbar-footer {
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding-top: 10px;
-  border-top: var(--border-width-md) solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-border);
 }
 
-.navbar-account-div h3 {
-  font-size: var(--font-size-h4);
+.account-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  overflow: hidden; /* Esconde o texto que vaza na animação */
+}
+
+.account-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name, .user-name-placeholder {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.user-name-placeholder {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  color: var(--color-danger);
+  background-color: rgba(220, 53, 69, 0.1); /* Cor de perigo com opacidade */
 }

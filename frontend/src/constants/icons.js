@@ -1,52 +1,49 @@
 // ==========================================================================
-// IMPORTAÇÕES DOS ÍCONES (CORRIGIDO)
-// Ícones importados diretamente de seus pacotes específicos.
+// IMPORTAÇÕES DOS ÍCONES
 // ==========================================================================
 
 // Ant Design Icons (ai)
-import { AiOutlineHome, AiOutlineReload } from "react-icons/ai";
+import { AiOutlineHome, AiOutlineReload, AiOutlineCloseCircle } from "react-icons/ai"; // Adicionado AiOutlineCloseCircle
 
 // BoxIcons (bi)
-import { BiArchive, BiSolidBusiness } from "react-icons/bi";
+import { BiSolidBusiness } from "react-icons/bi";
 
-// Bootstrap Icons (bs) - Nenhum ícone BsTrash existe, usei FaTrash de Font Awesome
-// import { BsTrash } from "react-icons/bs"; 
+// Bootstrap Icons (bs)
+import { SlGraph } from "react-icons/sl";
 
-// Font Awesome (fa)
-import { FaArrowLeftLong, FaCheck, FaClockRotateLeft, FaPenNib, FaQuestion, FaRegFolder, FaRegLightbulb, FaTags, FaTrash } from "react-icons/fa6"; // BsTrash não existe, usei FaTrash
+// Phosphor Icons (pi)
+import { PiSpinnerGapBold } from "react-icons/pi";
 
-// Feather (fi)
-import { FiFileText, FiSend, FiSun, FiMoon } from "react-icons/fi";
-
-// Grit Icons (gr)
+// Grommet-Icons (gr)
 import { GrScorecard } from "react-icons/gr";
 
+// Font Awesome (fa)
+import { FaCheck, FaClockRotateLeft, FaPenNib, FaQuestion, FaRegFolder, FaRegLightbulb, FaTags, FaTrash } from "react-icons/fa6";
+
+// Feather (fi)
+import { FiFileText, FiSend, FiSun, FiMoon, FiCheckCircle, FiAlertTriangle, FiInfo, FiUploadCloud, FiArrowLeft, FiArrowRight, FiEye, FiEyeOff, FiCode, FiDownload } from "react-icons/fi"; // Adicionados CheckCircle, AlertTriangle, Info
+
 // Heroicons (hi)
-import {HiOutlineAdjustmentsHorizontal, HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck, HiOutlineClipboardDocumentList, HiOutlineDocumentText, HiOutlineUserCircle } from "react-icons/hi2";
+import { HiOutlineAdjustmentsHorizontal, HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck, HiOutlineClipboardDocumentList, HiOutlineDocumentText, HiOutlineUserCircle } from "react-icons/hi2";
 
 // IcoMoon Free (im)
 import { ImFontSize, ImHammer2 } from "react-icons/im";
 
 // Ionicons (io)
-import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward, IoIosArrowUp, IoMdAdd, IoMdClose } from "react-icons/io";
+import { IoIosArrowDown, IoIosArrowForward, IoIosArrowUp } from "react-icons/io";
+import { IoAdd, IoClose, IoRocketOutline } from "react-icons/io5";
 
 // Lucide (lu)
-import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutPanelLeft, LuTextSearch } from "react-icons/lu";
+import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutDashboard, LuTextSearch , LuClipboard} from "react-icons/lu";
 
 // Material Design (md)
-import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSubtitles, MdPeopleAlt } from "react-icons/md";
+import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt } from "react-icons/md";
 
 // Phosphor Icons (pi)
-import { PiFilePdf } from "react-icons/pi";
-
-// Remix Icon (ri)
-import { RiArchiveLine, RiExpandDiagonalLine } from "react-icons/ri";
-
-// Simple Line Icons (sl)
-import { SlGraph } from "react-icons/sl";
+import { PiArchive, PiChartPie, PiFilePdf, PiListChecks } from "react-icons/pi";
 
 // Tabler Icons (tb)
-import { TbDeviceDesktopAnalytics, TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
+import { TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
 
 // VS Code Icons (vsc)
 import { VscLaw } from "react-icons/vsc";
@@ -57,81 +54,100 @@ import { VscLaw } from "react-icons/vsc";
 // ==========================================================================
 export const Icons = {
   // ============================
-  // Ações Gerais
+  // Navegação Principal e Layout
   // ============================
-  Add: IoMdAdd,                      // Sinal de mais (+) para adicionar ou criar.
-  EditNote: MdOutlineEditNote,       // Lápis para editar.
-  Delete: FaTrash,                   // Lixeira para excluir (BsTrash não encontrado, substituído).
-  Check: FaCheck,                    // Visto para confirmar ou sucesso.
-  Upload: MdFileUpload,              // Seta para cima para upload de arquivo.
-  Send: FiSend,                      // Avião de papel para enviar.
-  Retry: AiOutlineReload,            // Seta circular para tentar novamente.
+  Home: AiOutlineHome,
+  Dashboard: LuLayoutDashboard,
+  BackIn: TbLayoutSidebarRight,
+  DoorOpen: LuDoorOpen,
+  ArrowDown: IoIosArrowDown,
+  ArrowUp: IoIosArrowUp,
+  ArrowRight: FiArrowRight,
+  ArrowLeft: FiArrowLeft,
 
   // ============================
-  // Navegação e Layout
+  // Ações Comuns
   // ============================
-  Home: AiOutlineHome,               // Casa para a página inicial.
-  Close: IoMdClose,                  // 'X' para fechar modais ou alertas.
-  BackIn: TbLayoutSidebarRight,      // Seta entrando em um container, para retornar.
-  BackInSeta: FaArrowLeftLong,       // Seta longa para a esquerda, para voltar.
-  DoorOpen: LuDoorOpen,              // Porta aberta, geralmente para logout ou sair.
-  Expandir: RiExpandDiagonalLine,    // Setas diagonais para expandir para tela cheia.
-  Layout: LuLayoutPanelLeft,         // Painel para representar layout ou sidebar.
-  ArrowDown: IoIosArrowDown,        // Seta para baixo.
-  ArrowUp: IoIosArrowUp,            // Seta para cima.
-  ArrowRight: IoIosArrowForward,     // Seta para a direita.
-  ArrowLeft: IoIosArrowBack,         // Seta para a esquerda.
+  Add: IoAdd,
+  EditNote: MdOutlineEditNote,
+  Delete: FaTrash,
+  Send: FiSend,
+  Upload: MdFileUpload,
+  UploadCloud: FiUploadCloud,
+  Download: FiDownload,
+  Search: MdOutlineSearch,
+  Close: IoClose,
+  MoreHorizontal: MdOutlineMoreHoriz,
+  Eye: FiEye,
+  EyeOff: FiEyeOff,
 
   // ============================
-  // UI e Controles de Interface
+  // Feedback e Status
   // ============================
-  Search: MdOutlineSearch,           // Lupa para pesquisa geral.
-  SearchFile: LuFileSearch,          // Lupa sobre um arquivo para pesquisa de documentos.
-  TextSearch: LuTextSearch,          // Lupa sobre linhas de texto.
-  MdOutlineMoreHoriz: MdOutlineMoreHoriz, // Três pontos para menu de "mais opções".
-  Adjustments: HiOutlineAdjustmentsHorizontal, // Controles deslizantes para configurações ou filtros.
-  Selected: LuCircleDashed,          // Círculo tracejado para indicar seleção.
-  Sun: FiSun,                        // Sol, para tema claro.
-  Moon: FiMoon,                      // Lua, para tema escuro.
-  FontSize: ImFontSize,              // Ícone 'A' para ajuste de fonte.
-  Interface: HiOutlineAdjustmentsHorizontal, // Ícone para seções de Interface. (Reutilizado)
+  Check: FaCheck,
+  CheckCircle: FiCheckCircle,
+  CloseCircle: AiOutlineCloseCircle,
+  AlertTriangle: FiAlertTriangle,
+  Info: FiInfo,
+  Retry: AiOutlineReload,
+  Selected: LuCircleDashed,
+  Clock: FaClockRotateLeft,
+  Question: FaQuestion,
+  Lamp: FaRegLightbulb,
 
   // ============================
-  // Documentos e Arquivos
+  // Configurações e UI
   // ============================
-  FileText: FiFileText,              // Documento genérico com texto.
-  DocumentText: HiOutlineDocumentText, // Outra variação de documento de texto.
-  ScannerDocument: MdOutlineDocumentScanner, // Documento sendo escaneado.
-  Pdf_file: PiFilePdf,               // Ícone específico para arquivos PDF.
-  Folder: FaRegFolder,               // Pasta de arquivos.
-  Archive: RiArchiveLine,            // Caixa de arquivo.
-  Process: BiArchive,                // Variação de caixa de arquivo.
-  Despacho: HiOutlineClipboardDocument, // Prancheta para modelo "Despacho".
-  Parecer: HiOutlineClipboardDocumentList, // Prancheta com lista para "Parecer".
-  Programas: HiOutlineClipboardDocumentCheck, // Prancheta com visto para "Programas".
+  Settings: MdOutlineSettings,
+  Adjustments: HiOutlineAdjustmentsHorizontal,
+  Sun: FiSun,
+  Moon: FiMoon,
+  FontSize: ImFontSize,
+
+  // ============================
+  // Documentos, Pastas e Modelos
+  // ============================
+  FileText: FiFileText,
+  DocumentText: HiOutlineDocumentText,
+  FileList: PiListChecks,
+  ScannerDocument: MdOutlineDocumentScanner,
+  Pdf_file: PiFilePdf,
+  Folder: FaRegFolder,
+  Archive: PiArchive,
+  Model: LuLayoutDashboard,
+  Code: FiCode,
+  Clipboard: LuClipboard,
   
+  // Modelos Específicos (Pranchetas)
+  Despacho: HiOutlineClipboardDocument,
+  Parecer: HiOutlineClipboardDocumentList,
+  Programas: HiOutlineClipboardDocumentCheck,
+
   // ============================
-  // Ícones Temáticos e de Dados
+  // Análise e Dados
   // ============================
-  Model: TbDeviceDesktopAnalytics,   // Monitor com gráfico, para "Modelos".
-  Graphics: SlGraph,                 // Gráfico de linha.
-  Tags: FaTags,                      // Etiqueta para tags.
-  Lamp: FaRegLightbulb,              // Lâmpada para dicas ou modelos.
-  User: HiOutlineUserCircle,         // Círculo com usuário para perfil ou conta.
-  Calendar: LuCalendarDays,          // Calendário para datas.
-  Clock: FaClockRotateLeft,          // Relógio com seta, para histórico ou recentes.
-  Question: FaQuestion,              // Ponto de interrogação para ajuda.
+  Tags: FaTags,
+  TextSearch: LuTextSearch,
+  FileSearch: LuFileSearch,
+  ChartPie: PiChartPie,
+  Graphics: SlGraph,
+  Rocket: IoRocketOutline,
+  Spinner: PiSpinnerGapBold,
   
-  // ============================
   // Tags Específicas
+  Summarize: FaPenNib,
+  Title: MdOutlineSubtitles,
+  Number: TbNumber123,
+  Law: VscLaw,
+  Hammer: ImHammer2,
+  Score: GrScorecard,
+  PigMoney: TbPigMoney,
+  People: MdPeopleAlt,
+  Business: BiSolidBusiness,
+  
   // ============================
-  Summarize: FaPenNib,               // Pena para resumir texto.
-  Title: MdOutlineSubtitles,         // Ícone de título ou cabeçalho.
-  Number: TbNumber123,               // Números para extração de dados numéricos.
-  Law: VscLaw,                       // Balança da justiça para temas legais.
-  Hammer: ImHammer2,                 // Martelo do juiz.
-  Score: GrScorecard,                // Cartão de pontuação.
-  PigMoney: TbPigMoney,              // Porco-cofrinho para finanças.
-  People: MdPeopleAlt,               // Múltiplos usuários para partes envolvidas.
-  Business: BiSolidBusiness,         // Prédio para empresas ou negócios.
+  // Diversos
+  // ============================
+  User: HiOutlineUserCircle,
+  Calendar: LuCalendarDays,
 };

@@ -1,5 +1,5 @@
- /* CLASSES UTILITÁRIAS */
- 
+/* CLASSES UTILITÁRIAS */
+
 .italic {
   font-style: italic;
   color: var(--color-text-secondary);
@@ -8,6 +8,11 @@
 .controle {
   color: var(--color-accent);
   margin: 0 5px;
+}
+
+.danger:hover {
+  color: var(--color-danger);
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .delete {

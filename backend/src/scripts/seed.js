@@ -5,43 +5,75 @@ import path from "path";
 
 (async () => {
   try {
-    await sequelize.sync(); // garante tabelas, não apaga nada
+    // -------------------------------------------------------------------
+    // PASSO 1: APAGA E RECRIA TODAS AS TABELAS
+    // O `{ force: true }` é o que limpa o banco de dados.
+    // -------------------------------------------------------------------
+    console.log("🔄 Sincronizando e recriando o banco de dados...");
+    await sequelize.sync({ force: true });
+    console.log("✅ Banco de dados limpo e sincronizado!");
 
-    // 1️⃣ Cria ou atualiza modelos
-    const despacho = await models.Modelo.upsert({ name: "Despacho" });
-    const parecer = await models.Modelo.upsert({ name: "Parecer" });
-    const programa = await models.Modelo.upsert({ name: "Programa" });
+    // -------------------------------------------------------------------
+    // PASSO 2: CRIA AS PASTAS (FOLDERS) PADRÃO
+    // Usamos 'findOrCreate' para evitar duplicatas se o script rodar de novo.
+    // -------------------------------------------------------------------
+    console.log("\n📁 Criando pastas padrão...");
+    const pastasData = [
+      { name: "Despachos" },
+      { name: "Relatórios Gerais" },
+      { name: "Documentos Internos" },
+    ];
+    for (const pasta of pastasData) {
+      await models.Folder.findOrCreate({ where: { name: pasta.name } });
+    }
+    console.log("✅ Pastas criadas!");
 
-    // 2️⃣ Lê JSON de tags
+    // -------------------------------------------------------------------
+    // PASSO 3: CRIA OS MODELOS (MODELO) PADRÃO
+    // 'upsert' funciona bem aqui para criar ou atualizar.
+    // -------------------------------------------------------------------
+    console.log("\n🤖 Criando modelos padrão...");
+    const [despacho] = await models.Modelo.upsert({ name: "Despacho" });
+    const [parecer] = await models.Modelo.upsert({ name: "Parecer" });
+    const [programa] = await models.Modelo.upsert({ name: "Programa" });
+    console.log("✅ Modelos criados!");
+
+    // -------------------------------------------------------------------
+    // PASSO 4: CRIA AS TAGS E ASSOCIA AOS MODELOS
+    // Lê o JSON e popula a tabela TagBase, associando cada tag ao seu modelo.
+    // -------------------------------------------------------------------
+    console.log("\n🏷️ Criando e associando tags...");
     const tagsJSON = JSON.parse(
       fs.readFileSync(path.resolve("src/constants/tags.json"), "utf8")
     );
 
-    // 3️⃣ Cria/atualiza TagBase e associa
     for (const t of tagsJSON) {
       const [tag] = await models.TagBase.findOrCreate({
         where: { name: t.name },
         defaults: t,
       });
 
-      if (t.category.toLowerCase() === "despacho") {
-        await despacho[0].addTagsBase(tag);
-        console.log(`Associação: ${t.name} -> Despacho`);
+      // Lógica de associação
+      if (t.category?.toLowerCase() === "despacho") {
+        await despacho.addTagsBase(tag);
       }
-      if (t.category.toLowerCase() === "parecer") {
-        await parecer[0].addTagsBase(tag);
-        console.log(`Associação: ${t.name} -> Parecer`);
+      if (t.category?.toLowerCase() === "parecer") {
+        await parecer.addTagsBase(tag);
       }
-      if (t.category.toLowerCase() === "programa") {
-        await programa[0].addTagsBase(tag);
-        console.log(`Associação: ${t.name} -> Programa`);
+      if (t.category?.toLowerCase() === "programa") {
+        await programa.addTagsBase(tag);
       }
     }
+    console.log("✅ Tags criadas e associadas!");
 
-    console.log("✅ Seed concluído!");
-    process.exit();
+    // -------------------------------------------------------------------
+    // CONCLUSÃO
+    // -------------------------------------------------------------------
+    console.log("\n🏁 Processo de seed concluído com sucesso!");
+    process.exit(0);
+
   } catch (err) {
-    console.error("❌ Erro no seed:", err);
+    console.error("❌ Erro durante o processo de seed:", err);
     process.exit(1);
   }
 })();

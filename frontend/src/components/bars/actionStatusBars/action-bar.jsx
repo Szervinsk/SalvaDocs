@@ -1,6 +1,6 @@
 import { Icons } from "../../../constants/icons";
 
-// 1. Componente reutilizável para exibir informações
+// 1. Componente reutilizável para exibir informações de status
 const InfoBlock = ({ title, icon, children }) => (
   <div className="info-block">
     <h4 className="info-block__title">{title}</h4>
@@ -11,7 +11,7 @@ const InfoBlock = ({ title, icon, children }) => (
   </div>
 );
 
-// Componente principal ActionBar
+// 2. Componente principal ActionBar
 function ActionBar({
   docSelecionado,
   selectedModel,
@@ -23,11 +23,9 @@ function ActionBar({
   more,
   setTool,
   tool,
-  searchQuery,
-  setSearchQuery,
 }) {
   
-  // 2. Lógica de renderização movida para fora do JSX para maior clareza
+  // 3. Lógica de renderização movida para fora do JSX para maior clareza
   const renderInfoContent = () => {
     if (docSelecionado && !selectedModel && tool === 6) {
       return (
@@ -66,7 +64,7 @@ function ActionBar({
       return (
         <InfoBlock
           title="Arquivo para análise"
-          icon={<Icons.FiFileText size={16} className="icon--accent" />}
+          icon={<Icons.FileText size={16} className="icon--accent" />}
         >
           {file.name}
         </InfoBlock>
@@ -77,20 +75,19 @@ function ActionBar({
       return <h3 className="info-block__placeholder">Nenhuma seleção ativa</h3>;
     }
 
-    // Retorna null ou um placeholder se nenhuma condição for atendida na Home (tool === 1)
+    // Retorna um espaçador para manter a altura da barra consistente
     return <div className="info-block__placeholder--spacer" />;
   };
 
   return (
     <div className="action-bar">
       <div className="action-bar__info">
-        {/* 3. Renderização simplificada */}
         {renderInfoContent()}
       </div>
 
       <div className="action-bar__actions">
         <button
-          className="btn-secondary"
+          className="btn-mini"
           title="Iniciar nova análise"
           onClick={() => {
             setDocSelecionado(null);
@@ -101,11 +98,11 @@ function ActionBar({
         </button>
 
         <button
-          className="btn-secondary"
+          className="btn-mini"
           title="Mais opções"
           onClick={() => setMore(!more)}
         >
-          <Icons.MdOutlineMoreHoriz size={20} />
+          <Icons.MoreHorizontal size={20} />
         </button>
       </div>
     </div>

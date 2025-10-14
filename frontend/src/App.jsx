@@ -1,40 +1,41 @@
-import "./styles/main.css"
+import "./styles/main.css";
 import { useEffect, useState } from "react";
-
-import { PASTAS } from "../src/constants/constants";
+import { AnimatePresence } from "framer-motion";
+import axios from "axios"; // Importação do axios
 
 // COMPONENTES
 import Block from "../src/components/block";
 import Navbar from "./components/bars/navbar/navbar";
-import FoldersAction from "./components/bars/library/folders-action"
+import FoldersAction from "./components/bars/library/folders-action";
 import AuthForm from "./components/auth/authForm";
-import axios from "axios";
-import Welcome from "./components/alerts/welcome";
+import Alerts from "./components/alerts/alerts";
 
-function Abas() {
-  const [isLogged, setIsLogged] = useState(false); // verificar se está logado
+// Configura a URL base para todas as chamadas do axios
+axios.defaults.baseURL = "http://localhost:5000/api";
+axios.defaults.withCredentials = true; // Permite o envio de cookies
 
-  // estados principais
+function App() {
+  const [isLogged, setIsLogged] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Estados principais
   const [selectedModel, setSelectedModel] = useState(null);
   const [docSelecionado, setDocSelecionado] = useState(null);
   const [documentos, setDocumentos] = useState([]);
   const [modelos, setModelos] = useState([]);
-  const [tool, setTool] = useState(null);
-  const [user, setUser] = useState(null);
-  const [barraLateral, setBarraLateral] = useState(true);
-
-  // novo state para abrir/fechar OpenDocs
-  const [openDocsVisible, setOpenDocsVisible] = useState(false);
-
-  //efeito darkmode
+  const [pastas, setPastas] = useState([]);
+  const [tool, setTool] = useState(1);
+  const [pastasAbertas, setPastasAbertas] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [alert, setAlert] = useState(null);
 
-  // alertas de welcome / aviso
-  const [alert, setAlert] = useState(false);
+  // Função para exibir alertas na tela
+  const showAlert = (type, message) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 4000);
+  };
 
-  // novo estado para abrir/fechar pastas
-  const [pastasAbertas, setPastasAbertas] = useState(false);
-
+  // Efeito para alternar o tema dark/light
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -43,91 +44,103 @@ function Abas() {
     }
   }, [darkMode]);
 
-
+  // Efeito para verificar a sessão do usuário ao carregar a página
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      fetchMe(token);
-    }
-  }, []);
-
-  const handleLogout = () => {
-    axios.post("http://localhost:5000/api/auth/logout");
-    localStorage.removeItem("accessToken"); // limpa o token
-    setUser(null);
-    setIsLogged(false);
-  };
-
-  const fetchMe = async (token) => {
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-        credentials: "include", // permite enviar cookies
-      });
-
-      if (!res.ok) {
-        console.log("Token Inválido")
+    const checkUserSession = async () => {
+      try {
+        const response = await axios.get("/auth/me");
+        if (response.data) {
+          setUser(response.data);
+          setIsLogged(true);
+        }
+      } catch (error) {
+        console.log("Nenhum usuário logado na sessão.");
         setIsLogged(false);
       }
+    };
+    checkUserSession();
+  }, []);
 
-      const data = await res.json();
-      setUser(data);
-      setIsLogged(true);
-      setAlert(true)
-    } catch (err) {
-      console.log("Não logado:", err);
+  // Efeito para buscar os dados iniciais assim que o usuário loga
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (isLogged) {
+        try {
+          // Busca pastas, documentos e modelos em paralelo para otimizar
+          const [pastasRes, documentosRes, modelosRes] = await Promise.all([
+            axios.get("http://localhost:5000/api/folders"),
+            axios.get("http://localhost:5000/api/files/documentos"),
+            axios.get("http://localhost:5000/api/modelos"),
+          ]);
+          setPastas(pastasRes.data);
+          setDocumentos(documentosRes.data);
+          setModelos(modelosRes.data);
+
+          showAlert("sucess", "Dados carregados com sucesso da sua biblioteca!")
+        } catch (error) {
+          console.error("Erro ao buscar dados iniciais:", error);
+          showAlert("error", "Não foi possível carregar os dados da sua biblioteca.");
+        }
+      }
+    };
+    fetchInitialData();
+  }, [isLogged]); // Executa sempre que o status de login mudar
+
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:5000/api/auth/logout");
+      setUser(null);
       setIsLogged(false);
+      // Limpa os dados para evitar que o próximo usuário os veja
+      setDocumentos([]);
+      setPastas([]);
+      setModelos([]);
+      showAlert("success", "Logout realizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      showAlert("error", "Ocorreu um erro ao sair.");
     }
   };
 
-  if (!isLogged)
+  // Se o usuário não estiver logado, exibe o formulário de autenticação
+  if (!isLogged) {
     return (
       <AuthForm
-        isLogged={isLogged}
         setIsLogged={setIsLogged}
-        user={user}
         setUser={setUser}
+        showAlert={showAlert}
       />
     );
-  else {
-
   }
-  return (
 
+  // Se estiver logado, exibe a aplicação principal
+  return (
     <>
-      {alert && <Welcome user={user} />}
+      <AnimatePresence>
+        {alert && (
+          <Alerts
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        )}
+      </AnimatePresence>
 
       <div className="main-container">
-        <Navbar
-          setTool={setTool}
-          tool={tool}
-          setDocSelecionado={setDocSelecionado}
-          user={user}
-          onLogout={handleLogout}
-        />
-
-
+        <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} />
         <div className="background-block">
-          {/* Pasta sempre aparece */}
-
-          <FoldersAction
-            pastas={PASTAS}
-            documentos={documentos}
-            setDocumentos={setDocumentos}
-            docSelecionado={docSelecionado}
-            setDocSelecionado={setDocSelecionado}
-            onToggle={() => setPastasAbertas(!pastasAbertas)}
-            setTool={setTool}
-            setBarraLateral={setBarraLateral}
-            barraLateral={barraLateral}
-            onClose={() => {
-              setOpenDocsVisible(false);
-              setDocSelecionado(null);
-            }}
-            openDocsVisible={openDocsVisible}
-          />
-
-          {/* Aqui variam os outros blocos */}
+          {pastasAbertas && (
+            <FoldersAction
+              pastas={pastas}
+              setPastas={setPastas}
+              documentos={documentos}
+              setDocumentos={setDocumentos}
+              docSelecionado={docSelecionado}
+              setDocSelecionado={setDocSelecionado}
+              showAlert={showAlert}
+            />
+          )}
           <Block
             setModelos={setModelos}
             modelos={modelos}
@@ -137,18 +150,13 @@ function Abas() {
             setDocumentos={setDocumentos}
             docSelecionado={docSelecionado}
             setDocSelecionado={setDocSelecionado}
-            pastasAbertas={pastasAbertas}
-            setPastasAbertas={setPastasAbertas}
-            onVoltar={() => setTool(null)}
             tool={tool}
             setTool={setTool}
             user={user}
-            barraLateral={barraLateral}
-            setBarraLateral={setBarraLateral}
+            pastas={pastas}
             setDarkMode={setDarkMode}
             darkMode={darkMode}
-            openDocsVisible={openDocsVisible}
-            setOpenDocsVisible={setOpenDocsVisible}
+            showAlert={showAlert}
           />
         </div>
       </div>
@@ -156,4 +164,4 @@ function Abas() {
   );
 }
 
-export default Abas;
+export default App;

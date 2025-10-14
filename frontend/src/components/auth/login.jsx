@@ -1,4 +1,31 @@
 import { useState } from "react";
+import { Icons } from "../../constants/icons"
+
+// Componentes reutilizáveis
+const AuthHeader = ({ title, subtitle }) => (
+  <header className="auth-header">
+    <h2>{title}</h2>
+    <p>{subtitle}</p>
+  </header>
+);
+
+const AuthInput = ({ id, label, type, value, onChange, placeholder, children }) => (
+  <div className="input-wrapper">
+    <label htmlFor={id}>{label}</label>
+    <div className="input-group">
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="auth-input"
+        required
+      />
+      {children}
+    </div>
+  </div>
+);
 
 function Login({ onSubmit, err, loading, switchToSignup }) {
   const [email, setEmail] = useState("");
@@ -10,67 +37,48 @@ function Login({ onSubmit, err, loading, switchToSignup }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!canSubmit) return;
-    onSubmit({ email, password });
+    if (canSubmit) onSubmit({ email, password });
   };
 
   return (
-    <main className="fundo">
+    <form onSubmit={handleSubmit} noValidate>
+      <AuthHeader title="Bem-vindo de volta!" subtitle="Faça login para continuar." />
 
-      <form
-        className="fundo-content auth-card"
-        onSubmit={handleSubmit}
-        noValidate
-        >
-        <h1 className="nametag">Área de login</h1>
-        {err && <p className="error">{err}</p>}
-        <label htmlFor="login-email">Email</label>
-        <input
-          id="login-email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder="seu@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="auth-input"
-          required
-        />
+      {err && <p className="auth-error">{err}</p>}
 
-        <label htmlFor="login-password">Senha</label>
-        <div className="auth-input-group">
-          <input
-            id="login-password"
-            type={showPass ? "text" : "password"}
-            autoComplete="current-password"
-            placeholder="mínimo 6 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="auth-input"
-            required
-            minLength={6}
-          />
-          <button
-            type="button"
-            className="ghost-btn"
-            onClick={() => setShowPass((s) => !s)}
-          >
-            {showPass ? "Ocultar" : "Mostrar"}
-          </button>
-        </div>
+      <AuthInput
+        id="login-email"
+        label="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="seu@email.com"
+      />
 
-        <button type="submit" className="auth-btn" disabled={!canSubmit}>
-          {loading ? "Entrando..." : "Entrar"}
+      <AuthInput
+        id="login-password"
+        label="Senha"
+        type={showPass ? "text" : "password"}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="mínimo 6 caracteres"
+      >
+        <button type="button" className="ghost-btn" onClick={() => setShowPass((s) => !s)}>
+          {showPass ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
         </button>
+      </AuthInput>
 
-        <p className="auth-switch">
-          Não tem conta?{" "}
-          <button type="button" className="link-btn" onClick={switchToSignup}>
-            Cadastre-se
-          </button>
-        </p>
-      </form>
-    </main>
+      <button type="submit" className="auth-btn" disabled={!canSubmit}>
+        {loading ? "Entrando..." : "Entrar"}
+      </button>
+
+      <p className="auth-switch">
+        Não tem uma conta?{" "}
+        <button type="button" className="link-btn" onClick={switchToSignup}>
+          Cadastre-se
+        </button>
+      </p>
+    </form>
   );
 }
 

@@ -17,16 +17,19 @@ function EditVariables({
   setIsResponse,
   setDocSelecionado,
   setEtapaAtual,
+  showAlert,
   setDocumentos,
   user,
   tags,
   setTags,
-  setTool
+  setTool,
+  pastas,
 }) {
   const [sendFiles, setSendFiles] = useState(false);
   const [alterName, setAlterName] = useState(false);
   const [limitador, setLimitador] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState(null);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -61,6 +64,7 @@ function EditVariables({
         onClose={onClose}
         file={file}
         setFile={setFile}
+        pastas={pastas}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
         sendFiles={sendFiles}
@@ -71,6 +75,8 @@ function EditVariables({
         setFileName={setFileName}
         limitador={limitador}
         setLimitador={setLimitador}
+        selectedFolder={selectedFolder}
+        setSelectedFolder={setSelectedFolder}
       />
     );
   }
@@ -92,10 +98,12 @@ function EditVariables({
         setDocSelecionado={setDocSelecionado}
         setIsResponse={setIsResponse}
         setDocumentos={setDocumentos}
+        showAlert={showAlert}
         selectedModel={selectedModel}
         setEtapaAtual={setEtapaAtual}
         fileName={fileName}
         setTool={setTool}
+        selectedFolder={selectedFolder}
       />
     );
   }
