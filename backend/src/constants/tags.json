@@ -1,177 +1,154 @@
 [
   {
+    "name": "Título",
+    "icon": "Title",
+    "type": "ia",
+    "prompt": "Crie um título curto e objetivo para este documento, com no máximo 10 palavras, baseado em seu assunto principal.",
+    "category": "despacho",
+    "displayCategory": "title"
+  },
+  {
+    "name": "Assunto",
+    "icon": "Summarize",
+    "type": "ia",
+    "prompt": "Identifique e extraia a linha de 'Assunto' deste documento, retornando apenas o texto do assunto.",
+    "category": "programa",
+    "displayCategory": "title"
+  },
+  {
+    "name": "Nome da Norma",
+    "icon": "Law",
+    "type": "ia",
+    "prompt": "Extraia apenas o título completo da norma, portaria ou regimento, sem números ou datas.",
+    "category": "norma",
+    "displayCategory": "title"
+  },
+  {
+    "name": "Resumo",
+    "icon": "Summarize",
+    "type": "ia",
+    "prompt": "Analise o texto e gere um resumo conciso do propósito e conclusão do documento em no máximo 3 frases.",
+    "category": "despacho",
+    "displayCategory": "summary"
+  },
+  {
+    "name": "Ementa",
+    "icon": "Summarize",
+    "type": "ia",
+    "prompt": "Localize e extraia apenas o bloco de texto da 'Ementa' deste parecer.",
+    "category": "parecer",
+    "displayCategory": "summary"
+  },
+  {
+    "name": "Conclusão/Recomendação",
+    "icon": "Hammer",
+    "type": "ia",
+    "prompt": "Extraia o parágrafo ou seção final que define a 'Conclusão' ou 'Recomendação' do documento.",
+    "category": "parecer",
+    "displayCategory": "summary"
+  },
+  {
     "name": "SEI",
     "icon": "Archive",
     "type": "regex",
     "regex": "\\b(?:SEI|NUP)\\s*([0-9]{5}\\.[0-9]{6}/[0-9]{4}-[0-9]{2})\\b",
-    "category": "despacho"
+    "category": "despacho",
+    "displayCategory": "data"
   },
   {
     "name": "Gdoc",
     "icon": "Archive",
     "type": "regex",
-    "regex": "\\b(?:GDOC|Doc\\. Id\\.|Doc\\. SEI(?:/GDF)?)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+\\/\\d{4})",
-    "category": "despacho"
+    "regex": "\\b(?:GDOC|Doc\\. Id\\.)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+\\/\\d{4})",
+    "category": "despacho",
+    "displayCategory": "data"
   },
   {
     "name": "Data",
     "icon": "Calendar",
     "type": "regex",
     "regex": "\\b(\\d{1,2}\\s+de\\s+[a-zA-Zçã]+\\s+de\\s+\\d{4}|\\d{2}[/\\-]\\d{2}[/\\-]\\d{4})\\b",
-    "category": "despacho"
-  },
-  {
-    "name": "Origem",
-    "icon": "Send",
-    "type": "regex",
-    "regex": "\\b(?:De|Origem)\\s*[:\\-]?\\s*(.+?)(?:\\n|Para:|À:)",
-    "category": "despacho"
-  },
-  {
-    "name": "Destinatários",
-    "icon": "People",
-    "type": "ia",
-    "prompt": "Extraia o(s) nome(s) do(s) destinatário(s) principal(is) do documento. Se houver mais de um, retorne como uma lista (array JSON de strings).",
-    "category": "despacho"
-  },
-  {
-    "name": "Signatário",
-    "icon": "User",
-    "type": "ia",
-    "prompt": "Identifique e extraia o nome e, se disponível, o cargo da pessoa que assina o documento.",
-    "category": "despacho"
-  },
-  {
-    "name": "Documentos Referenciados",
-    "icon": "DocumentText",
-    "type": "ia",
-    "prompt": "Extraia e retorne uma lista (array JSON de strings) com os nomes e números de todos os processos, despachos, pareceres ou outros documentos citados no texto.",
-    "category": "despacho"
-  },
-  {
-    "name": "Resumo",
-    "icon": "Summarize",
-    "type": "ia",
-    "prompt": "Analise o texto completo e gere um resumo conciso em um único parágrafo, focando no objetivo principal e na conclusão do documento.",
-    "category": "despacho"
-  },
-  {
-    "name": "Título",
-    "icon": "Title",
-    "type": "ia",
-    "prompt": "Crie um título curto e descritivo para este documento com base em seu assunto principal.",
-    "category": "despacho"
+    "category": "despacho",
+    "displayCategory": "data"
   },
   {
     "name": "Número do Parecer",
     "icon": "Number",
     "type": "regex",
     "regex": "PARECER\\s*n[º°]?\\s*(\\d+\\/\\d{4})",
-    "category": "parecer"
-  },
-  {
-    "name": "Ementa",
-    "icon": "Summarize",
-    "type": "ia",
-    "prompt": "Localize e extraia o bloco de texto da 'Ementa' deste parecer.",
-    "category": "parecer"
-  },
-  {
-    "name": "Resumo Parecer",
-    "icon": "Summarize",
-    "type": "ia",
-    "prompt": "Com base nas seções de 'Histórico' e 'Conclusão' do parecer, crie um resumo objetivo do caso e da recomendação final.",
-    "category": "parecer"
-  },
-  {
-    "name": "Conclusão/Recomendação",
-    "icon": "Hammer",
-    "type": "ia",
-    "prompt": "Extraia a conclusão ou recomendação final do parecer. A resposta deve ser o parágrafo ou seção que define a decisão ou o conselho final.",
-    "category": "parecer"
-  },
-  {
-    "name": "Assunto",
-    "icon": "Summarize",
-    "type": "regex",
-    "regex": "Assunto\\s*[:\\-]?\\s*(.+?)(?:\\n|$)",
-    "category": "programa"
+    "category": "parecer",
+    "displayCategory": "data"
   },
   {
     "name": "Contrato",
     "icon": "Hammer",
     "type": "regex",
     "regex": "Contrato\\s*n[º°]?\\s*(\\d+\\/?\\d{0,4})",
-    "category": "programa"
-  },
-  {
-    "name": "ARP",
-    "icon": "Hammer",
-    "type": "regex",
-    "regex": "(?:ARP|Ata de Registro de Preços)\\s*n[º°]?\\s*(\\d+\\/?\\d{0,4})",
-    "category": "programa"
+    "category": "programa",
+    "displayCategory": "data"
   },
   {
     "name": "Valor",
     "icon": "PigMoney",
     "type": "regex",
     "regex": "(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*(?:,\\d{2})?)",
-    "category": "programa"
-  },
-  {
-    "name": "Pontuação",
-    "icon": "Score",
-    "type": "regex",
-    "regex": "\\bPontuação\\s*[:\\-]?\\s*(\\d+)\\b",
-    "category": "programa"
+    "category": "programa",
+    "displayCategory": "data"
   },
   {
     "name": "Empresa",
     "icon": "Business",
     "type": "regex",
-    "regex": "(?i)empresa\\s+([A-Za-zÀ-ÿ\\s]+?(?:LTDA\\.?|Ltda\\.?|S\\/A|S\\.A))",
-    "category": "programa"
-  },
-  {
-    "name": "Diretoria",
-    "icon": "People",
-    "type": "regex",
-    "regex": "Diretoria\\s+de\\s+[A-Za-z\\s]+-\\s*(DP|DE|DS|PR|DC)",
-    "category": "programa"
+    "regex": "(?i)empresa\\s+([A-Za-zÀ-ÿ\\s]+?(?:LTDA\\.?|S\\/A))",
+    "category": "programa",
+    "displayCategory": "data"
   },
   {
     "name": "Decisão",
     "icon": "Hammer",
     "type": "regex",
     "regex": "Decisão\\s*n[º°]?\\s*(\\d+\\/\\d{4})",
-    "category": "programa"
+    "category": "programa",
+    "displayCategory": "data"
   },
   {
     "name": "Número da Norma",
     "icon": "Number",
     "type": "regex",
     "regex": "\\b(?:Norma|Portaria|Resolução|Decreto)\\s*(?:N[º°]?)?\\s*([\\d.\\/]+)",
-    "category": "norma"
+    "category": "norma",
+    "displayCategory": "data"
   },
   {
-    "name": "Nome da Norma",
-    "icon": "Law",
+    "name": "Signatário",
+    "icon": "User",
     "type": "ia",
-    "prompt": "Extraia o título completo da norma, portaria, regimento ou instrução mencionada, excluindo seu número de identificação e data.",
-    "category": "norma"
+    "prompt": "Identifique o signatário principal e retorne um objeto JSON com as chaves 'Nome' e 'Cargo'.",
+    "category": "despacho",
+    "displayCategory": "signatory"
   },
   {
-    "name": "Data de Publicação",
-    "icon": "Calendar",
+    "name": "Destinatários",
+    "icon": "People",
     "type": "ia",
-    "prompt": "Extraia a data de publicação ou de assinatura da norma, formatando como DD/MM/AAAA.",
-    "category": "norma"
+    "prompt": "Extraia o(s) nome(s) do(s) destinatário(s) principal(is) do documento. Se houver mais de um, retorne como um array JSON de strings.",
+    "category": "despacho",
+    "displayCategory": "list"
   },
   {
-    "name": "Status da Norma",
-    "icon": "Check",
+    "name": "Documentos Referenciados",
+    "icon": "DocumentText",
     "type": "ia",
-    "prompt": "Analise o texto e determine o status da norma (ex: 'Vigente', 'Revogada', 'Alterada por...'). Se não houver menção, retorne 'Vigente'.",
-    "category": "norma"
+    "prompt": "Extraia e retorne uma lista (array JSON de strings) com os nomes e números dos 5 principais processos, despachos ou outros documentos citados no texto, como decisões, ofícios",
+    "category": "despacho",
+    "displayCategory": "list"
+  },
+  {
+    "name": "Origem",
+    "icon": "Send",
+    "type": "regex",
+    "regex": "\\b(?:De|Origem)\\s*[:\\-]?\\s*(.+?)(?:\\n|Para:|À:)",
+    "category": "despacho",
+    "displayCategory": "data"
   }
 ]

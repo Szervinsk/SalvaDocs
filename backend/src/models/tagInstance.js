@@ -8,6 +8,7 @@ export default (sequelize) => {
     type: { type: DataTypes.STRING },
     icon: { type: DataTypes.STRING },
     documentId: { type: DataTypes.INTEGER },
+    displayCategory: { type: DataTypes.STRING },
   });
 
   TagInstance.associate = (models) => {

@@ -5,12 +5,19 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { fileURLToPath } from 'url';
+import path from 'path';
+
 
 import { sequelize } from "./models/index.js";
 import apiRoutes from "./routes/api.js";
 
 dotenv.config();
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(helmet());
 app.use(express.json());

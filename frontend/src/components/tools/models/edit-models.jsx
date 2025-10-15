@@ -1,15 +1,14 @@
 import "./EditModels.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Icons } from "../../../constants/icons";
-import axios from "axios";
 
-// Importando os componentes filhos
+// Importando os componentes filhos que este arquivo gerencia
 import Dashboard from "./dashboard";
 import TagsManager from "./tagsManager";
 import ModelsManager from "./modelsManager";
 import PastasManager from "./pastasManager";
 
-// O SegmentedControl, como é usado aqui, pode ficar neste arquivo.
+// Componente reutilizável para as abas de navegação
 export const SegmentedControl = ({ options, activeOption, onSelect }) => (
   <div className="segmented-control">
     {options.map((option) => (
@@ -25,36 +24,9 @@ export const SegmentedControl = ({ options, activeOption, onSelect }) => (
   </div>
 );
 
-// ==========================================================================
-// COMPONENTE PAI PRINCIPAL
-// ==========================================================================
-function EditModels({showAlert}) {
+// Componente principal que gerencia as abas
+function EditModels({ modelos, tags, pastas, onDataChange, showAlert, baseURL }) {
   const [area, setArea] = useState("dashboard");
-  
-  // Estados para armazenar os dados do banco
-  const [tags, setTags] = useState([]);
-  const [modelos, setModelos] = useState([]);
-  const [pastas, setPastas] = useState([]);
-
-  // Efeito para buscar todos os dados iniciais da API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [tagsRes, modelosRes, pastasRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/tags/"),
-          axios.get("http://localhost:5000/api/modelos/"), 
-          axios.get("http://localhost:5000/api/folders/"),
-        ]);
-        setTags(tagsRes.data);
-        setModelos(modelosRes.data);
-        setPastas(pastasRes.data);
-      } catch (error) {
-        console.error("Erro ao buscar dados iniciais:", error);
-      }
-    };
-
-    fetchData();
-  }, []); // O array vazio [] garante que isso rode apenas uma vez
 
   const areaOptions = [
     { label: "Dashboard", value: "dashboard", icon: <Icons.Graphics size={16} /> },
@@ -63,15 +35,14 @@ function EditModels({showAlert}) {
     { label: "Pastas", value: "pastas", icon: <Icons.Folder size={16} /> },
   ];
 
-  // Função que decide qual componente filho renderizar
   const renderArea = () => {
     switch (area) {
       case "tags":
-        return <TagsManager tags={tags} setTags={setTags} showAlert={showAlert} />;
+        return <TagsManager tags={tags} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
       case "models":
-        return <ModelsManager modelos={modelos} setModelos={setModelos} showAlert={showAlert} />;
+        return <ModelsManager modelos={modelos} tags={tags} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
       case "pastas":
-        return <PastasManager pastas={pastas} setPastas={setPastas} showAlert={showAlert} />;
+        return <PastasManager pastas={pastas} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
       case "dashboard":
       default:
         return <Dashboard tags={tags} modelos={modelos} />;

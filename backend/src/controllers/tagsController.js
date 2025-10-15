@@ -6,7 +6,7 @@ import models from "../models/index.js";
 export const getAllTags = async (req, res) => {
   try {
     const tags = await models.TagBase.findAll({
-      attributes: ["id", "name", "type", "icon", "regex", "prompt", "category"],
+      attributes: ["id", "name", "type", "icon", "regex", "prompt", "category", "displayCategory"],
     });
     res.json(tags);
   } catch (err) {

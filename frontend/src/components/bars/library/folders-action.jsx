@@ -3,11 +3,6 @@ import { useState, useEffect } from "react";
 import { Icons } from "../../../constants/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "./library.css";
-import axios from "axios";
-
-// ==========================================================================
-// SUB-COMPONENTES INTERNOS (Tudo em um só lugar)
-// ==========================================================================
 
 // --- Sub-componente para exibir um único item de documento ---
 const DocumentItem = ({ doc, docSelecionado, onClick }) => {
@@ -31,7 +26,6 @@ const DocumentItem = ({ doc, docSelecionado, onClick }) => {
 const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }) => {
   const [isAberta, setIsAberta] = useState(false);
 
-  // Abre a pasta automaticamente se a busca encontrar documentos dentro dela
   useEffect(() => {
     if (abrirPastaSeFiltrada) {
       setIsAberta(true);
@@ -49,7 +43,7 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
           <h3>{pasta.name}</h3>
         </div>
         <div className="folder-info">
-          <span className="doc-count">{pasta.documentos.length}</span>
+          <span className="doc-count">{pasta.documentos?.length || 0}</span>
           <Icons.ArrowDown size={16} className={`arrow-icon ${isAberta ? "rotated" : ""}`} />
         </div>
       </div>
@@ -63,8 +57,7 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {/* Adicionada a mensagem para quando não há documentos */}
-            {pasta.documentos.length > 0 ? (
+            {pasta.documentos?.length > 0 ? (
               pasta.documentos.map((doc) => (
                 <DocumentItem 
                   key={doc.id} 
@@ -84,51 +77,24 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
 };
 
 
-// ==========================================================================
-// COMPONENTE PRINCIPAL
-// ==========================================================================
-
-function FoldersAction({ setDocSelecionado, docSelecionado, pastas, setPastas }) {
-  const [documentos, setDocumentos] = useState([]);
-  const [loading, setLoading] = useState(true);
+// --- Componente Principal ---
+function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSelecionado }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isReduzido, setIsReduzido] = useState(false);
-
-  // Busca os dados iniciais da API
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [pastasRes, documentosRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/folders"),
-          axios.get("http://localhost:5000/api/files/documentos"),
-        ]);
-        setPastas(pastasRes.data);
-        setDocumentos(documentosRes.data);
-      } catch (error) {
-        console.error("Erro ao buscar dados da biblioteca:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleDocumentClick = (doc) => {
     setDocSelecionado(prev => (prev?.id === doc.id ? null : doc));
   };
   
-  // Lógica de filtragem e combinação dos dados
   const pastasComDocumentosFiltrados = pastas
-    .map(pasta => {
-      const docsNestaPasta = documentos.filter(doc => 
+    .map(pasta => ({
+      ...pasta,
+      documentos: documentos.filter(doc => 
         doc.folderId === pasta.id &&
-        (doc.resolvedTemplate || doc.templateName || "").toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      return { ...pasta, documentos: docsNestaPasta };
-    })
+        (doc.templateName || "").toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
     .filter(pasta => 
-      // A pasta só será removida da lista se o NOME dela não corresponder à busca.
       pasta.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -138,7 +104,6 @@ function FoldersAction({ setDocSelecionado, docSelecionado, pastas, setPastas })
       animate={{ width: isReduzido ? 70 : 280 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      {/* Cabeçalho */}
       <div className="sidebar-header">
         {!isReduzido && <h2>Biblioteca</h2>}
         <button className="icon-btn" onClick={() => setIsReduzido(prev => !prev)} title={isReduzido ? "Expandir" : "Reduzir"}>
@@ -146,18 +111,12 @@ function FoldersAction({ setDocSelecionado, docSelecionado, pastas, setPastas })
         </button>
       </div>
 
-      {/* Busca */}
       {!isReduzido && (
         <div className="sidebar-controls">
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            placeholder="Buscar pastas ou docs..."
-          />
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Buscar..." />
         </div>
       )}
 
-      {/* Lista de Pastas */}
       <div className="folders-list">
         {loading ? (
           <p className="loading-text">Carregando...</p> 

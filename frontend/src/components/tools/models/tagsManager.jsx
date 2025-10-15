@@ -1,10 +1,12 @@
 import "./EditModels.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icons } from "../../../constants/icons";
 import axios from "axios";
 
-// --- Sub-componente: Modal de Formulário de Tags ---
-const TagFormModal = ({ tag, onClose, onSave }) => {
+// ==========================================================================
+// SUB-COMPONENTE: MODAL COM FORMULÁRIO DE TAGS
+// ==========================================================================
+const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
   const [formData, setFormData] = useState({
     name: tag?.name || "",
     category: tag?.category || "",
@@ -22,15 +24,18 @@ const TagFormModal = ({ tag, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (tag) {
-        await axios.put(`http://localhost:5000/api/tags/${tag.id}`, formData);
-      } else {
-        await axios.post("http://localhost:5000/api/tags/create", formData);
+      if (tag) { // Modo Edição
+        await axios.put(`${baseURL}/tags/${tag.id}`, formData);
+        showAlert("success", `Tag "${formData.name}" atualizada com sucesso!`);
+      } else { // Modo Criação
+        await axios.post(`${baseURL}/tags/create`, formData);
+        showAlert("success", `Tag "${formData.name}" criada com sucesso!`);
       }
-      onSave();
+      onSave(); // Chama a função 'refreshData' do App.jsx
       onClose();
     } catch (err) {
       console.error("Erro ao salvar a tag:", err);
+      showAlert("error", "Erro ao salvar a tag. Tente novamente.");
     }
   };
 
@@ -42,47 +47,49 @@ const TagFormModal = ({ tag, onClose, onSave }) => {
             <h2>{tag ? "Editar Tag" : "Criar Nova Tag"}</h2>
             <button type="button" className="icon-button" onClick={onClose}><Icons.Close size={20} /></button>
           </header>
-          <div className="form-grid">
-            <div className="form-field">
-              <label htmlFor="name">Nome da Tag</label>
-              <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
-            </div>
-            <div className="form-field">
-              <label htmlFor="category">Categoria</label>
-              <input type="text" id="category" name="category" value={formData.category} onChange={handleInputChange} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="type">Tipo de Extração</label>
-              <div className="custom-select-wrapper">
-                <select id="type" name="type" value={formData.type} onChange={handleInputChange}>
-                  <option value="Manual">Manual</option>
-                  <option value="Regex">Regex</option>
-                  <option value="IA">Inteligência Artificial</option>
-                </select>
+          <div className="modal-body">
+            <div className="form-grid">
+              <div className="form-field">
+                <label htmlFor="name">Nome da Tag</label>
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+              </div>
+              <div className="form-field">
+                <label htmlFor="category">Categoria</label>
+                <input type="text" id="category" name="category" value={formData.category} onChange={handleInputChange} />
+              </div>
+              <div className="form-field">
+                <label htmlFor="type">Tipo de Extração</label>
+                <div className="custom-select-wrapper">
+                  <select id="type" name="type" value={formData.type} onChange={handleInputChange}>
+                    <option value="Manual">Manual</option>
+                    <option value="Regex">Regex</option>
+                    <option value="IA">Inteligência Artificial</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-field">
+                <label htmlFor="icon">Ícone</label>
+                <div className="custom-select-wrapper">
+                  <select id="icon" name="icon" value={formData.icon} onChange={handleInputChange}>
+                    <option value="">Nenhum</option>
+                    {Object.keys(Icons).map(iconName => (<option key={iconName} value={iconName}>{iconName}</option>))}
+                  </select>
+                </div>
               </div>
             </div>
-            <div className="form-field">
-              <label htmlFor="icon">Ícone</label>
-              <div className="custom-select-wrapper">
-                <select id="icon" name="icon" value={formData.icon} onChange={handleInputChange}>
-                  <option value="">Nenhum</option>
-                  {Object.keys(Icons).map(iconName => (<option key={iconName} value={iconName}>{iconName}</option>))}
-                </select>
+            {formData.type === "Regex" && (
+              <div className="form-field full-width">
+                <label htmlFor="regex">Padrão Regex</label>
+                <input type="text" id="regex" name="regex" value={formData.regex} onChange={handleInputChange} placeholder="Ex: /([0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2})/" />
               </div>
-            </div>
+            )}
+            {formData.type === "IA" && (
+              <div className="form-field full-width">
+                <label htmlFor="prompt">Prompt de IA</label>
+                <textarea id="prompt" name="prompt" value={formData.prompt} onChange={handleInputChange} rows="4" placeholder="Ex: Extraia o nome completo do autor principal..."></textarea>
+              </div>
+            )}
           </div>
-          {formData.type === "Regex" && (
-            <div className="form-field full-width">
-              <label htmlFor="regex">Padrão Regex</label>
-              <input type="text" id="regex" name="regex" value={formData.regex} onChange={handleInputChange} placeholder="Ex: /([0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2})/" />
-            </div>
-          )}
-          {formData.type === "IA" && (
-            <div className="form-field full-width">
-              <label htmlFor="prompt">Prompt de IA</label>
-              <textarea id="prompt" name="prompt" value={formData.prompt} onChange={handleInputChange} rows="4" placeholder="Ex: Extraia o nome completo do autor principal..."></textarea>
-            </div>
-          )}
           <footer className="modal-footer">
             <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
             <button type="submit" className="btn-primary">Salvar</button>
@@ -93,15 +100,19 @@ const TagFormModal = ({ tag, onClose, onSave }) => {
   );
 };
 
-// --- Sub-componente: Modal de Confirmação para Excluir ---
-const DeleteConfirmationModal = ({ tag, onClose, onConfirm }) => {
+// ==========================================================================
+// SUB-COMPONENTE: MODAL DE CONFIRMAÇÃO PARA EXCLUIR
+// ==========================================================================
+const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert, baseURL }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/tags/${tag.id}`);
-      onConfirm();
+      await axios.delete(`${baseURL}/tags/${tag.id}`);
+      showAlert("success", "Tag excluída com sucesso!");
+      onConfirm(); // Chama a função 'refreshData' do App.jsx
       onClose();
     } catch (err) {
       console.error("Erro ao excluir a tag:", err);
+      showAlert("error", "Erro ao excluir a tag.");
     }
   };
 
@@ -125,33 +136,29 @@ const DeleteConfirmationModal = ({ tag, onClose, onConfirm }) => {
   );
 };
 
-// --- Componente Principal do Arquivo ---
-const TagsManager = ({ tags, setTags }) => {
+// ==========================================================================
+// COMPONENTE PRINCIPAL DO ARQUIVO
+// ==========================================================================
+const TagsManager = ({ tags, onDataChange, showAlert, baseURL}) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentTag: null });
 
   const handleOpenModal = (mode, tag = null) => setModalState({ isOpen: true, mode, currentTag: tag });
   const handleCloseModal = () => setModalState({ isOpen: false, mode: null, currentTag: null });
 
-  const refreshTags = () => {
-    axios.get("http://localhost:5000/api/tags/")
-      .then(res => setTags(res.data))
-      .catch(err => console.error("Erro ao recarregar tags:", err));
-  };
-
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <TagFormModal tag={modalState.currentTag} onClose={handleCloseModal} onSave={refreshTags} />;
+      return <TagFormModal tag={modalState.currentTag} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal tag={modalState.currentTag} onClose={handleCloseModal} onConfirm={refreshTags} />;
+      return <DeleteConfirmationModal tag={modalState.currentTag} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
     return null;
   };
 
   return (
-    <div className="tags-manager">
-      <div className="tags-manager__header">
+    <div className="manager-container">
+      <div className="manager-header">
         <h2>Gerenciamento de Tags</h2>
         <button className="btn-primary" onClick={() => handleOpenModal('create')}>
           <Icons.Add size={16} /> Criar Nova Tag

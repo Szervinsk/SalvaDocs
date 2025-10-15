@@ -4,21 +4,24 @@ import { Icons } from "../../../constants/icons";
 import axios from "axios";
 
 // --- Sub-componente: Modal de Formulário de Pasta ---
-const PastaFormModal = ({ pasta, onClose, onSave }) => {
+const PastaFormModal = ({ pasta, onClose, onSave, showAlert , baseURL}) => {
   const [name, setName] = useState(pasta?.name || "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (pasta) { // Modo Edição
-        await axios.put(`http://localhost:5000/api/folders/${pasta.id}`, { name });
-      } else { // Modo Criação
-        await axios.post("http://localhost:5000/api/folders", { name });
+      if (pasta) {
+        await axios.put(`${baseURL}/folders/${pasta.id}`, { name });
+        showAlert("success", `Pasta "${name}" editada com sucesso!`);
+      } else {
+        await axios.post(`${baseURL}/folders`, { name });
+        showAlert("success", "Pasta criada com sucesso!");
       }
       onSave();
       onClose();
     } catch (err) {
       console.error("Erro ao salvar a pasta:", err);
+      showAlert("error", "Erro ao salvar a pasta.");
     }
   };
 
@@ -30,7 +33,7 @@ const PastaFormModal = ({ pasta, onClose, onSave }) => {
             <h2>{pasta ? "Editar Pasta" : "Criar Nova Pasta"}</h2>
             <button type="button" className="icon-button" onClick={onClose}><Icons.Close size={20} /></button>
           </header>
-          <div className="form-grid" style={{gridTemplateColumns: '1fr'}}>
+          <div className="modal-body">
             <div className="form-field">
               <label htmlFor="name">Nome da Pasta</label>
               <input type="text" id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -47,14 +50,16 @@ const PastaFormModal = ({ pasta, onClose, onSave }) => {
 };
 
 // --- Sub-componente: Modal de Confirmação para Excluir ---
-const DeleteConfirmationModal = ({ pasta, onClose, onConfirm }) => {
+const DeleteConfirmationModal = ({ pasta, onClose, onConfirm, showAlert, baseURL }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/folders/${pasta.id}`);
+      await axios.delete(`${baseURL}/folders/${pasta.id}`);
+      showAlert("success", "Pasta excluída com sucesso!");
       onConfirm();
       onClose();
     } catch (err) {
       console.error("Erro ao excluir a pasta:", err);
+      showAlert("error", "Erro ao excluir a pasta.");
     }
   };
 
@@ -77,29 +82,24 @@ const DeleteConfirmationModal = ({ pasta, onClose, onConfirm }) => {
   );
 };
 
+
 // --- Componente Principal do Arquivo ---
-const PastasManager = ({ pastas, setPastas }) => {
+const PastasManager = ({ pastas, onDataChange, showAlert, baseURL }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentPasta: null });
 
   const handleOpenModal = (mode, pasta = null) => setModalState({ isOpen: true, mode, currentPasta: pasta });
   const handleCloseModal = () => setModalState({ isOpen: false, mode: null, currentPasta: null });
 
-  const refreshPastas = () => {
-    axios.get("http://localhost:5000/api/folders")
-      .then(res => setPastas(res.data))
-      .catch(err => console.error("Erro ao recarregar pastas:", err));
-  };
-
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <PastaFormModal pasta={modalState.currentPasta} onClose={handleCloseModal} onSave={refreshPastas} />;
+      return <PastaFormModal pasta={modalState.currentPasta} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal pasta={modalState.currentPasta} onClose={handleCloseModal} onConfirm={refreshPastas} />;
+      return <DeleteConfirmationModal pasta={modalState.currentPasta} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
     return null;
-  }
+  };
 
   return (
     <div className="manager-container">
@@ -122,7 +122,7 @@ const PastasManager = ({ pastas, setPastas }) => {
             {pastas.map((pasta) => (
               <tr key={pasta.id}>
                 <td>{pasta.name}</td>
-                <td>{pasta.documents?.length || 0}</td>
+                <td>{pasta.documentos?.length || 0}</td>
                 <td className="actions-cell">
                   <button className="icon-button" title="Editar Pasta" onClick={() => handleOpenModal('edit', pasta)}><Icons.EditNote size={16} /></button>
                   <button className="icon-button icon-button--danger" title="Excluir Pasta" onClick={() => handleOpenModal('delete', pasta)}><Icons.Delete size={16} /></button>

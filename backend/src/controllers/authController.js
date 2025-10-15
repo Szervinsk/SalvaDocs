@@ -1,3 +1,4 @@
+// src/controllers/authController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
@@ -7,22 +8,27 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refresh123";
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body; // Alterado de 'name' para 'username'
 
     const existing = await models.User.findOne({ where: { email } });
     if (existing) return res.status(400).json({ error: "Email já registrado" });
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await models.User.create({
-      username: name,
+      username,
       email,
-      password: hashed,
+      password: hashedPassword,
     });
 
-    res.json({ message: "Usuário registrado com sucesso", user });
+    const userResponse = user.toJSON();
+    delete userResponse.password; // Nunca retorne o hash da senha
+
+    res
+      .status(201)
+      .json({ message: "Usuário registrado com sucesso", user: userResponse });
   } catch (err) {
-    console.error("Erro register:", err);
-    res.status(500).json({ error: "Erro no registro" });
+    console.error("Erro no registro:", err);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 
@@ -31,10 +37,11 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await models.User.findOne({ where: { email } });
 
-    if (!user) return res.status(400).json({ error: "Usuário não encontrado" });
+    if (!user) return res.status(400).json({ error: "Credenciais inválidas" });
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ error: "Senha incorreta" });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword)
+      return res.status(400).json({ error: "Credenciais inválidas" });
 
     const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, {
       expiresIn: "15m",
@@ -45,45 +52,53 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false, // coloque true em produção com HTTPS
+      secure: process.env.NODE_ENV === "production", // true em produção (HTTPS)
       sameSite: "strict",
+      path: "/api/auth", // Escopo do cookie para as rotas de autenticação
     });
 
-    res.json({ accessToken, user });
+    const userResponse = user.toJSON();
+    delete userResponse.password;
+
+    res.json({ accessToken, user: userResponse });
   } catch (err) {
-    console.error("Erro login:", err);
-    res.status(500).json({ error: "Erro no login" });
+    console.error("Erro no login:", err);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 
 export const refreshToken = (req, res) => {
-  const token = req.cookies?.refreshToken; // importante colocar '?'
-
-  if (!token) return res.status(401).json({ error: "Sem token de refresh" });
+  const token = req.cookies?.refreshToken;
+  if (!token)
+    return res.status(401).json({ error: "Refresh token não encontrado" });
 
   jwt.verify(token, JWT_REFRESH_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ error: "Token inválido" });
+    if (err) return res.status(403).json({ error: "Refresh token inválido" });
 
-    const newAccess = jwt.sign({ id: decoded.id }, JWT_SECRET, {
+    const newAccessToken = jwt.sign({ id: decoded.id }, JWT_SECRET, {
       expiresIn: "15m",
     });
-    res.json({ accessToken: newAccess });
+    res.json({ accessToken: newAccessToken });
   });
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("refreshToken");
-  res.json({ message: "Logout feito com sucesso" });
+  res.clearCookie("refreshToken", { path: "/api/auth" });
+  res.status(200).json({ message: "Logout realizado com sucesso" });
 };
 
 export const me = async (req, res) => {
   try {
+    // req.user é fornecido pelo authMiddleware
     const user = await models.User.findByPk(req.user.id, {
-      attributes: ["id", "username", "email"],
+      attributes: ["id", "username", "email", "createdAt"], // Nunca inclua a senha
     });
+    if (!user)
+      return res.status(404).json({ error: "Usuário não encontrado." });
+
     res.json(user);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao buscar dados do usuário:", err);
     res.status(500).json({ error: "Erro ao buscar usuário" });
   }
 };

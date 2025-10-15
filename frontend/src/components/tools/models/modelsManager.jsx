@@ -6,21 +6,10 @@ import axios from "axios";
 // ==========================================================================
 // SUB-COMPONENTE: MODAL COM FORMULÁRIO DE MODELO
 // ==========================================================================
-const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
+const ModelFormModal = ({ model, tags, onClose, onSave, showAlert, baseURL }) => {
   const [name, setName] = useState(model?.name || "");
   const [description, setDescription] = useState(model?.description || "");
-  const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState(model?.tagsBase?.map(t => t.id) || []);
-
-  // Busca todas as tags disponíveis para o multiselect
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/tags")
-      .then(res => setAvailableTags(res.data))
-      .catch(err => {
-        console.error("Erro ao buscar tags disponíveis:", err);
-        showAlert("error", "Não foi possível carregar as tags.");
-      });
-  }, [showAlert]);
 
   const handleTagChange = (tagId) => {
     setSelectedTagIds(prev =>
@@ -33,10 +22,10 @@ const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
     const payload = { name, description, tagIds: selectedTagIds };
     try {
       if (model) {
-        await axios.put(`http://localhost:5000/api/modelos/${model.id}`, payload);
+        await axios.put(`${baseURL}/modelos/${model.id}`, payload);
         showAlert("success", `Modelo "${name}" atualizado com sucesso!`);
       } else {
-        await axios.post(`http://localhost:5000/api/modelos`, payload);
+        await axios.post(`${baseURL}/modelos`, payload);
         showAlert("success", `Modelo "${name}" criado com sucesso!`);
       }
       onSave();
@@ -55,22 +44,19 @@ const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
             <h2>{model ? "Editar Modelo" : "Criar Novo Modelo"}</h2>
             <button type="button" className="icon-button" onClick={onClose}><Icons.Close size={20} /></button>
           </header>
-
           <div className="modal-body">
             <div className="form-field">
               <label htmlFor="name">Nome do Modelo</label>
               <input type="text" id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
-
             <div className="form-field">
               <label htmlFor="description">Descrição (Opcional)</label>
               <input type="text" id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
-
             <div className="form-field">
               <label>Tags Associadas</label>
               <div className="tag-selection-grid">
-                {availableTags.length > 0 ? availableTags.map(tag => (
+                {tags.length > 0 ? tags.map(tag => (
                   <label key={tag.id} className={`tag-pill ${selectedTagIds.includes(tag.id) ? "active" : ""}`}>
                     <input
                       type="checkbox"
@@ -85,7 +71,6 @@ const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
               </div>
             </div>
           </div>
-
           <footer className="modal-footer">
             <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
             <button type="submit" className="btn-primary">Salvar</button>
@@ -99,10 +84,10 @@ const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
 // ==========================================================================
 // SUB-COMPONENTE: MODAL DE CONFIRMAÇÃO PARA EXCLUIR
 // ==========================================================================
-const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert }) => {
+const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, baseURL }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/modelos/${model.id}`);
+      await axios.delete(`${baseURL}/modelos/${model.id}`);
       showAlert("success", `Modelo "${model.name}" excluído com sucesso.`);
       onConfirm();
       onClose();
@@ -134,32 +119,20 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert }) => {
 // ==========================================================================
 // COMPONENTE PRINCIPAL DO ARQUIVO
 // ==========================================================================
-const ModelsManager = ({ modelos, setModelos, showAlert }) => {
+const ModelsManager = ({ modelos, tags, onDataChange, showAlert, baseURL }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentModel: null });
 
   const handleOpenModal = (mode, model = null) => setModalState({ isOpen: true, mode, currentModel: model });
   const handleCloseModal = () => setModalState({ isOpen: false, mode: null, currentModel: null });
 
-  const refreshModels = () => {
-    axios.get("http://localhost:5000/api/modelos")
-      .then(res => setModelos(res.data))
-      .catch(err => {
-        console.error("Erro ao recarregar modelos:", err);
-        showAlert("error", "Não foi possível atualizar a lista de modelos.");
-      });
-  };
-
   const renderModal = () => {
     if (!modalState.isOpen) return null;
-
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <ModelFormModal model={modalState.currentModel} onClose={handleCloseModal} onSave={refreshModels} showAlert={showAlert} />;
+      return <ModelFormModal model={modalState.currentModel} tags={tags} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
-
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal model={modalState.currentModel} onClose={handleCloseModal} onConfirm={refreshModels} showAlert={showAlert} />;
+      return <DeleteConfirmationModal model={modalState.currentModel} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
     }
-
     return null;
   };
 

@@ -1,22 +1,74 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { Icons } from "../../constants/icons";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import "./open-docs.css";
 import axios from "axios";
 
-// --- Sub-componente: Cabeçalho do Modal ---
-const Header = ({ doc, onClose, onDelete, onToggleExpand, isExpanded }) => (
+// ==========================================================================
+// HOOK CUSTOMIZADO QUE USA O 'displayCategory'
+// ==========================================================================
+const useTagCategorization = (tags = []) => {
+  return useMemo(() => {
+    // 1. Prepara os "cestos" para cada categoria de exibição.
+    const categorized = {
+      titleTag: null,
+      summaryTags: [],
+      signatoryTag: null,
+      listTags: [],
+      dataTags: [],
+    };
+
+    if (!tags) return categorized;
+
+    // 2. Itera sobre cada tag recebida do documento.
+    for (const tag of tags) {
+      // Ignora tags sem valor, mas permite que tags de 'dados' sem valor (Não encontrado) apareçam.
+      if (!tag.value && tag.displayCategory !== 'data') {
+        continue;
+      }
+
+      // 3. Coloca a tag no "cesto" correto com base na sua `displayCategory`.
+      switch (tag.displayCategory) {
+        case 'title':
+          if (!categorized.titleTag) categorized.titleTag = tag;
+          break;
+        case 'summary':
+          categorized.summaryTags.push(tag);
+          break;
+        case 'signatory':
+          if (!categorized.signatoryTag) categorized.signatoryTag = tag;
+          break;
+        case 'list':
+          categorized.listTags.push(tag);
+          break;
+        case 'data':
+        default:
+          categorized.dataTags.push(tag);
+          break;
+      }
+    }
+
+    // 4. Retorna os "cestos" preenchidos e organizados.
+    return categorized;
+  }, [tags]);
+};
+
+
+// ==========================================================================
+// SUB-COMPONENTES DE UI
+// ==========================================================================
+const Header = ({ doc, onClose, onDelete }) => (
   <header className="od-header">
     <div className="od-header__left">
-      <button className="od-icon-btn danger" onClick={onDelete}>
-        <Icons.Delete size={16} />
-      </button>
       <div className="od-header__title">
         <Icons.FileText size={16} />
-        <h4>{doc.resolvedTemplate || doc.templateName}</h4>
+        <h4>{doc.name || "Documento"}</h4>
       </div>
     </div>
     <div className="od-header__right">
+      <button className="od-icon-btn od-icon-btn--danger" onClick={onDelete} title="Apagar Documento">
+        <Icons.Delete size={16} />
+      </button>
       <button className="od-icon-btn" onClick={onClose} title="Fechar (Esc)">
         <Icons.Close size={20} />
       </button>
@@ -24,52 +76,97 @@ const Header = ({ doc, onClose, onDelete, onToggleExpand, isExpanded }) => (
   </header>
 );
 
-// --- Sub-componente: Tag Individual ---
-const TagItem = ({ tag, onCopy }) => {
+const DataTagItem = ({ tag, onCopy }) => {
   const Icon = Icons[tag.icon] || Icons.Tags;
-  const isNotFound = tag.value === "Não encontrado" || !tag.value;
+  const isNotFound = !tag.value;
 
   return (
-    <div className={`od-tag-item ${isNotFound ? 'not-found' : ''}`}>
-      <div className="od-tag-item__label">
+    <div className={`data-tag-item ${isNotFound ? 'not-found' : ''}`}>
+      <div className="data-tag-item__label">
         {Icon && <Icon size={14} />}
         <span>{tag.name}</span>
       </div>
-      <div className="od-tag-item__value" onClick={() => onCopy(tag.value)}>
+      <div className="data-tag-item__value" onClick={() => onCopy(tag.value)}>
         <p>{tag.value || "Não encontrado"}</p>
-        <Icons.Clipboard size={14} className="copy-icon" />
+        {!isNotFound && <Icons.Clipboard size={14} className="copy-icon" />}
       </div>
     </div>
   );
 };
 
-// --- Sub-componente: Navegação das Abas ---
-const ViewSwitcher = ({ viewMode, setViewMode, docCount }) => (
-  <nav className="od-view-switcher">
-    <button className={viewMode === 'resumo' ? 'active' : ''} onClick={() => setViewMode('resumo')}>
-      <Icons.TextSearch size={14} /> Resumo
-    </button>
-    <button className={viewMode === 'docs' ? 'active' : ''} onClick={() => setViewMode('docs')}>
-      <Icons.FileList size={14} /> Documentos ({docCount})
-    </button>
-    <button className={viewMode === 'json' ? 'active' : ''} onClick={() => setViewMode('json')}>
-      <Icons.Code size={14} /> JSON
-    </button>
-  </nav>
+const TextBlockItem = ({ tag, onCopy }) => (
+  <div className="text-block-item">
+    <h4>{tag.name}</h4>
+    <p onClick={() => onCopy(tag.value)}>
+      {tag.value}
+      <Icons.Clipboard size={14} className="copy-icon" />
+    </p>
+  </div>
 );
 
-// --- Componente Principal ---
-function OpenDocs({
-  docSelecionado,
-  setDocumentos,
-  showAlert,
-  onClose,
-  onToggleExpand,
-  isExpanded,
-}) {
-  const [viewMode, setViewMode] = useState("resumo");
+const ListSection = ({ tag }) => {
+  let items;
+  try {
+    const parsed = JSON.parse(tag.value);
+    items = Array.isArray(parsed) ? parsed : [tag.value];
+  } catch {
+    items = [tag.value];
+  }
+  const Icon = tag.name === 'Destinatários' ? <Icons.User size={16} /> : <Icons.FileText size={16} />;
 
-  // Fechar o modal com a tecla 'Esc'
+  return (
+    <div className="list-section">
+      <h4>{tag.name} <span className="item-count">({items.length})</span></h4>
+      <div className="list-section__items">
+        {items.map((item, idx) => (
+          <div className="list-section__item" key={idx}>
+            <div className="list-section__item-icon">{Icon}</div>
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const SignatoryItem = ({ signer }) => (
+  <div className="signatory-item">
+    <div className="signatory-item__icon"><Icons.User size={20} /></div>
+    <div className="signatory-item__info">
+      <span className="signatory-item__name">{signer.Nome || "Nome não encontrado"}</span>
+      <span className="signatory-item__title">{signer.Cargo || "Cargo não especificado"}</span>
+    </div>
+  </div>
+);
+
+const SignatoriesSection = ({ tag }) => {
+  let signatories = [];
+  try {
+    const parsed = JSON.parse(tag.value);
+    signatories = Array.isArray(parsed) ? parsed : [parsed];
+  } catch {
+    signatories = [{ Nome: tag.value, Cargo: 'Informação' }];
+  }
+
+  return (
+    <div className="signatory-section">
+      <h4>{tag.name} ({signatories.length})</h4>
+      <div className="signatory-section__items">
+        {signatories.map((signer, idx) => (
+          <SignatoryItem key={idx} signer={signer} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
+// ==========================================================================
+// COMPONENTE PRINCIPAL
+// ==========================================================================
+function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, baseURL }) {
+  const STATIC_FILE_BASE_URL = "http://localhost:5000"; //url para baixar e exibir o arquivo pdf (sem a /api)
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -78,52 +175,37 @@ function OpenDocs({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // Função para copiar texto e mostrar alerta
   const handleCopyToClipboard = (text) => {
     if (!text || text === "Não encontrado") return;
     navigator.clipboard.writeText(text);
-    showAlert("success", "Texto copiado para a área de transferência!");
+    showAlert("success", "Texto copiado!");
   };
 
-  // Lógica para deletar o documento
   const handleDelete = async () => {
-    if (!window.confirm("Tem certeza que deseja apagar este documento?")) return;
+    if (!window.confirm(`Tem certeza que deseja apagar o documento "${docSelecionado.name}"?`)) return;
     try {
-      await axios.delete(`http://localhost:5000/api/files/documentos/${docSelecionado.id}`);
-      setDocumentos(prev => prev.filter(d => d.id !== docSelecionado.id));
+      await axios.delete(`files/documentos/${docSelecionado.id}`);
       showAlert("success", "Documento apagado com sucesso!");
+      onDataChange();
       onClose();
-      window.location.reload()
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao apagar documento:", error);
       showAlert("error", "Erro ao apagar documento");
     }
   };
 
-  // Memoiza os dados das tags para otimização
-  const { titleTag, summaryTags, docsTag, otherTags } = useMemo(() => {
-    if (!docSelecionado?.tags) return { otherTags: [] };
-    const tags = docSelecionado.tags;
-    const priorityTitle = ["Título", "Assunto", "Título Parecer"];
-    
-    return {
-      titleTag: tags.find(t => priorityTitle.includes(t.name)),
-      summaryTags: tags.filter(t => ["Resumo", "Resumo Parecer"].includes(t.name) && t.value),
-      docsTag: tags.find(t => t.name === "Documentos referenciados"),
-      otherTags: tags.filter(t => !priorityTitle.includes(t.name) && !["Resumo", "Resumo Parecer", "Documentos referenciados"].includes(t.name))
-    };
-  }, [docSelecionado]);
-  
-  const docCount = useMemo(() => {
-    if (!docsTag?.value) return 0;
-    try {
-      const parsed = JSON.parse(docsTag.value);
-      return Array.isArray(parsed) ? parsed.length : 1;
-    } catch {
-      return 1;
-    }
-  }, [docsTag]);
-  
+  const handleDownload = () => {
+    const fileUrl = `${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`;
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', docSelecionado.name);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const { titleTag, summaryTags, signatoryTag, listTags, dataTags } = useTagCategorization(docSelecionado?.tags);
+
   if (!docSelecionado) return null;
 
   return (
@@ -136,91 +218,59 @@ function OpenDocs({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <Header 
-            doc={docSelecionado} 
-            onClose={onClose} 
-            onDelete={handleDelete} 
-            onToggleExpand={onToggleExpand} 
-            isExpanded={isExpanded}
-        />
+        <Header doc={docSelecionado} onClose={onClose} onDelete={handleDelete} />
 
-        <main className="od-main-content">
-          {/* Título Principal */}
-          <section className="od-title-section">
-            <h2 onClick={() => handleCopyToClipboard(titleTag?.value || docSelecionado.name)}>
-              {titleTag?.value || docSelecionado.name}
-              <Icons.Clipboard size={16} className="copy-icon" />
-            </h2>
-            <span className="od-title-label">{titleTag?.name || "Nome do Arquivo"}</span>
-          </section>
+        <div className="od-content-wrapper">
+          <main className="od-main-content">
 
-          {/* Tags Gerais */}
-          <section className="od-tags-section">
-            {otherTags.map(tag => (
-              <TagItem key={tag.id} tag={tag} onCopy={handleCopyToClipboard} />
+            {/* 1. Título (da categoria 'title') */}
+            <section className="od-title-section">
+              <h2 onClick={() => handleCopyToClipboard(titleTag?.value || docSelecionado.name)}>
+                {titleTag?.value || docSelecionado.name}
+                <Icons.Clipboard size={16} className="copy-icon" />
+              </h2>
+              <span className="od-title-label">{titleTag?.name || "Nome do Arquivo"}</span>
+            </section>
+
+            {/* 2. Resumos (da categoria 'summary') */}
+            {summaryTags.map(tag => (
+              <TextBlockItem key={tag.id} tag={tag} onCopy={handleCopyToClipboard} />
             ))}
-          </section>
 
-          {/* Navegação e Conteúdo Dinâmico */}
-          <ViewSwitcher viewMode={viewMode} setViewMode={setViewMode} docCount={docCount} />
-          
-          <AnimatePresence mode="wait">
-            <motion.section
-              key={viewMode}
-              className="od-dynamic-content"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              {viewMode === "resumo" && (
-                <div className="od-summary-view">
-                  {summaryTags.length > 0 ? (
-                    summaryTags.map(tag => <p key={tag.id}>{tag.value}</p>)
-                  ) : (
-                    <p className="placeholder-text">Nenhum resumo encontrado.</p>
-                  )}
-                </div>
-              )}
+            {/* 3. Dados Principais ("Caixinhas", da categoria 'data') */}
+            <section className="od-data-grid">
+              {dataTags.map(tag => (
+                <DataTagItem key={tag.id} tag={tag} onCopy={handleCopyToClipboard} />
+              ))}
+            </section>
 
-              {viewMode === "docs" && (
-                <div className="od-docs-view">
-                  {docsTag?.value ? (
-                    (() => {
-                        try {
-                            const docs = JSON.parse(docsTag.value);
-                            return (Array.isArray(docs) ? docs : [docs]).map((docName, idx) => (
-                                <div className="od-doc-item" key={idx}>
-                                <Icons.FileText size={18} />
-                                <span>{docName}</span>
-                                </div>
-                            ));
-                        } catch {
-                            return (
-                                <div className="od-doc-item">
-                                <Icons.FileText size={18} />
-                                <span>{docsTag.value}</span>
-                                </div>
-                            );
-                        }
-                    })()
-                  ) : (
-                    <p className="placeholder-text">Nenhum documento referenciado.</p>
-                  )}
-                </div>
-              )}
+            {/* 4. Signatário (da categoria 'signatory') */}
+            {signatoryTag && <SignatoriesSection tag={signatoryTag} />}
 
-              {viewMode === "json" && (
-                <pre className="od-json-view">{JSON.stringify(docSelecionado, null, 2)}</pre>
-              )}
-            </motion.section>
-          </AnimatePresence>
-        </main>
+            {/* 5. Outras Listas (da categoria 'list') */}
+            {listTags.map(tag => (
+              <ListSection key={tag.id} tag={tag} />
+            ))}
 
-        <footer className="od-footer">
-            <button className="btn-secondary"><Icons.Pdf_file size={16}/> Visualizar PDF</button>
-            <button className="btn-primary"><Icons.Upload size={16}/> Baixar Documento</button>
-        </footer>
+          </main>
+
+          <aside className="od-pdf-viewer">
+            <header className="od-viewer-header">
+              <p>{docSelecionado.name}</p>
+              <button className="icon-button" onClick={handleDownload} title="Baixar PDF">
+                <Icons.Download size={16} />
+              </button>
+            </header>
+            <div className="od-pdf-frame">
+              <iframe
+                src={`${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`}
+                title={docSelecionado.name}
+                width="100%"
+                height="100%"
+              />
+            </div>
+          </aside>
+        </div>
       </motion.div>
     </div>
   );

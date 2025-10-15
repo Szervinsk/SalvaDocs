@@ -28,7 +28,7 @@ export const getModelos = async (req, res) => {
       include: [{
         model: models.TagBase,
         as: "tagsBase",
-        attributes: ["id", "name", "type", "icon", "regex", "prompt", "category"],
+        attributes: ["id", "name", "type", "icon", "regex", "prompt", "category", "displayCategory"],
         through: { attributes: [] },
       }],
     });

@@ -12,8 +12,8 @@ function Alerts({ type = "info", message, onClose }) {
   const ICONS = {
     success: <Icons.CheckCircle size={20} />,
     error: <Icons.CloseCircle size={20} />,
-    warning: <Icons.AlertTriangle size={20} />, // Supondo que você tenha este ícone
-    info: <Icons.Info size={20} />, // Supondo que você tenha este ícone
+    warning: <Icons.AlertTriangle size={20} />,
+    info: <Icons.Info size={20} />,
   };
 
   return (

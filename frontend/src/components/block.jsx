@@ -1,47 +1,53 @@
 import { useState, useEffect } from "react";
 import { Icons } from "../constants/icons";
 import { ETAPAS } from "../constants/constants";
-import ActionBar from "./bars/actionStatusBars/action-bar";
-import axios from "axios";
 import { AnimatePresence } from "framer-motion";
+import axios from "axios";
 
-// Tools
+// Importação das Ferramentas (Componentes Filhos)
 import AnalyseDoc from "./tools/analyse/analyse";
 import Home from "./tools/home/home";
 import EditModels from "./tools/models/edit-models";
 import Configurations from "./tools/configurations/configurations";
 import Account from "./tools/account/account";
 import OpenDocs from "./openDocs/open-docs";
+import ActionBar from "./bars/actionStatusBars/action-bar";
 import StatusBar from "./bars/actionStatusBars/status-bar";
+import ApiMonitoration from "./tools/dev/ApiMonitoration";
+import MoreContent from "./more/moreContent";
 
 function Block({
-  setModelos,
+  // Props recebidas do App.jsx
+  pastas,
   modelos,
-  selectedModel,
-  setSelectedModel,
   documentos,
+  onDataChange,
+  setPastas,
+  setModelos,
   setDocumentos,
-  docSelecionado,
-  setDocSelecionado,
+  user,
   tool,
   setTool,
-  user,
-  pastas,
-  setDarkMode,
+  docSelecionado,
+  setDocSelecionado,
+  selectedModel,
+  setSelectedModel,
   darkMode,
-  showAlert, // Recebendo showAlert para passar para OpenDocs
+  setDarkMode,
+  showAlert,
+  baseURL,
 }) {
+  // Estados locais do Block, para gerenciar o fluxo interno
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
-  const [erroArquivo, setErroArquivo] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [tremer, setTremer] = useState(false);
   const [more, setMore] = useState(false);
   const [isResponse, setIsResponse] = useState(false);
-  const [tags, setTags] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
 
-  // Limpa o estado da análise quando o 'tool' principal muda
+  // Limpa estados específicos da análise quando o usuário muda de ferramenta
   useEffect(() => {
     if (tool !== 2) {
       setSelectedModel(null);
@@ -49,25 +55,26 @@ function Block({
       setFile(null);
       setEtapaAtual(1);
     }
-  }, [tool, setSelectedModel, setSelectedTags, setFile, setEtapaAtual]);
+  }, [tool, setSelectedModel]);
 
-  // Busca todas as tags disponíveis ao montar o componente
+  // Busca a lista completa de tags uma vez, para usar nos componentes filhos
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tags/")
+    axios.get(`${baseURL}/tags`)
       .then((res) => {
-        setTags(res.data || []);
+        setTags(res.data || [])
       })
-      .catch(err => console.error("Erro ao buscar todas as tags:", err));
-  }, []);
+      .catch(err => {
+        console.error("Erro ao buscar todas as tags:", err);
+        showAlert("error", "Não foi possível carregar as tags (block).");
+      });
+  }, [showAlert]);
 
   const toggleExpandDocs = () => setIsExpanded(prev => !prev);
 
   const triggerShake = () => {
-    setErroArquivo(true);
     setTremer(true);
-    setTimeout(() => setTremer(false), 500);
-    setTimeout(() => setErroArquivo(false), 500);
-    showAlert("warning", "Nenhum arquivo foi anexado!");
+    setTimeout(() => setTremer(false), 4000);
+    showAlert("warning", "Ação bloqueada: anexe um arquivo para prosseguir.");
   };
 
   const isEtapaDisabled = (id) => {
@@ -76,18 +83,19 @@ function Block({
     return false;
   };
 
+  // Função que decide qual componente de ferramenta renderizar
   const handleSelectTool = (id) => {
     switch (id) {
       case 1:
         return (
           <Home
-            documentos={documentos}
             user={user}
             setDocSelecionado={setDocSelecionado}
-            docSelecionado={docSelecionado}
+            documentos={documentos}
+            pastas={pastas}
+            modelos={modelos}
             setTool={setTool}
             setSelectedModel={setSelectedModel}
-            setEtapaAtual={setEtapaAtual}
           />
         );
       case 2:
@@ -104,7 +112,6 @@ function Block({
             setSelectedTags={setSelectedTags}
             file={file}
             setFile={setFile}
-            erroArquivo={erroArquivo}
             tremer={tremer}
             setIsResponse={setIsResponse}
             setDocSelecionado={setDocSelecionado}
@@ -114,38 +121,56 @@ function Block({
             user={user}
             setTool={setTool}
             tags={tags}
-            setTags={setTags}
             setDocumentos={setDocumentos}
             pastas={pastas}
           />
         );
       case 3:
-        return <EditModels modelos={modelos} tags={tags} pastas={pastas} showAlert={showAlert}/>;
+        return (
+          <EditModels
+            modelos={modelos}
+            tags={tags}
+            pastas={pastas}
+            setModelos={setModelos}
+            setTags={setTags}
+            setPastas={setPastas}
+            onDataChange={onDataChange}
+            showAlert={showAlert}
+            baseURL={baseURL}
+          />
+        );
       case 4:
-        return <Configurations setDarkMode={setDarkMode} darkMode={darkMode} />;
+        return (
+          <Configurations
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+          />
+        );
       case 5:
         return <Account user={user} />;
+      case 6:
+        return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} baseURL={baseURL} />;
       default:
-        // Se nenhuma ferramenta estiver selecionada (tool === null), renderiza Home
-        if (tool === null) {
-          return (
-            <Home
-              documentos={documentos}
-              user={user}
-              setDocSelecionado={setDocSelecionado}
-              docSelecionado={docSelecionado}
-              setTool={setTool}
-              setSelectedModel={setSelectedModel}
-              setEtapaAtual={setEtapaAtual}
-            />
-          );
-        }
-        return null;
+        // Se nenhuma ferramenta for selecionada, volta para a Home
+        return (
+          <Home
+            user={user}
+            setDocSelecionado={setDocSelecionado}
+            documentos={documentos}
+            pastas={pastas}
+            modelos={modelos}
+            setTool={setTool}
+            setSelectedModel={setSelectedModel}
+          />
+        );
     }
   };
 
   return (
     <main className="switch-area">
+      {/* Caixa do more */}
+      {more && <MoreContent tool={tool} setTool={setTool} setMore={setMore} />}
+
       <ActionBar
         docSelecionado={docSelecionado}
         selectedModel={selectedModel}
@@ -157,31 +182,25 @@ function Block({
         more={more}
         tool={tool}
         setTool={setTool}
-        pastas={pastas}
       />
 
       <div className="middle-area">
-        {/* O conteúdo principal (Home, AnalyseDoc, etc.) é renderizado aqui */}
         <div className="main-content">
           {handleSelectTool(tool)}
         </div>
 
-        {/* O OpenDocs (modal) é renderizado por cima quando um doc está selecionado */}
         <AnimatePresence>
           {docSelecionado && (
             <OpenDocs
               docSelecionado={docSelecionado}
-              setDocumentos={setDocumentos}
               showAlert={showAlert}
               onClose={() => setDocSelecionado(null)}
-              onToggleExpand={toggleExpandDocs}
-              isExpanded={isExpanded}
+              baseURL={baseURL}
             />
           )}
         </AnimatePresence>
       </div>
 
-      {/* A StatusBar aparece condicionalmente na parte inferior */}
       {(tool === 2 && selectedModel) && (
         <StatusBar
           selectedModel={selectedModel}

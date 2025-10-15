@@ -1,7 +1,7 @@
 import "./styles/main.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
-import axios from "axios"; // Importação do axios
+import axios from "axios";
 
 // COMPONENTES
 import Block from "../src/components/block";
@@ -10,153 +10,131 @@ import FoldersAction from "./components/bars/library/folders-action";
 import AuthForm from "./components/auth/authForm";
 import Alerts from "./components/alerts/alerts";
 
-// Configura a URL base para todas as chamadas do axios
-axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.withCredentials = true; // Permite o envio de cookies
+axios.defaults.withCredentials = true;
+const baseURL = "http://localhost:5000/api";
 
 function App() {
+  // Estados de UI e Autenticação
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
+  const [tool, setTool] = useState(1);
+  const [pastasAbertas, setPastasAbertas] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [alert, setAlert] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Estados principais
+  // Estados de Dados (A FONTE DA VERDADE)
   const [selectedModel, setSelectedModel] = useState(null);
   const [docSelecionado, setDocSelecionado] = useState(null);
   const [documentos, setDocumentos] = useState([]);
   const [modelos, setModelos] = useState([]);
   const [pastas, setPastas] = useState([]);
-  const [tool, setTool] = useState(1);
-  const [pastasAbertas, setPastasAbertas] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [alert, setAlert] = useState(null);
 
-  // Função para exibir alertas na tela
-  const showAlert = (type, message) => {
+  // O array de dependências vazio `[]` garante que a função NUNCA será recriada.
+  const showAlert = useCallback((type, message) => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 4000);
+  }, []);
+
+  // FUNÇÃO CENTRALIZADA PARA ATUALIZAR TODOS OS DADOS
+  const refreshData = async () => {
+    if (!loading) setLoading(true);
+    try {
+      const [pastasRes, documentosRes, modelosRes] = await Promise.all([
+        axios.get(`${baseURL}/folders`),
+        axios.get(`${baseURL}/files/documentos`),
+        axios.get(`${baseURL}/modelos`),
+      ]);
+      setPastas(pastasRes.data);
+      setDocumentos(documentosRes.data);
+      setModelos(modelosRes.data);
+    } catch (error) {
+      console.error("Erro ao carregar dados da aplicação:", error);
+      showAlert("error", "Não foi possível carregar os dados.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Efeito para alternar o tema dark/light
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  // Efeito para verificar a sessão do usuário ao carregar a página
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const response = await axios.get("/auth/me");
+        const response = await axios.get(`${baseURL}/auth/me`);
         if (response.data) {
           setUser(response.data);
           setIsLogged(true);
         }
       } catch (error) {
-        console.log("Nenhum usuário logado na sessão.");
         setIsLogged(false);
       }
     };
     checkUserSession();
   }, []);
 
-  // Efeito para buscar os dados iniciais assim que o usuário loga
   useEffect(() => {
-    const fetchInitialData = async () => {
-      if (isLogged) {
-        try {
-          // Busca pastas, documentos e modelos em paralelo para otimizar
-          const [pastasRes, documentosRes, modelosRes] = await Promise.all([
-            axios.get("http://localhost:5000/api/folders"),
-            axios.get("http://localhost:5000/api/files/documentos"),
-            axios.get("http://localhost:5000/api/modelos"),
-          ]);
-          setPastas(pastasRes.data);
-          setDocumentos(documentosRes.data);
-          setModelos(modelosRes.data);
+    if (isLogged) {
+      refreshData();
+    }
+  }, [isLogged]);
 
-          showAlert("sucess", "Dados carregados com sucesso da sua biblioteca!")
-        } catch (error) {
-          console.error("Erro ao buscar dados iniciais:", error);
-          showAlert("error", "Não foi possível carregar os dados da sua biblioteca.");
-        }
-      }
-    };
-    fetchInitialData();
-  }, [isLogged]); // Executa sempre que o status de login mudar
-
-  // Função de logout
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/api/auth/logout");
+      await axios.post(`${baseURL}/auth/logout`);
       setUser(null);
       setIsLogged(false);
-      // Limpa os dados para evitar que o próximo usuário os veja
       setDocumentos([]);
       setPastas([]);
       setModelos([]);
       showAlert("success", "Logout realizado com sucesso!");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
       showAlert("error", "Ocorreu um erro ao sair.");
     }
   };
 
-  // Se o usuário não estiver logado, exibe o formulário de autenticação
   if (!isLogged) {
-    return (
-      <AuthForm
-        setIsLogged={setIsLogged}
-        setUser={setUser}
-        showAlert={showAlert}
-      />
-    );
+    return <AuthForm setIsLogged={setIsLogged} setUser={setUser} showAlert={showAlert} />;
   }
 
-  // Se estiver logado, exibe a aplicação principal
   return (
     <>
       <AnimatePresence>
-        {alert && (
-          <Alerts
-            type={alert.type}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-          />
-        )}
+        {alert && <Alerts type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       </AnimatePresence>
-
       <div className="main-container">
         <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} />
         <div className="background-block">
           {pastasAbertas && (
             <FoldersAction
               pastas={pastas}
-              setPastas={setPastas}
               documentos={documentos}
-              setDocumentos={setDocumentos}
+              loading={loading}
               docSelecionado={docSelecionado}
               setDocSelecionado={setDocSelecionado}
-              showAlert={showAlert}
             />
           )}
           <Block
-            setModelos={setModelos}
+            pastas={pastas}
             modelos={modelos}
-            selectedModel={selectedModel}
-            setSelectedModel={setSelectedModel}
             documentos={documentos}
+            setPastas={setPastas}
+            setModelos={setModelos}
             setDocumentos={setDocumentos}
-            docSelecionado={docSelecionado}
-            setDocSelecionado={setDocSelecionado}
+            onDataChange={refreshData} // A função de refresh
+            user={user}
             tool={tool}
             setTool={setTool}
-            user={user}
-            pastas={pastas}
-            setDarkMode={setDarkMode}
+            docSelecionado={docSelecionado}
+            setDocSelecionado={setDocSelecionado}
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
             darkMode={darkMode}
+            setDarkMode={setDarkMode}
             showAlert={showAlert}
+            baseURL={baseURL}
           />
         </div>
       </div>

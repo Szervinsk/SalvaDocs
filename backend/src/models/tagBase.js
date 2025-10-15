@@ -9,6 +9,7 @@ export default (sequelize) => {
     regex: { type: DataTypes.STRING },
     prompt: { type: DataTypes.STRING },
     category: { type: DataTypes.STRING },
+    displayCategory: { type: DataTypes.STRING },
   });
   TagBase.associate = (models) => {
     TagBase.belongsToMany(models.Modelo, {

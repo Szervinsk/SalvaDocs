@@ -64,7 +64,8 @@ export const uploadFileAndAnalyze = async (req, res) => {
     // --- 3. Criar o Documento no Banco de Dados ---
     const document = await models.Document.create({
       name: req.file.originalname,
-      path: req.file.path,
+      path: `uploads/${req.file.filename}`,
+      size: req.file.size,
       model: model || "Desconhecido",
       templateName: templateName || null,
       ownerId: ownerId,
@@ -97,6 +98,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
             value,
             type: "ia",
             icon: tag.icon,
+            displayCategory: tag.displayCategory,
             documentId: document.id,
           });
         }
@@ -108,6 +110,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
             value: "Erro na extração IA",
             type: "ia",
             icon: tag.icon,
+            displayCategory: tag.displayCategory,
             documentId: document.id,
           })
         );
@@ -124,6 +127,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
         value: extracted?.value || null,
         type: "regex",
         icon: tag.icon,
+        displayCategory: tag.displayCategory,
         documentId: document.id,
       });
     }
@@ -171,7 +175,14 @@ export const getAllDocuments = async (req, res) => {
         {
           model: models.TagInstance,
           as: "tags",
-          attributes: ["id", "name", "value", "type", "icon"],
+          attributes: [
+            "id",
+            "name",
+            "value",
+            "type",
+            "icon",
+            "displayCategory",
+          ],
         },
         {
           model: models.Folder,

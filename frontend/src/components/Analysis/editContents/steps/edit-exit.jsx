@@ -104,6 +104,7 @@ function EditExit({
               <select
                 name="folder"
                 id="folder"
+                className="custom-select"
                 value={selectedFolder ? selectedFolder.id : ""}
                 onChange={(e) => {
                   const folderId = e.target.value;

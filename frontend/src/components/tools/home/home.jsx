@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "../../../constants/icons";
 import "./home.css";
 import SearchBar from "../../bars/searchBar/searchbar";
-import axios from "axios";
 
 // ==========================================================================
 // SUB-COMPONENTES PARA CADA ABA
 // ==========================================================================
 
-// --- ABA 1: ACESSO RÁPIDO ---
-const AcessoRapido = ({ documentos, setTool, setSelectedModel }) => (
+// --- ABA 1: VISÃO GERAL ---
+const VisaoGeral = ({ documentos, setTool, setSelectedModel }) => (
   <motion.div
-    key="acesso-rapido"
+    key="visao-geral"
     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
     transition={{ duration: 0.3, ease: "easeInOut" }}
     className="home-section-container"
   >
-    {/* Nova Seção de Ações Recomendadas */}
     <section className="home-section">
       <h4>Ações Recomendadas</h4>
       <div className="action-cards-container">
@@ -27,9 +25,8 @@ const AcessoRapido = ({ documentos, setTool, setSelectedModel }) => (
             <h5>1 Documento com Erro</h5>
             <p>Um documento falhou na última análise. Tente novamente.</p>
           </div>
-          <button className="icon-btn"><Icons.ArrowRight size={16}/></button>
+          <button className="icon-button"><Icons.ArrowRight size={16}/></button>
         </div>
-        {/* Adicione mais cards de ação aqui baseados em dados reais */}
       </div>
     </section>
 
@@ -147,8 +144,11 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
             return searchMatch && pastaMatch && modeloMatch;
         })
         .sort((a, b) => {
-            if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
-            if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
+            const valA = sortConfig.key === 'folder' ? a.folder?.name.toLowerCase() : (a[sortConfig.key] || '').toLowerCase();
+            const valB = sortConfig.key === 'folder' ? b.folder?.name.toLowerCase() : (b[sortConfig.key] || '').toLowerCase();
+
+            if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
             return 0;
         });
 
@@ -192,7 +192,7 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
                                 <td><span className="tag-count">{doc.tags.length} tags</span></td>
                                 <td>{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</td>
                                 <td>
-                                    <button className="icon-btn" onClick={(e) => { e.stopPropagation(); handleDocumentClick(doc); }} title="Ver detalhes">
+                                    <button className="icon-button" onClick={(e) => { e.stopPropagation(); handleDocumentClick(doc); }} title="Ver detalhes">
                                         <Icons.ArrowRight size={16} />
                                     </button>
                                 </td>
@@ -210,59 +210,50 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
 // COMPONENTE PRINCIPAL HOME
 // ==========================================================================
 
-function Home({ user, setDocSelecionado, docSelecionado, setTool, setSelectedModel }) {
+function Home({ 
+    user, 
+    documentos, 
+    pastas, 
+    modelos,
+    loading, // Recebe o estado de loading do pai
+    setDocSelecionado, 
+    setTool, 
+    setSelectedModel 
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [option, setOption] = useState(1);
-  const [documentos, setDocumentos] = useState([]);
-  const [modelos, setModelos] = useState([]);
-  const [pastas, setPastas] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [docsRes, modelsRes, pastasRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/documents"),
-          axios.get("http://localhost:5000/api/modelos"),
-          axios.get("http://localhost:5000/api/folders"),
-        ]);
-        const sortedDocs = docsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setDocumentos(sortedDocs);
-        setModelos(modelsRes.data);
-        setPastas(pastasRes.data);
-      } catch (error) {
-        console.error("Erro ao buscar dados do dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-  
   const handleDocumentClick = (doc) => {
     setDocSelecionado(prev => (prev?.id === doc.id ? null : doc));
   };
   
   const getFriendlyDate = () => {
-    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   };
 
   const HOME_TYPES = [
-    { id: 1, name: "Acesso Rápido", icon: <Icons.Clock size={16} /> },
+    { id: 1, name: "Visão Geral", icon: <Icons.Home size={16} /> },
     { id: 2, name: "Gráficos", icon: <Icons.Graphics size={16} /> },
     { id: 3, name: "Documentos", icon: <Icons.DocumentText size={16} /> },
   ];
 
   const renderContent = () => {
-    if (loading) return <p className="loading-text">Carregando informações...</p>;
+    if (loading) {
+        return <div className="loading-container"><p className="loading-text">Carregando informações...</p></div>;
+    }
     switch(option) {
       case 1:
-        return <AcessoRapido documentos={documentos} setTool={setTool} setSelectedModel={setSelectedModel} />;
+        return <VisaoGeral documentos={documentos} setTool={setTool} setSelectedModel={setSelectedModel} />;
       case 2:
         return <Graficos documentos={documentos} modelos={modelos} />;
       case 3:
-        return <ListaDocumentos documentos={documentos} pastas={pastas} modelos={modelos} handleDocumentClick={handleDocumentClick} searchQuery={searchQuery} />;
+        return <ListaDocumentos 
+                    documentos={documentos} 
+                    pastas={pastas} 
+                    modelos={modelos} 
+                    handleDocumentClick={handleDocumentClick} 
+                    searchQuery={searchQuery} 
+                />;
       default:
         return null;
     }
@@ -274,11 +265,11 @@ function Home({ user, setDocSelecionado, docSelecionado, setTool, setSelectedMod
         <div className="welcome">
           <div className="account-img"></div>
           <div>
-            <h2>Olá, {user.username}!</h2>
+            <h2>Olá, {user?.username}!</h2>
             <h3>{getFriendlyDate()}</h3>
           </div>
         </div>
-        {option === 3 && ( // Mostra a busca apenas na aba de documentos
+        {option === 3 && (
           <div className="home-search">
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Pesquisar por nome ou pasta..." />
           </div>

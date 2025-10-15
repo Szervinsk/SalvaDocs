@@ -105,7 +105,8 @@
   color: var(--color-text-secondary);
 }
 
-.icon-btn {
+.icon-btn,
+.icon-button {
   background: none;
   border: none;
   padding: var(--spacing-xs);
@@ -275,14 +276,145 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-/* --- Animações --- */
+/* ==========================================================================
+   MENU DROPDOWN 'MAIS OPÇÕES'
+   ========================================================================== */
+
+/* Container principal do menu */
+.more-dropdown {
+  background-color: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 280px; /* Um pouco mais largo para a descrição */
+  position: absolute;
+  top: 60px; /* Posição relativa à action-bar */
+  right: 20px;
+  z-index: 100;
+  overflow: hidden; /* Garante que os itens internos respeitem o border-radius */
+
+  /* Animação de entrada */
+  animation: fadeIn 0.2s ease-out;
+}
+
+.more-dropdown__header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+}
+
+.more-dropdown__header h4 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.more-dropdown__list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs);
+}
+
+/* Item individual do menu */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+
+  /* Reset do botão */
+  background: none;
+  border: none;
+  text-align: left;
+
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-background);
+}
+
+.dropdown-item__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.dropdown-item__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item__name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.dropdown-item__desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   COMPONENTE: CUSTOM SELECT (Dropdown)
+   ========================================================================== */
+
+/* 1. O contêiner que envolve o <select> e a seta customizada */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%; /* Faz o select ocupar a largura do seu contêiner pai */
+}
+
+/* 2. O estilo principal do elemento <select> */
+.custom-select {
+  /* Reset da aparência padrão do navegador */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Estilização */
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  /* Adiciona espaço extra à direita para não sobrepor a seta */
+  padding-right: calc(var(--spacing-md) * 2 + 16px);
+
+  background-color: var(--color-background);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+
+  /* Tipografia */
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-family: inherit; /* Herda a fonte do 'body' */
+
+  transition: all 0.3s ease;
+}
+
+/* 3. Estilo para o estado de :hover */
+.custom-select:hover {
+  border-color: var(--color-text-secondary);
+}
+
+/* 4. Estilo para o estado de :focus (acessibilidade) */
+.custom-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(89, 125, 255, 0.2); /* Usa a cor de accent com transparência */
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -10px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }

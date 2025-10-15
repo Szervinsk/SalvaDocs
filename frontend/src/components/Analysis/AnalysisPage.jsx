@@ -58,7 +58,7 @@ function AnalysisPage({
   setIsResponse,
   setDocSelecionado,
   setDocumentos,
-  triggerShake,
+  onBlocked,
   setTool,
   tags,
   setTags,
@@ -72,7 +72,7 @@ function AnalysisPage({
 
   const goToEtapa = (targetId) => {
     if (targetId === 3 && !file) {
-      triggerShake();
+      onBlocked();
       return;
     }
     setEtapaAtual(Math.max(1, Math.min(targetId, etapas.length)));
@@ -86,7 +86,7 @@ function AnalysisPage({
 
   const [text, setText] = useState("Use um dos modelos para iniciar a análise automatizada.");
   const defaultMessage = "Use um dos modelos para iniciar a análise automatizada.";
-  const handleModelText = (model) => setText(`Use o modelo ${model.name} para extrair dados específicos.`);
+  const handleModelText = (model) => setText(`${model.description}`);
 
   const handleModelClick = async (model) => {
     try {

@@ -10,22 +10,22 @@ const AuthHeader = ({ title, subtitle }) => (
 );
 
 const AuthInput = ({ id, label, type, value, onChange, placeholder, children }) => (
-    <div className="input-wrapper">
-      <label htmlFor={id}>{label}</label>
-      <div className="input-group">
-        <input
-          id={id}
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className="auth-input"
-          required
-        />
-        {children}
-      </div>
+  <div className="input-wrapper">
+    <label htmlFor={id}>{label}</label>
+    <div className="input-group">
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="auth-input"
+        required
+      />
+      {children}
     </div>
-  );
+  </div>
+);
 
 function Cadastro({ onSubmit, err, loading, switchToLogin }) {
   const [name, setName] = useState("");
@@ -45,13 +45,13 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (canSubmit) onSubmit({ name, email, password });
+    if (canSubmit) onSubmit({ username: name, email, password });
   };
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <AuthHeader title="Crie sua conta" subtitle="Comece a organizar seus documentos hoje." />
-      
+
       {err && <p className="auth-error">{err}</p>}
 
       <AuthInput
@@ -90,7 +90,7 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
         onChange={(e) => setConfirm(e.target.value)}
         placeholder="repita a senha"
       />
-      
+
       {!match && confirm.length > 0 && (
         <small className="hint error">As senhas não conferem.</small>
       )}
