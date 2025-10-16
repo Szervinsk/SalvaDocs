@@ -164,7 +164,7 @@ const SignatoriesSection = ({ tag }) => {
 // ==========================================================================
 // COMPONENTE PRINCIPAL
 // ==========================================================================
-function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, baseURL }) {
+function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizarPDF, baseURL }) {
   const STATIC_FILE_BASE_URL = "http://localhost:5000"; //url para baixar e exibir o arquivo pdf (sem a /api)
 
   useEffect(() => {
@@ -225,11 +225,11 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, baseURL })
 
             {/* 1. Título (da categoria 'title') */}
             <section className="od-title-section">
+              <span className="od-title-label">{titleTag?.name || "Nome do Arquivo"}</span>
               <h2 onClick={() => handleCopyToClipboard(titleTag?.value || docSelecionado.name)}>
                 {titleTag?.value || docSelecionado.name}
                 <Icons.Clipboard size={16} className="copy-icon" />
               </h2>
-              <span className="od-title-label">{titleTag?.name || "Nome do Arquivo"}</span>
             </section>
 
             {/* 2. Resumos (da categoria 'summary') */}
@@ -254,22 +254,25 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, baseURL })
 
           </main>
 
-          <aside className="od-pdf-viewer">
-            <header className="od-viewer-header">
+          {/* <header className="od-viewer-header">
               <p>{docSelecionado.name}</p>
               <button className="icon-button" onClick={handleDownload} title="Baixar PDF">
                 <Icons.Download size={16} />
               </button>
-            </header>
-            <div className="od-pdf-frame">
-              <iframe
-                src={`${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`}
-                title={docSelecionado.name}
-                width="100%"
-                height="100%"
-              />
-            </div>
-          </aside>
+            </header> */}
+
+          {visualizarPDF && (
+            <aside className="od-pdf-viewer">
+              <div className="od-pdf-frame">
+                <iframe
+                  src={`${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`}
+                  title={docSelecionado.name}
+                  width="100%"
+                  height="100%"
+                />
+              </div>
+            </aside>
+          )}
         </div>
       </motion.div>
     </div>

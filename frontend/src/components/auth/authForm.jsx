@@ -4,7 +4,7 @@ import Login from "./login";
 import Cadastro from "./sign";
 import "./auth.css";
 
-function AuthForm({ setIsLogged, setUser }) {
+function AuthForm({ setIsLogged, setUser, baseURL}) {
   const [mode, setMode] = useState("login"); // 'login' ou 'signup'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -12,7 +12,7 @@ function AuthForm({ setIsLogged, setUser }) {
   // Função unificada para realizar a autenticação e definir o usuário
   const authenticateAndSetUser = async (token) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
+      const res = await fetch(`${baseURL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Sessão inválida. Por favor, entre novamente.");
@@ -38,7 +38,7 @@ function AuthForm({ setIsLogged, setUser }) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${baseURL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -61,7 +61,7 @@ function AuthForm({ setIsLogged, setUser }) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${baseURL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(details),

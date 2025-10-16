@@ -15,6 +15,7 @@ import ActionBar from "./bars/actionStatusBars/action-bar";
 import StatusBar from "./bars/actionStatusBars/status-bar";
 import ApiMonitoration from "./tools/dev/ApiMonitoration";
 import MoreContent from "./more/moreContent";
+import AboutPage from "./tools/aboutPage/AboutPage";
 
 function Block({
   // Props recebidas do App.jsx
@@ -36,16 +37,19 @@ function Block({
   setDarkMode,
   showAlert,
   baseURL,
+  setUser,
+  onLogout,
+  setPastasAbertas,
+  pastasAbertas
 }) {
   // Estados locais do Block, para gerenciar o fluxo interno
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
   const [tags, setTags] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [tremer, setTremer] = useState(false);
   const [more, setMore] = useState(false);
-  const [isResponse, setIsResponse] = useState(false);
+  const [visualizarPDF, setVisualizarPDF] = useState(true);
 
   // Limpa estados específicos da análise quando o usuário muda de ferramenta
   useEffect(() => {
@@ -68,8 +72,6 @@ function Block({
         showAlert("error", "Não foi possível carregar as tags (block).");
       });
   }, [showAlert]);
-
-  const toggleExpandDocs = () => setIsExpanded(prev => !prev);
 
   const triggerShake = () => {
     setTremer(true);
@@ -113,7 +115,6 @@ function Block({
             file={file}
             setFile={setFile}
             tremer={tremer}
-            setIsResponse={setIsResponse}
             setDocSelecionado={setDocSelecionado}
             triggerShake={triggerShake}
             isEtapaDisabled={isEtapaDisabled}
@@ -144,12 +145,20 @@ function Block({
           <Configurations
             darkMode={darkMode}
             setDarkMode={setDarkMode}
+            setPastasAbertas={setPastasAbertas}
+            pastasAbertas={pastasAbertas}
+            visualizarPDF={visualizarPDF}
+            setVisualizarPDF={setVisualizarPDF}
+            showAlert={showAlert}
           />
         );
       case 5:
-        return <Account user={user} />;
+        return <Account user={user} onUserUpdate={setUser}
+          onLogout={onLogout} showAlert={showAlert} baseURL={baseURL} />;
       case 6:
         return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} baseURL={baseURL} />;
+      case 7:
+        return <AboutPage />;
       default:
         // Se nenhuma ferramenta for selecionada, volta para a Home
         return (
@@ -167,7 +176,7 @@ function Block({
   };
 
   return (
-    <main className="switch-area">
+    <main className="switch-area" style={{ borderTopLeftRadius: pastasAbertas ? "none" : "10px", borderBottomLeftRadius: pastasAbertas ? "none" : "10px" }}>
       {/* Caixa do more */}
       {more && <MoreContent tool={tool} setTool={setTool} setMore={setMore} />}
 
@@ -196,6 +205,8 @@ function Block({
               showAlert={showAlert}
               onClose={() => setDocSelecionado(null)}
               baseURL={baseURL}
+              visualizarPDF={visualizarPDF}
+              setVisualizarPDF={setVisualizarPDF}
             />
           )}
         </AnimatePresence>

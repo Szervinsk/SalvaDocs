@@ -55,7 +55,6 @@ function AnalysisPage({
   setTremer,
   user,
   showAlert,
-  setIsResponse,
   setDocSelecionado,
   setDocumentos,
   onBlocked,
@@ -119,7 +118,6 @@ function AnalysisPage({
             setFile={setFile}
             erroArquivo={erroArquivo}
             showAlert={showAlert}
-            setIsResponse={setIsResponse}
             setDocSelecionado={setDocSelecionado}
             tags={tags}
             setTags={setTags}

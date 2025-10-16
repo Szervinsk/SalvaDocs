@@ -21,25 +21,23 @@
 
 .account-layout {
   display: grid;
-  grid-template-columns: 300px 1fr; /* Coluna fixa à esquerda, flexível à direita */
+  grid-template-columns: 300px 1fr;
   gap: var(--spacing-xl);
   align-items: flex-start;
 }
-
 
 /* ==========================================================================
    2. SIDEBAR DO PERFIL (COLUNA ESQUERDA)
    ========================================================================== */
 .account-sidebar {
   position: sticky;
-  top: var(--spacing-xl); /* Fixa a sidebar ao rolar */
+  top: var(--spacing-xl);
 }
 
 .profile-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 400px;
   padding: var(--spacing-xl);
   background: var(--color-surface);
   border: var(--border-width-sm) solid var(--color-border);
@@ -86,8 +84,8 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   width: 100%;
+  margin-top: auto; /* Empurra os botões para baixo */
 }
-
 
 /* ==========================================================================
    3. CONTEÚDO PRINCIPAL (COLUNA DIREITA)
@@ -119,7 +117,8 @@
   flex-direction: column;
 }
 
-.info-row, .info-row--action {
+.info-row,
+.info-row--action {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -128,7 +127,6 @@
   padding: var(--spacing-md) var(--spacing-lg);
 }
 
-/* Adiciona uma linha divisória, exceto no último item */
 .info-row:not(:last-child) {
   border-bottom: var(--border-width-sm) solid var(--color-border);
 }
@@ -146,23 +144,49 @@
   font-size: var(--font-size-sm);
 }
 
-.tag-plan {
+/* --- Estilos para o Formulário de Edição --- */
+.form-input {
+  width: 50%; /* Ocupa metade do espaço, pode ajustar */
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
   background-color: var(--color-background);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: var(--font-weight-semibold);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
 }
 
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
+}
+
+/* --- Estilos para a Zona de Perigo --- */
+.danger-zone {
+  border-color: var(--color-danger);
+}
+
+.danger-zone .details-card__header {
+  background-color: rgba(220, 53, 69, 0.05);
+  color: var(--color-danger);
+}
+
+.danger-zone .info-row--action p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
 
 /* ==========================================================================
    4. RESPONSIVIDADE
    ========================================================================== */
 @media (max-width: 900px) {
   .account-layout {
-    grid-template-columns: 1fr; /* As colunas agora empilham verticalmente */
+    grid-template-columns: 1fr;
   }
 
   .account-sidebar {
-    position: static; /* Remove o sticky em telas menores */
+    position: static;
   }
 }

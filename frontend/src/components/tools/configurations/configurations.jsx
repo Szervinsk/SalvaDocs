@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Icons } from "../../../constants/icons"; // Certifique-se que o caminho dos ícones está correto
 import "./configurations.css";
 
-function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas }) {
+function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas, visualizarPDF, setVisualizarPDF, showAlert }) {
   // O estado da fonte foi movido para cá, pois é uma configuração local desta página
   const [fontSize, setFontSize] = useState("16px");
 
@@ -10,7 +10,7 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
   useEffect(() => {
     const savedMode = localStorage.getItem("darkMode") === "true";
     const savedFont = localStorage.getItem("fontSize") || "16px";
-    
+
     setDarkMode(savedMode);
     setFontSize(savedFont);
 
@@ -112,7 +112,33 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
               <input
                 type="checkbox"
                 checked={pastasAbertas}
-                onChange={() => setPastasAbertas(!pastasAbertas)}
+                onChange={() => {
+                  setPastasAbertas(!pastasAbertas)
+                  showAlert("success", "Configuração salva com sucesso!")
+                }}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div className="config-card">
+          <div className="config-card__info">
+            <Icons.Pdf_file size={20} />
+            <div>
+              <h3>Painel de visualização de PDF</h3>
+              <p>Exibir ou ocultar o painel lateral de visualização de PDF.</p>
+            </div>
+          </div>
+          <div className="config-card__control">
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={visualizarPDF}
+                onChange={() => {
+                  setVisualizarPDF(!visualizarPDF)
+                  showAlert("success", "Configuração salva com sucesso!")
+                }}
               />
               <span className="slider"></span>
             </label>

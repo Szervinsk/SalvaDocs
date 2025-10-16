@@ -4,6 +4,7 @@ import authRoutes from "./authRoutes.js";
 import modelsRoutes from "./modelsRoutes.js";
 import tagsRoutes from "./tagsRoutes.js";
 import foldersRoutes from "./foldersRoutes.js";
+import userRoutes from "./userRoutes.js";
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use("/folders", foldersRoutes);
 router.use("/files", fileRoutes);
 router.use("/modelos", modelsRoutes);
 router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
 
 export default router;

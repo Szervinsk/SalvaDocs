@@ -218,6 +218,7 @@
 .list-filters {
   display: flex;
   gap: var(--spacing-md);
+  align-items: center;
 }
 .table-wrapper {
   flex: 1;

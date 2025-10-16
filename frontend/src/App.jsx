@@ -96,7 +96,7 @@ function App() {
   };
 
   if (!isLogged) {
-    return <AuthForm setIsLogged={setIsLogged} setUser={setUser} showAlert={showAlert} />;
+    return <AuthForm setIsLogged={setIsLogged} setUser={setUser} showAlert={showAlert} baseURL={baseURL} />;
   }
 
   return (
@@ -135,6 +135,10 @@ function App() {
             setDarkMode={setDarkMode}
             showAlert={showAlert}
             baseURL={baseURL}
+            setUser={setUser}
+            onLogout={handleLogout}
+            setPastasAbertas={setPastasAbertas}
+            pastasAbertas={pastasAbertas}
           />
         </div>
       </div>

@@ -160,14 +160,15 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
             className="list-documents-container"
         >
             <div className="list-filters">
+                <h3>Filtros</h3>
                 <div className="custom-select-wrapper">
-                    <select value={filterPasta} onChange={e => setFilterPasta(e.target.value)}>
+                    <select className="custom-select" value={filterPasta} onChange={e => setFilterPasta(e.target.value)}>
                         <option value="">Todas as Pastas</option>
                         {pastas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
                 </div>
                 <div className="custom-select-wrapper">
-                    <select value={filterModelo} onChange={e => setFilterModelo(e.target.value)}>
+                    <select className="custom-select" value={filterModelo} onChange={e => setFilterModelo(e.target.value)}>
                         <option value="">Todos os Modelos</option>
                         {modelos.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
                     </select>

@@ -1,14 +1,18 @@
 import SearchBar from "../searchBar/searchbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Icons } from "../../../constants/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "./library.css";
+
+// ==========================================================================
+// SUB-COMPONENTES
+// ==========================================================================
 
 // --- Sub-componente para exibir um único item de documento ---
 const DocumentItem = ({ doc, docSelecionado, onClick }) => {
   const displayName = doc.resolvedTemplate || doc.templateName || "Documento sem nome";
   const isActive = docSelecionado?.id === doc.id;
-  
+
   return (
     <div
       className={`document-item ${isActive ? "active" : ""}`}
@@ -31,7 +35,7 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
       setIsAberta(true);
     }
   }, [abrirPastaSeFiltrada]);
-  
+
   return (
     <div className="folder-block">
       <div
@@ -47,7 +51,7 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
           <Icons.ArrowDown size={16} className={`arrow-icon ${isAberta ? "rotated" : ""}`} />
         </div>
       </div>
-      
+
       <AnimatePresence>
         {isAberta && (
           <motion.div
@@ -59,11 +63,11 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
           >
             {pasta.documentos?.length > 0 ? (
               pasta.documentos.map((doc) => (
-                <DocumentItem 
-                  key={doc.id} 
-                  doc={doc} 
-                  docSelecionado={docSelecionado} 
-                  onClick={onDocClick} 
+                <DocumentItem
+                  key={doc.id}
+                  doc={doc}
+                  docSelecionado={docSelecionado}
+                  onClick={onDocClick}
                 />
               ))
             ) : (
@@ -77,24 +81,35 @@ const FolderBlock = ({ pasta, docSelecionado, onDocClick, abrirPastaSeFiltrada }
 };
 
 
-// --- Componente Principal ---
+// ==========================================================================
+// COMPONENTE PRINCIPAL
+// ==========================================================================
+
 function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSelecionado }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isReduzido, setIsReduzido] = useState(false);
+  const [viewRecentDocs, setViewRecentDocs] = useState(false); // Estado para a lista de recentes
 
   const handleDocumentClick = (doc) => {
     setDocSelecionado(prev => (prev?.id === doc.id ? null : doc));
   };
-  
+
+  // Memoiza a lista de documentos recentes para otimização
+  const recentDocuments = useMemo(() => {
+    return [...documentos]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+  }, [documentos]);
+
   const pastasComDocumentosFiltrados = pastas
     .map(pasta => ({
       ...pasta,
-      documentos: documentos.filter(doc => 
+      documentos: documentos.filter(doc =>
         doc.folderId === pasta.id &&
-        (doc.templateName || "").toLowerCase().includes(searchQuery.toLowerCase())
+        (doc.templateName || doc.name || "").toLowerCase().includes(searchQuery.toLowerCase())
       ),
     }))
-    .filter(pasta => 
+    .filter(pasta =>
       pasta.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -119,15 +134,15 @@ function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSele
 
       <div className="folders-list">
         {loading ? (
-          <p className="loading-text">Carregando...</p> 
+          <p className="loading-text">Carregando...</p>
         ) : pastasComDocumentosFiltrados.length > 0 ? (
           pastasComDocumentosFiltrados.map((pasta) => {
             const deveAbrir = searchQuery.length > 0 && pasta.documentos.length > 0;
             return (
-              <FolderBlock 
-                key={pasta.id} 
-                pasta={pasta} 
-                docSelecionado={docSelecionado} 
+              <FolderBlock
+                key={pasta.id}
+                pasta={pasta}
+                docSelecionado={docSelecionado}
                 onDocClick={handleDocumentClick}
                 abrirPastaSeFiltrada={deveAbrir}
               />
@@ -137,6 +152,40 @@ function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSele
           <p className="empty-text">Nenhuma pasta encontrada.</p>
         )}
       </div>
+
+      {!isReduzido && (
+        <div className="sidebar-footer">
+          <div className={`recent-docs-header ${viewRecentDocs ? "active" : ""}`} onClick={() => setViewRecentDocs(prev => !prev)}>
+            <h3>Documentos Recentes</h3>
+            <Icons.ArrowDown size={16} className={`arrow-icon ${viewRecentDocs ? "rotated" : ""}`} />
+          </div>
+          <AnimatePresence>
+            {viewRecentDocs && (
+              <motion.div
+                className="recent-docs-list"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {recentDocuments.length > 0 ? (
+                  recentDocuments.map((doc) => (
+                    <div key={doc.id} className="recent-doc-item" onClick={() => handleDocumentClick(doc)}>
+                      <div className="recent-doc-info">
+                        <span className="recent-doc-name">{doc.templateName || doc.name}</span>
+                        <span className="recent-doc-date">{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</span>
+                      </div>
+                      <Icons.ArrowRight size={14} />
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-docs">Nenhum documento recente</p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -22,8 +22,6 @@ export function AnalyseDoc({
   closeAlert,
   setCloseAlert,
   user,
-  isResponse,
-  setIsResponse,
   alertSuccess,
   alertError,
   showAlert,
@@ -76,8 +74,6 @@ export function AnalyseDoc({
         docSelecionado={docSelecionado}
         setDocSelecionado={setDocSelecionado}
         onVoltar={onVoltar}
-        setIsResponse={setIsResponse}
-        isResponse={isResponse}
         isEtapaDisabled={isEtapaDisabled}
         handleClick={goToEtapa}
         showAlert={showAlert}

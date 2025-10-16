@@ -14,7 +14,6 @@ function EditVariables({
   file,
   setFile,
   erroArquivo,
-  setIsResponse,
   setDocSelecionado,
   setEtapaAtual,
   showAlert,
@@ -90,13 +89,11 @@ function EditVariables({
         file={file}
         tags={tags}
         onClose={() => {
-          setIsResponse(false);
           setDocSelecionado(null);
           setEtapaAtual(1);
         }}
         user={user}
         setDocSelecionado={setDocSelecionado}
-        setIsResponse={setIsResponse}
         setDocumentos={setDocumentos}
         showAlert={showAlert}
         selectedModel={selectedModel}
