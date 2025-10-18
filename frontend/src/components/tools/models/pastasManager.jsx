@@ -11,10 +11,10 @@ const PastaFormModal = ({ pasta, onClose, onSave, showAlert , baseURL}) => {
     e.preventDefault();
     try {
       if (pasta) {
-        await axios.put(`${baseURL}/folders/${pasta.id}`, { name });
+        await axios.put(`/folders/${pasta.id}`, { name });
         showAlert("success", `Pasta "${name}" editada com sucesso!`);
       } else {
-        await axios.post(`${baseURL}/folders`, { name });
+        await axios.post(`/folders`, { name });
         showAlert("success", "Pasta criada com sucesso!");
       }
       onSave();
@@ -53,7 +53,7 @@ const PastaFormModal = ({ pasta, onClose, onSave, showAlert , baseURL}) => {
 const DeleteConfirmationModal = ({ pasta, onClose, onConfirm, showAlert, baseURL }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`${baseURL}/folders/${pasta.id}`);
+      await axios.delete(`/folders/${pasta.id}`);
       showAlert("success", "Pasta excluída com sucesso!");
       onConfirm();
       onClose();

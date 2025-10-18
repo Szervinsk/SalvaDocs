@@ -6,7 +6,7 @@ import axios from "axios";
 // ==========================================================================
 // SUB-COMPONENTE: MODAL COM FORMULÁRIO DE MODELO
 // ==========================================================================
-const ModelFormModal = ({ model, tags, onClose, onSave, showAlert, baseURL }) => {
+const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
   const [name, setName] = useState(model?.name || "");
   const [description, setDescription] = useState(model?.description || "");
   const [selectedTagIds, setSelectedTagIds] = useState(model?.tagsBase?.map(t => t.id) || []);
@@ -22,10 +22,10 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert, baseURL }) =>
     const payload = { name, description, tagIds: selectedTagIds };
     try {
       if (model) {
-        await axios.put(`${baseURL}/modelos/${model.id}`, payload);
+        await axios.put(`/modelos/${model.id}`, payload);
         showAlert("success", `Modelo "${name}" atualizado com sucesso!`);
       } else {
-        await axios.post(`${baseURL}/modelos`, payload);
+        await axios.post(`/modelos`, payload);
         showAlert("success", `Modelo "${name}" criado com sucesso!`);
       }
       onSave();
@@ -84,10 +84,10 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert, baseURL }) =>
 // ==========================================================================
 // SUB-COMPONENTE: MODAL DE CONFIRMAÇÃO PARA EXCLUIR
 // ==========================================================================
-const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, baseURL }) => {
+const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`${baseURL}/modelos/${model.id}`);
+      await axios.delete(`/modelos/${model.id}`);
       showAlert("success", `Modelo "${model.name}" excluído com sucesso.`);
       onConfirm();
       onClose();
@@ -109,7 +109,7 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, baseURL
         </div>
         <footer className="modal-footer">
           <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button type="button" className="btn-danger" onClick={handleDelete}>Sim, Excluir</button>
+          <button type="button" className="btn-danger" onClick={()=> handleDelete()}>Sim, Excluir</button>
         </footer>
       </div>
     </div>
@@ -119,7 +119,7 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, baseURL
 // ==========================================================================
 // COMPONENTE PRINCIPAL DO ARQUIVO
 // ==========================================================================
-const ModelsManager = ({ modelos, tags, onDataChange, showAlert, baseURL }) => {
+const ModelsManager = ({ modelos, tags, onDataChange, showAlert, }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentModel: null });
 
   const handleOpenModal = (mode, model = null) => setModalState({ isOpen: true, mode, currentModel: model });
@@ -128,10 +128,10 @@ const ModelsManager = ({ modelos, tags, onDataChange, showAlert, baseURL }) => {
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <ModelFormModal model={modalState.currentModel} tags={tags} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <ModelFormModal model={modalState.currentModel} tags={tags} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} />;
     }
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal model={modalState.currentModel} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <DeleteConfirmationModal model={modalState.currentModel} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} />;
     }
     return null;
   };

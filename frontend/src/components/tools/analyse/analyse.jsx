@@ -33,6 +33,7 @@ export function AnalyseDoc({
   setTool,
   setTags,
   tags,
+  baseURL,
   pastas,
 }) {
 
@@ -79,6 +80,7 @@ export function AnalyseDoc({
         showAlert={showAlert}
         setTool={setTool}
         setTags={setTags}
+        baseURL={baseURL}
         tags={tags}
         pastas={pastas}
       />

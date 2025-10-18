@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Icons } from "../../constants/icons"
+import { Icons } from "../../constants/icons";
 
-// Componentes reutilizáveis
+// Componentes reutilizáveis (podem ser movidos para um arquivo separado)
 const AuthHeader = ({ title, subtitle }) => (
-  <header className="auth-header">
+  <header className="auth-form__header">
     <h2>{title}</h2>
     <p>{subtitle}</p>
   </header>
@@ -41,14 +41,14 @@ function Login({ onSubmit, err, loading, switchToSignup }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <AuthHeader title="Bem-vindo de volta!" subtitle="Faça login para continuar." />
+    <form onSubmit={handleSubmit} className="auth-form" noValidate>
+      <AuthHeader title="Bem-vindo de volta!" subtitle="Faça login para acessar seu painel." />
 
       {err && <p className="auth-error">{err}</p>}
 
       <AuthInput
         id="login-email"
-        label="Email"
+        label="Endereço de Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -61,16 +61,19 @@ function Login({ onSubmit, err, loading, switchToSignup }) {
         type={showPass ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="mínimo 6 caracteres"
+        placeholder="••••••••"
       >
         <button type="button" className="ghost-btn" onClick={() => setShowPass((s) => !s)}>
           {showPass ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
         </button>
       </AuthInput>
 
-      <button type="submit" className="auth-btn" disabled={!canSubmit}>
-        {loading ? "Entrando..." : "Entrar"}
-      </button>
+      <div className="auth-actions">
+        <button type="button" className="link-btn">Esqueceu a senha?</button>
+        <button type="submit" className="auth-btn" disabled={!canSubmit}>
+          {loading ? "Entrando..." : "Entrar"}
+        </button>
+      </div>
 
       <p className="auth-switch">
         Não tem uma conta?{" "}

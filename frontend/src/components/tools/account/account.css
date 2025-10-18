@@ -87,6 +87,21 @@
   margin-top: auto; /* Empurra os botões para baixo */
 }
 
+/* Botão estilizado como link */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s ease;
+}
+.btn-link:hover {
+  background-color: var(--color-background);
+}
+
 /* ==========================================================================
    3. CONTEÚDO PRINCIPAL (COLUNA DIREITA)
    ========================================================================== */
@@ -127,7 +142,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
 }
 
-.info-row:not(:last-child) {
+.details-card__body > *:not(:last-child) {
   border-bottom: var(--border-width-sm) solid var(--color-border);
 }
 
@@ -146,7 +161,7 @@
 
 /* --- Estilos para o Formulário de Edição --- */
 .form-input {
-  width: 50%; /* Ocupa metade do espaço, pode ajustar */
+  width: 50%;
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--font-size-sm);
   background-color: var(--color-background);
@@ -166,14 +181,15 @@
 .danger-zone {
   border-color: var(--color-danger);
 }
-
 .danger-zone .details-card__header {
   background-color: rgba(220, 53, 69, 0.05);
   color: var(--color-danger);
 }
-
+.danger-zone .info-row--action strong {
+  font-weight: var(--font-weight-bold);
+}
 .danger-zone .info-row--action p {
-  margin: 0;
+  margin: 4px 0 0 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
@@ -185,8 +201,10 @@
   .account-layout {
     grid-template-columns: 1fr;
   }
-
   .account-sidebar {
     position: static;
+  }
+  .form-input {
+    width: 100%;
   }
 }

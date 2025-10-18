@@ -5,13 +5,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 0;
   width: 280px;
   background-color: var(--color-surface);
   border-right: var(--border-width-sm) solid var(--color-border);
   transition: width 0.3s ease;
   flex-shrink: 0;
 }
-
 .sidebar.reduzido {
   width: 70px;
   align-items: center;
@@ -28,18 +28,15 @@
   flex-shrink: 0;
   width: 100%;
 }
-
 .sidebar-header h2 {
   font-size: var(--font-size-h4);
   font-weight: var(--font-weight-bold);
   white-space: nowrap;
   margin: 0;
 }
-
 .sidebar.reduzido .icon-btn {
   transform: rotate(180deg);
 }
-
 .sidebar-controls {
   padding: 0 var(--spacing-md);
   margin-bottom: var(--spacing-sm);
@@ -72,7 +69,6 @@
 .folder-block {
   margin-bottom: var(--spacing-xs);
 }
-
 .folder-header {
   display: flex;
   justify-content: space-between;
@@ -88,7 +84,6 @@
 .folder-header.active {
   background-color: rgba(89, 125, 255, 0.1);
 }
-
 .folder-info {
   display: flex;
   align-items: center;
@@ -106,7 +101,6 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
-
 .folder-header .arrow-icon {
   transition: transform 0.25s ease;
 }
@@ -115,13 +109,38 @@
   color: var(--color-accent);
 }
 
+/* --- Input de Renomeação --- */
+.folder-rename-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--border-radius-sm);
+  padding: 2px 6px;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
+}
+
+/* --- Botão "Mais Opções" --- */
+.more-options-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.folder-header:hover .more-options-btn {
+  opacity: 1;
+  pointer-events: all;
+}
+
 .documents-list {
   padding-left: calc(var(--spacing-md) + 6px);
   border-left: 2px solid var(--color-border);
   margin-left: calc(var(--spacing-xs) + 8px);
   overflow: hidden;
 }
-
 .document-item {
   display: flex;
   align-items: center;
@@ -149,10 +168,14 @@
 .empty-text,
 .loading-text,
 .no-docs {
-  padding: 6px var(--spacing-sm);
+  padding: var(--spacing-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-style: italic;
+  text-align: center;
+}
+.documents-list .empty-text {
+  padding: 6px var(--spacing-sm);
 }
 
 /* ==========================================================================
@@ -163,7 +186,6 @@
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
 }
-
 .recent-docs-header {
   display: flex;
   justify-content: space-between;
@@ -181,12 +203,10 @@
 .recent-docs-header.active .arrow-icon {
   transform: rotate(180deg);
 }
-
 .recent-docs-list {
   margin-top: var(--spacing-sm);
   overflow: hidden;
 }
-
 .recent-doc-item {
   display: flex;
   justify-content: space-between;
@@ -214,4 +234,88 @@
 }
 .no-docs {
   margin-top: var(--spacing-sm);
+}
+
+/* ==========================================================================
+   5. BOTÕES DE ÍCONE GENÉRICOS
+   ========================================================================== */
+.icon-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+.icon-btn:hover {
+  color: var(--color-accent);
+  background-color: var(--color-background);
+}
+
+/* ==========================================================================
+   6. MENU DE CONTEXTO (MORE FOLDERS)
+   ========================================================================== */
+.more-folders-dropdown {
+  position: fixed;
+  z-index: 100;
+  width: 220px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-xs);
+}
+.more-folders__header {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-xs);
+}
+.more-folders__header h4 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.more-folders__list {
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm);
+  background: none;
+  border: none;
+  text-align: left;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.dropdown-item:hover {
+  background-color: var(--color-background);
+}
+.dropdown-item__icon {
+  color: var(--color-text-secondary);
+}
+.dropdown-item:hover .dropdown-item__icon {
+  color: var(--color-text-primary);
+}
+.dropdown-item__name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+.dropdown-item.is-danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+.dropdown-item.is-danger .dropdown-item__icon,
+.dropdown-item.is-danger .dropdown-item__name {
+  color: var(--color-danger);
 }

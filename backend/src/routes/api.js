@@ -10,9 +10,9 @@ const router = express.Router();
 
 router.use("/tags", tagsRoutes);
 router.use("/folders", foldersRoutes);
-router.use("/files", fileRoutes);
+router.use("/documents", fileRoutes);
 router.use("/modelos", modelsRoutes);
-router.use("/auth", authRoutes);
+router.use("/auth", authRoutes); // Rota pública
 router.use("/users", userRoutes);
 
 export default router;

@@ -36,11 +36,12 @@ function Block({
   darkMode,
   setDarkMode,
   showAlert,
-  baseURL,
   setUser,
   onLogout,
   setPastasAbertas,
-  pastasAbertas
+  pastasAbertas,
+  setShowAlternativeTools,
+  showAlternativeTools
 }) {
   // Estados locais do Block, para gerenciar o fluxo interno
   const [etapaAtual, setEtapaAtual] = useState(1);
@@ -63,7 +64,7 @@ function Block({
 
   // Busca a lista completa de tags uma vez, para usar nos componentes filhos
   useEffect(() => {
-    axios.get(`${baseURL}/tags`)
+    axios.get(`/tags`)
       .then((res) => {
         setTags(res.data || [])
       })
@@ -122,6 +123,7 @@ function Block({
             user={user}
             setTool={setTool}
             tags={tags}
+          
             setDocumentos={setDocumentos}
             pastas={pastas}
           />
@@ -137,7 +139,7 @@ function Block({
             setPastas={setPastas}
             onDataChange={onDataChange}
             showAlert={showAlert}
-            baseURL={baseURL}
+          
           />
         );
       case 4:
@@ -150,13 +152,15 @@ function Block({
             visualizarPDF={visualizarPDF}
             setVisualizarPDF={setVisualizarPDF}
             showAlert={showAlert}
+            showAlternativeTools={showAlternativeTools}
+            setShowAlternativeTools={setShowAlternativeTools}
           />
         );
       case 5:
         return <Account user={user} onUserUpdate={setUser}
-          onLogout={onLogout} showAlert={showAlert} baseURL={baseURL} />;
+          onLogout={onLogout} showAlert={showAlert} />;
       case 6:
-        return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} baseURL={baseURL} />;
+        return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} />;
       case 7:
         return <AboutPage />;
       default:
@@ -204,7 +208,6 @@ function Block({
               docSelecionado={docSelecionado}
               showAlert={showAlert}
               onClose={() => setDocSelecionado(null)}
-              baseURL={baseURL}
               visualizarPDF={visualizarPDF}
               setVisualizarPDF={setVisualizarPDF}
             />

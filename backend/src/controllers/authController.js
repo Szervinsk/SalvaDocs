@@ -3,8 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import models from "../models/index.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret123";
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refresh123";
+import { JWT_SECRET, JWT_REFRESH_SECRET } from "../config/jwt.js";
 
 export const register = async (req, res) => {
   try {
@@ -44,7 +43,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Credenciais inválidas" });
 
     const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, {
-      expiresIn: "15m",
+      expiresIn: "30m",
     });
     const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
       expiresIn: "7d",
@@ -85,7 +84,7 @@ export const refreshToken = (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("refreshToken", { path: "/api/auth" });
   res.status(200).json({ message: "Logout realizado com sucesso" });
-};
+};''
 
 export const me = async (req, res) => {
   try {

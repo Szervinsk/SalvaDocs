@@ -184,12 +184,12 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizar
   const handleDelete = async () => {
     if (!window.confirm(`Tem certeza que deseja apagar o documento "${docSelecionado.name}"?`)) return;
     try {
-      await axios.delete(`files/documentos/${docSelecionado.id}`);
+      await axios.delete(`/documents/${docSelecionado.id}`);
       showAlert("success", "Documento apagado com sucesso!");
       onDataChange();
       onClose();
     } catch (error) {
-      console.error("Erro ao apagar documento:", error);
+      console.error("Erro ao apagar documentos:", error);
       showAlert("error", "Erro ao apagar documento");
     }
   };

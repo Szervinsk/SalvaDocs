@@ -6,7 +6,7 @@ import axios from "axios";
 // ==========================================================================
 // SUB-COMPONENTE: MODAL COM FORMULÁRIO DE TAGS
 // ==========================================================================
-const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
+const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
   const [formData, setFormData] = useState({
     name: tag?.name || "",
     category: tag?.category || "",
@@ -15,6 +15,7 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
     regex: tag?.regex || "",
     prompt: tag?.prompt || "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,19 +24,22 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (tag) { // Modo Edição
-        await axios.put(`${baseURL}/tags/${tag.id}`, formData);
+        await axios.put(`/tags/${tag.id}`, formData);
         showAlert("success", `Tag "${formData.name}" atualizada com sucesso!`);
       } else { // Modo Criação
-        await axios.post(`${baseURL}/tags/create`, formData);
+        await axios.post(`/tags`, formData); // Rota corrigida para padrão REST
         showAlert("success", `Tag "${formData.name}" criada com sucesso!`);
       }
-      onSave(); // Chama a função 'refreshData' do App.jsx
+      onSave();
       onClose();
     } catch (err) {
       console.error("Erro ao salvar a tag:", err);
       showAlert("error", "Erro ao salvar a tag. Tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,8 +95,10 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
             )}
           </div>
           <footer className="modal-footer">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn-primary">Salvar</button>
+            <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Salvando..." : "Salvar"}
+            </button>
           </footer>
         </form>
       </div>
@@ -103,16 +109,21 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert, baseURL }) => {
 // ==========================================================================
 // SUB-COMPONENTE: MODAL DE CONFIRMAÇÃO PARA EXCLUIR
 // ==========================================================================
-const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert, baseURL }) => {
+const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDelete = async () => {
+    setIsLoading(true);
     try {
-      await axios.delete(`${baseURL}/tags/${tag.id}`);
+      await axios.delete(`/tags/${tag.id}`);
       showAlert("success", "Tag excluída com sucesso!");
-      onConfirm(); // Chama a função 'refreshData' do App.jsx
+      onConfirm();
       onClose();
     } catch (err) {
       console.error("Erro ao excluir a tag:", err);
       showAlert("error", "Erro ao excluir a tag.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,8 +139,10 @@ const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert, baseURL }
           <p>Esta ação não pode ser desfeita.</p>
         </div>
         <footer className="modal-footer">
-          <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button type="button" className="btn-danger" onClick={handleDelete}>Sim, Excluir</button>
+          <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
+          <button type="button" className="btn-danger" onClick={handleDelete} disabled={isLoading}>
+            {isLoading ? "Excluindo..." : "Sim, Excluir"}
+          </button>
         </footer>
       </div>
     </div>
@@ -139,7 +152,7 @@ const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert, baseURL }
 // ==========================================================================
 // COMPONENTE PRINCIPAL DO ARQUIVO
 // ==========================================================================
-const TagsManager = ({ tags, onDataChange, showAlert, baseURL}) => {
+const TagsManager = ({ tags, onDataChange, showAlert }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentTag: null });
 
   const handleOpenModal = (mode, tag = null) => setModalState({ isOpen: true, mode, currentTag: tag });
@@ -148,10 +161,10 @@ const TagsManager = ({ tags, onDataChange, showAlert, baseURL}) => {
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <TagFormModal tag={modalState.currentTag} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <TagFormModal tag={modalState.currentTag} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} />;
     }
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal tag={modalState.currentTag} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <DeleteConfirmationModal tag={modalState.currentTag} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} />;
     }
     return null;
   };

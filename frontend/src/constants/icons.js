@@ -48,6 +48,7 @@ import { TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
 // VS Code Icons (vsc)
 import { VscLaw } from "react-icons/vsc";
 
+import { FaTools } from "react-icons/fa";
 
 // ==========================================================================
 // OBJETO DE ÍCONES CENTRALIZADO
@@ -64,6 +65,7 @@ export const Icons = {
   ArrowUp: IoIosArrowUp,
   ArrowRight: FiArrowRight,
   ArrowLeft: FiArrowLeft,
+  Tools: FaTools,
 
   // ============================
   // Ações Comuns

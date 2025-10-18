@@ -1,3 +1,5 @@
+import { Icons } from "./icons";
+
 // Modelos disponíveis
 export const MODELOS = [
   { id: 1, name: "Despacho" },
@@ -19,17 +21,45 @@ export const ALERTS = [
 ];
 
 export const TOOLS = [
-  { id: 1, name: "Home", icon: "Home" },
-  { id: 2, name: "Analisar Documentos", icon: "ScannerDocument" },
-  { id: 3, name: "Editar Modelos", icon: "Model" },
-  { id: 4, name: "Configurações", icon: "Adjustments" },
-  { id: 5, name: "Sua Conta", icon: "User" },
+  { id: 1, name: "Home", icon: <Icons.Home size={22} />, shortcut: "H" },
+  {
+    id: 2,
+    name: "Analisar",
+    icon: <Icons.ScannerDocument size={22} />,
+    shortcut: "A",
+  },
+  { id: 3, name: "Gerenciar", icon: <Icons.Model size={22} />, shortcut: "G" },
+  {
+    id: 4,
+    name: "Configurações",
+    icon: <Icons.Adjustments size={22} />,
+    shortcut: "D",
+  },
+  { id: 5, name: "Conta", icon: <Icons.User size={22} />, shortcut: "E" }, // Sem atalho
 ];
+
+export const MORE_TOOLS = [
+  {
+    id: 6,
+    name: "Monitoramento APIs",
+    icon: <Icons.Model size={20} />, // Usando o componente de ícone diretamente
+    description: "Visualize as requisições do sistema.",
+    shortcut: "M",
+  },
+  {
+    id: 7,
+    name: "Sobre o Projeto",
+    icon: <Icons.Question size={20} />,
+    description: "Conheça mais sobre a aplicação.",
+    shortcut: "P",
+  },
+];
+
 // Pastas iniciais
 export const PASTAS = [
-  { id: 1, name: "Despacho", color: "#f44336" },   // vermelho
-  { id: 2, name: "Programa", color: "#2196f3" },  // azul
-  { id: 3, name: "Parecer", color: "#4caf50" },    // verde
+  { id: 1, name: "Despacho", color: "#f44336" }, // vermelho
+  { id: 2, name: "Programa", color: "#2196f3" }, // azul
+  { id: 3, name: "Parecer", color: "#4caf50" }, // verde
 ];
 
 // Tags gerais (despacho)
@@ -72,7 +102,8 @@ export const TAGS_IA = [
     content: "Documentos referenciados",
     icon: "DocumentText",
     type: "ia",
-    prompt: "Liste os documentos referenciados neste texto em um formato de lista.",
+    prompt:
+      "Liste os documentos referenciados neste texto em um formato de lista.",
   },
   {
     id: 6,
@@ -205,7 +236,13 @@ export const BLOCOS = [
     data: TAGS_UNIVERSAIS,
     color: "#4CAF50",
   }, // verde
-  { key: "ia", title: "Tags de IA", info: "Tags que utilizam inteligência artificial.", data: TAGS_IA, color: "#9C27B0" }, // roxo
+  {
+    key: "ia",
+    title: "Tags de IA",
+    info: "Tags que utilizam inteligência artificial.",
+    data: TAGS_IA,
+    color: "#9C27B0",
+  }, // roxo
   {
     key: "programa",
     title: "Tags de Programa",

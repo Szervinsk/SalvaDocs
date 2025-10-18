@@ -5,6 +5,12 @@
   color: var(--color-text-secondary);
 }
 
+.thin {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
 .controle {
   color: var(--color-accent);
   margin: 0 5px;

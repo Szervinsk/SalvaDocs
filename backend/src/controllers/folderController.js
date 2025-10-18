@@ -22,20 +22,31 @@ export const createFolder = async (req, res) => {
   }
 };
 
+// controllers/folderController.js
+
 export const updateFolder = async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
 
-    const pastaToUpdate = await folder.Folder.findByPk(id);
-    if (!pastaToUpdate)
-      return res.status(400).json({ error: "Não foi encontrado a pasta." });
-    else
-      await pastaToUpdate.update({ name });
-      
-      res.status(201).json("Pasta editada com sucesso!");
+    if (!name || name.trim() === "") {
+      return res
+        .status(400)
+        .json({ error: "O nome da pasta não pode ser vazio." });
+    }
+
+    const folder = await models.Folder.findByPk(id);
+
+    if (!folder) {
+      return res.status(404).json({ error: "Pasta não encontrada." });
+    }
+
+    folder.name = name;
+    await folder.save();
+    res.status(200).json(folder);
   } catch (err) {
-    res.status(500).json({ error: "Erro ao editar a pasta" });
+    console.error("Erro ao atualizar a pasta:", err);
+    res.status(500).json({ error: "Erro interno ao editar a pasta" });
   }
 };
 

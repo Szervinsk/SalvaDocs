@@ -1,54 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Login from "./login";
 import Cadastro from "./sign";
 import "./auth.css";
+import { Icons } from "../../constants/icons";
+import Logo from "../../../src/assets/pen.svg";
+import appPhoto from "../../assets/Photo.png";
 
-function AuthForm({ setIsLogged, setUser, baseURL}) {
-  const [mode, setMode] = useState("login"); // 'login' ou 'signup'
+// Componente para a coluna de branding (visual)
+const AuthBranding = () => (
+  <div className="auth-branding">
+    <div className="branding-content">
+      <div className="branding-footer">
+        <h3>Transforme Documentos em Dados.</h3>
+        <p>
+          Nossa plataforma com IA integrada analisa seus arquivos, extrai informações
+          essenciais e organiza tudo para você.
+        </p>
+        <img src={appPhoto} alt="Visualização do aplicativo" />
+      </div>
+    </div>
+  </div>
+);
+
+// Componente principal do formulário de autenticação
+function AuthForm({ onLoginSubmit, onSignupSubmit }) {
+  const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Função unificada para realizar a autenticação e definir o usuário
-  const authenticateAndSetUser = async (token) => {
-    try {
-      const res = await fetch(`${baseURL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Sessão inválida. Por favor, entre novamente.");
-      const userInfo = await res.json();
-      setUser(userInfo);
-      setIsLogged(true);
-    } catch (err) {
-      localStorage.removeItem("accessToken");
-      setError(err.message);
-    }
-  };
+  // NENHUMA LÓGICA DE API AQUI!
 
-  // Checa o token ao montar o componente
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      authenticateAndSetUser(token);
-    }
-  }, [setUser, setIsLogged]);
-
-  // Função para lidar com o login
+  // Funções "wrapper" que adicionam estado de loading e erro antes de chamar a prop
   const handleLogin = async (credentials) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${baseURL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro no login.");
-      
-      localStorage.setItem("accessToken", data.accessToken);
-      setUser(data.user);
-      setIsLogged(true);
+      await onLoginSubmit(credentials);
+      // O App.jsx vai cuidar de mudar o estado isLogged
     } catch (err) {
       setError(err.message);
     } finally {
@@ -56,22 +45,11 @@ function AuthForm({ setIsLogged, setUser, baseURL}) {
     }
   };
 
-  // Função para lidar com o cadastro
   const handleSignup = async (details) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${baseURL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(details),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao cadastrar.");
-
-      // Após o cadastro, faz o login automaticamente
-      await handleLogin({ email: details.email, password: details.password });
-
+      await onSignupSubmit(details);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -80,40 +58,51 @@ function AuthForm({ setIsLogged, setUser, baseURL}) {
   };
 
   const formVariants = {
-    hidden: { opacity: 0, x: mode === 'login' ? -100 : 100 },
+    hidden: { opacity: 0, x: mode === 'login' ? -50 : 50 },
     visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: mode === 'login' ? 100 : -100 },
+    exit: { opacity: 0, x: mode === 'login' ? 50 : -50 },
   };
 
   return (
     <main className="auth-container">
-      <AnimatePresence mode="wait">
+      <div className="auth-card">
         <motion.div
-          key={mode}
-          className="auth-card"
-          variants={formVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}
         >
-          {mode === "login" ? (
-            <Login
-              onSubmit={handleLogin}
-              loading={loading}
-              err={error}
-              switchToSignup={() => setMode("signup")}
-            />
-          ) : (
-            <Cadastro
-              onSubmit={handleSignup}
-              loading={loading}
-              err={error}
-              switchToLogin={() => setMode("login")}
-            />
-          )}
+          <div className="logo-wrapper">
+            <img src={Logo} alt="SalvaDocs Logo" className="logo-icon" />
+            <motion.h2 className="app-title">SalvaDocs</motion.h2>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              style={{ width: "100%" }}
+            >
+              {mode === "login" ? (
+                <Login
+                  onSubmit={handleLogin}
+                  loading={loading}
+                  err={error}
+                  switchToSignup={() => setMode("signup")}
+                />
+              ) : (
+                <Cadastro
+                  onSubmit={handleSignup}
+                  loading={loading}
+                  err={error}
+                  switchToLogin={() => setMode("login")}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
-      </AnimatePresence>
+      </div>
+      <AuthBranding />
     </main>
   );
 }

@@ -1,15 +1,16 @@
 import express from "express";
+import { authMiddleware } from "../middleware/auth.js";
 import { updateUser, deleteUser } from "../controllers/userController.js";
-import { authMiddleware } from "../middleware/auth.js"; // Reutilizamos o mesmo middleware
 
 const router = express.Router();
 
 // Todas as rotas aqui exigem autenticação
+router.use(authMiddleware);
 
 // Atualiza o usuário logado
-router.put("/:id", authMiddleware, updateUser);
+router.put("/", updateUser);
 
 // Deleta o usuário logado
-router.delete("/", authMiddleware, deleteUser);
+router.delete("/", deleteUser);
 
 export default router;

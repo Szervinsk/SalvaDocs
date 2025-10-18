@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Icons } from "../../../constants/icons"; // Certifique-se que o caminho dos ícones está correto
 import "./configurations.css";
 
-function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas, visualizarPDF, setVisualizarPDF, showAlert }) {
+function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas, visualizarPDF, setVisualizarPDF, showAlert, setShowAlternativeTools, showAlternativeTools }) {
   // O estado da fonte foi movido para cá, pois é uma configuração local desta página
   const [fontSize, setFontSize] = useState("16px");
 
@@ -101,7 +101,7 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
         {/* Card de Layout */}
         <div className="config-card">
           <div className="config-card__info">
-            <Icons.FileList size={20} />
+            <Icons.Folder size={20} />
             <div>
               <h3>Painel de Pastas</h3>
               <p>Exibir ou ocultar o painel lateral de pastas.</p>
@@ -144,6 +144,30 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
             </label>
           </div>
         </div>
+
+        <div className="config-card">
+          <div className="config-card__info">
+            <Icons.Adjustments size={20} />
+            <div>
+              <h3>Visualizar ferramentas ocultas</h3>
+              <p>Exibir ou ocultar ferramentas alternativas</p>
+            </div>
+          </div>
+          <div className="config-card__control">
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={showAlternativeTools}
+                onChange={() => {
+                  setShowAlternativeTools(!showAlternativeTools)
+                  showAlert("success", "Configuração salva com sucesso!")
+                }}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </div>
+
       </div>
     </div>
   );

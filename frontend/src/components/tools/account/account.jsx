@@ -10,7 +10,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
     email: user?.email || "",
   });
 
-  // Reseta o formulário se o usuário mudar (ex: após logout/login)
+  // Reseta o formulário se o objeto 'user' mudar (ex: após logout/login)
   useEffect(() => {
     setFormData({
       username: user?.username || "",
@@ -19,6 +19,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
   }, [user]);
 
   const getInitials = (name = "") => {
+    if (!name) return "";
     const names = name.split(' ');
     const initials = names.map(n => n[0]).join('');
     return initials.slice(0, 2).toUpperCase();
@@ -36,7 +37,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Se estava editando (clicou em Cancelar), reseta os dados do formulário
+      // Se estava editando e clicou em Cancelar, reseta os dados do formulário
       setFormData({ username: user.username, email: user.email });
     }
     setIsEditing(prev => !prev);
@@ -45,7 +46,8 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`${baseURL}/users/${user.id}`, formData);
+      // A rota não precisa do ID na URL, pois o backend usa o token.
+      const response = await axios.put(`${baseURL}/users`, formData);
       onUserUpdate(response.data); // Atualiza o estado global do usuário no App.jsx
       setIsEditing(false);
       showAlert("success", "Perfil atualizado com sucesso!");
@@ -56,14 +58,14 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm("Você tem CERTEZA que deseja excluir sua conta? Esta ação é irreversível.")) {
+    if (window.confirm("Você tem CERTEZA que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados serão perdidos.")) {
       try {
         await axios.delete(`${baseURL}/users`);
         showAlert("success", "Sua conta foi excluída com sucesso.");
         onLogout(); // Chama a função de logout do App.jsx
       } catch (err) {
-        console.error("Erro ao deletar conta:", err);
-        showAlert("error", "Não foi possível excluir a conta.");
+        console.error("Erro ao excluir conta:", err);
+        showAlert("error", err.response?.data?.error || "Não foi possível excluir o perfil.");
       }
     }
   };
@@ -82,7 +84,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
               {user?.avatarUrl ? <img src={user.avatarUrl} alt="Avatar" /> : <span>{getInitials(user?.username)}</span>}
             </div>
             <h2 className="profile-name">{user.username}</h2>
-            <p className="profile-email">{user?.email}</p>
+            <p className="profile-email">{user.email}</p>
             <div className="profile-actions">
               {isEditing ? (
                 <>
@@ -90,7 +92,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
                   <button type="button" className="btn-secondary" onClick={handleEditToggle}>Cancelar</button>
                 </>
               ) : (
-                <button type="button" className="btn-primary" onClick={handleEditToggle}>Editar Perfil</button>
+                <div className="btn-link" onClick={handleEditToggle}>Editar Perfil</div>
               )}
             </div>
           </div>
@@ -129,6 +131,10 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
               <div className="info-row--action">
                 <span>Altere sua senha para manter sua conta segura.</span>
                 <button type="button" className="btn-secondary">Alterar Senha</button>
+              </div>
+              <div className="info-row--action">
+                <span>Altere sua chave de API para integrações.</span>
+                <button type="button" className="btn-secondary">Alterar Chave</button>
               </div>
             </div>
           </div>

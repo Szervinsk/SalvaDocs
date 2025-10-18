@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
-import { Icons } from "../../constants/icons"
+import { Icons } from "../../constants/icons";
+import "./auth.css";
 
-// Reutilizando os componentes do Login.jsx
+// Componentes reutilizáveis (assumindo que estão no mesmo escopo ou importados)
 const AuthHeader = ({ title, subtitle }) => (
-  <header className="auth-header">
+  <header className="auth-form__header">
     <h2>{title}</h2>
     <p>{subtitle}</p>
   </header>
@@ -49,8 +50,8 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <AuthHeader title="Crie sua conta" subtitle="Comece a organizar seus documentos hoje." />
+    <form onSubmit={handleSubmit} className="auth-form" noValidate>
+      <AuthHeader title="Crie sua Conta" subtitle="Comece a organizar seus documentos hoje." />
 
       {err && <p className="auth-error">{err}</p>}
 
@@ -64,7 +65,7 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
       />
       <AuthInput
         id="signup-email"
-        label="Email"
+        label="Endereço de Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +77,7 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
         type={showPass ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="mínimo 6 caracteres"
+        placeholder="Mínimo 6 caracteres"
       >
         <button type="button" className="ghost-btn" onClick={() => setShowPass((s) => !s)}>
           {showPass ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
@@ -88,16 +89,19 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
         type={showPass ? "text" : "password"}
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
-        placeholder="repita a senha"
+        placeholder="Repita a senha"
       />
 
       {!match && confirm.length > 0 && (
         <small className="hint error">As senhas não conferem.</small>
       )}
 
-      <button type="submit" className="auth-btn" disabled={!canSubmit}>
-        {loading ? "Cadastrando..." : "Criar Conta"}
-      </button>
+      <div className="auth-actions">
+        <button type="submit" className="auth-btn" disabled={!canSubmit}>
+          {loading ? "Cadastrando..." : "Criar Conta"}
+        </button>
+      </div>
+
 
       <p className="auth-switch">
         Já tem uma conta?{" "}

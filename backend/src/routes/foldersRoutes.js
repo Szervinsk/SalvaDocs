@@ -1,12 +1,11 @@
 import express from "express";
-import {
-  getAllFolders,
-  createFolder,
-  updateFolder,
-  deleteFolder,
-} from "../controllers/folderController.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { getAllFolders, createFolder, updateFolder, deleteFolder } from "../controllers/folderController.js";
 
 const router = express.Router();
+
+// Middleware de segurança -> garante que todas as seguintes rotas sejam privadas
+router.use(authMiddleware);
 
 // MÉTODO: GET
 // ROTA: /api/folders

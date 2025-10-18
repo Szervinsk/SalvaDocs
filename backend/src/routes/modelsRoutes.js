@@ -1,13 +1,11 @@
 import express from "express";
-import {
-  getAllModelos,
-  getModelos,
-  createModelo,
-  updateModelo,
-  deleteModelo,
-} from "../controllers/modelosController.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { getAllModelos, getModelos, createModelo, updateModelo, deleteModelo } from "../controllers/modelosController.js";
 
 const router = express.Router();
+
+// Middleware de segurança -> garante que todas as seguintes rotas sejam privadas
+router.use(authMiddleware);
 
 // MÉTODO: GET
 // ROTA: /api/modelos

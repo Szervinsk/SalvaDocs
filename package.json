@@ -4,8 +4,9 @@
   "description": "Aplicativo de software livre com intuito de resumir documentos do trabalho...",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "concurrently \"npm:dev --prefix backend\" \"npm:start --prefix frontend\""
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Szervinsk/SalvaDocs.git"
@@ -17,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/Szervinsk/SalvaDocs/issues"
   },
-  "homepage": "https://github.com/Szervinsk/SalvaDocs#readme"
+  "homepage": "https://github.com/Szervinsk/SalvaDocs#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

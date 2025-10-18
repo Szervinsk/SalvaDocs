@@ -56,10 +56,10 @@ const ApiMonitoration = ({ baseURL }) => {
   const [responses, setResponses] = useState({});
 
   const apiEndpoints = [
-    { name: 'documentos', method: 'GET', path: `${baseURL}/files/documentos` },
-    { name: 'pastas', method: 'GET', path: `${baseURL}/folders` },
-    { name: 'modelos', method: 'GET', path: `${baseURL}/modelos` },
-    { name: 'tags', method: 'GET', path: `${baseURL}/tags` },
+    { name: 'documentos', method: 'GET', path: `/files/documentos` },
+    { name: 'pastas', method: 'GET', path: `/folders` },
+    { name: 'modelos', method: 'GET', path: `/modelos` },
+    { name: 'tags', method: 'GET', path: `/tags` },
   ];
 
   const handleRunRequest = async (endpoint) => {
@@ -118,7 +118,6 @@ const ApiMonitoration = ({ baseURL }) => {
             path={endpoint.path}
             onRun={() => handleRunRequest(endpoint)}
             response={responses[endpoint.name]}
-            baseURL={baseURL}
           />
         ))}
       </div>

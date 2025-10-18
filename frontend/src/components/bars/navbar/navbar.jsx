@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TOOLS } from "../../../constants/constants";
+import { TOOLS, MORE_TOOLS } from "../../../constants/constants";
 import { Icons } from "../../../constants/icons";
 import Logo from "../../../assets/pen.svg";
 import SearchBar from "../searchBar/searchbar";
 import "./navbar.css";
 
-function Navbar({ setTool, tool, user, onLogout }) {
+function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -22,6 +22,12 @@ function Navbar({ setTool, tool, user, onLogout }) {
     visible: { opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } },
   };
 
+  // filtro da barra de pesquisa
+  const tools_filtradas = TOOLS.filter(tool => tool.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const other_tools_filtradas = MORE_TOOLS.filter(tool => tool.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+
   return (
     <motion.nav
       className={`navbar ${isCollapsed ? "collapsed" : ""}`}
@@ -30,7 +36,6 @@ function Navbar({ setTool, tool, user, onLogout }) {
       animate={isCollapsed ? "collapsed" : "expanded"}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      {/* --- SEÇÃO SUPERIOR --- */}
       <div className="navbar-top">
         <div className="navbar-header">
           <div className="logo-wrapper">
@@ -66,30 +71,74 @@ function Navbar({ setTool, tool, user, onLogout }) {
           </AnimatePresence>
         </div>
 
-        <ul className="navbar-tools">
-          {TOOLS.map((toolItem) => {
-            const Icon = Icons[toolItem.icon];
-            const isSelected = tool === toolItem.id;
-            return (
-              <li
-                key={toolItem.id}
-                className={`tool-item ${isSelected ? "selected" : ""}`}
-                onClick={() => setTool(toolItem.id)}
-              >
-                {Icon && <Icon size={20} className="tool-icon" />}
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span variants={textVariants} initial="hidden" animate="visible" exit="hidden" className="tool-label">
-                      {toolItem.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+        <div className="navbar__tools">
+          <>
+            <hr />
+            <div className="tools-Header">
+              <Icons.Tools size={10} className="icons-r" />
+              <h5>Ferramentas</h5>
+            </div>
 
+            {tools_filtradas.length > 0 ? (
+              tools_filtradas.map((item) => (
+                <button
+                  key={item.id}
+                  className={`tool-item ${tool === item.id ? "active" : ""}`}
+                  onClick={() => setTool(item.id)}
+                  title={`${item.name}${item.shortcut ? ` (Shift + ${item.shortcut})` : ""}`}
+                >
+                  <div className="flex-row" style={{ gap: "10px" }}>
+                    <div className="tool-item__icon">{item.icon}</div>
+                    <span className="tool-item__label">{item.name}</span>
+                  </div>
+
+                  {item.shortcut && (
+                    <kbd className="tool-item__shortcut">
+                      shift + {item.shortcut}
+                    </kbd>
+                  )}
+                </button>
+              ))
+            ) : (
+              <h5 className="thin" style={{marginBottom: "10px"}}>Não foram encontradas ferramentas</h5>
+            )}
+          </>
+
+          {showAlternativeTools && (
+            <>
+              <hr />
+              <div className="tools-Header">
+                <Icons.Tools size={15} className="icons-r" />
+                <h5>Outras ferramentas</h5>
+              </div>
+
+              {other_tools_filtradas.length > 0 ? (
+                other_tools_filtradas.map((item) => (
+                  <button
+                    key={item.id}
+                    className={`tool-item ${tool === item.id ? "active" : ""}`}
+                    onClick={() => setTool(item.id)}
+                    title={`${item.name}${item.shortcut ? ` (Shift + ${item.shortcut})` : ""}`}
+                  >
+                    <div className="flex-row" style={{ gap: "10px" }}>
+                      <div className="tool-item__icon">{item.icon}</div>
+                      <span className="tool-item__label">{item.name}</span>
+                    </div>
+
+                    {item.shortcut && (
+                      <kbd className="tool-item__shortcut">
+                        shift + {item.shortcut}
+                      </kbd>
+                    )}
+                  </button>
+                ))
+              ) : (
+                <h5 className="thin">Não foram encontradas ferramentas</h5>
+              )}
+            </>
+          )}
+        </div>
+      </div>
       {/* --- SEÇÃO INFERIOR (CONTA) --- */}
       <div className="navbar-footer">
         <div className="account-info">

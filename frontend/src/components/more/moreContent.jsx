@@ -1,20 +1,7 @@
 import { Icons } from "../../constants/icons";
-function MoreContent({ setTool, setMore }) {
+import { MORE_TOOLS } from "../../constants/constants";
 
-  const MORE_TOOLS = [
-    { 
-      id: 6, 
-      name: "Monitoramento de API", 
-      icon: <Icons.Model size={20} />, // Usando o componente de ícone diretamente
-      description: "Visualize as requisições do sistema."
-    },
-    { 
-      id: 7, 
-      name: "Sobre o Projeto", 
-      icon: <Icons.Question size={20} />,
-      description: "Conheça mais sobre a aplicação."
-    },
-  ];
+function MoreContent({ setTool, setMore }) {
 
   const handleItemClick = (id) => {
     setTool(id);

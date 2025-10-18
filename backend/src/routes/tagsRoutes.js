@@ -1,13 +1,12 @@
 // routes/tagsRoutes.js
 import express from "express";
-import {
-  getAllTags,
-  createTag,
-  updateTag,
-  deleteTag,
-} from "../controllers/tagsController.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { getAllTags, createTag, updateTag, deleteTag } from "../controllers/tagsController.js";
 
 const router = express.Router();
+
+// Middleware de segurança -> garante que todas as seguintes rotas sejam privadas
+router.use(authMiddleware);
 
 // Rota para LER todas as tags
 // MÉTODO: GET, URL: /api/tags

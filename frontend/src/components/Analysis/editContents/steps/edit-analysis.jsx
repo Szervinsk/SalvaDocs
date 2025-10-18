@@ -39,7 +39,7 @@ function EditAnalise({
 
     try {
       // 3. Faz a requisição POST para a sua API
-      const response = await axios.post("http://localhost:5000/api/files/upload", formData, {
+      const response = await axios.post("documents/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
