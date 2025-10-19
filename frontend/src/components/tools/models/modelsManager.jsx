@@ -6,10 +6,21 @@ import axios from "axios";
 // ==========================================================================
 // SUB-COMPONENTE: MODAL COM FORMULÁRIO DE MODELO
 // ==========================================================================
-const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
+const ModelFormModal = ({ model, onClose, onSave, showAlert }) => {
   const [name, setName] = useState(model?.name || "");
   const [description, setDescription] = useState(model?.description || "");
+  const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState(model?.tagsBase?.map(t => t.id) || []);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    axios.get("/tags")
+      .then(res => setAvailableTags(res.data))
+      .catch(err => {
+        console.error("Erro ao buscar tags disponíveis:", err);
+        showAlert("error", "Não foi possível carregar as tags.");
+      });
+  }, [showAlert]);
 
   const handleTagChange = (tagId) => {
     setSelectedTagIds(prev =>
@@ -19,13 +30,14 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const payload = { name, description, tagIds: selectedTagIds };
     try {
       if (model) {
         await axios.put(`/modelos/${model.id}`, payload);
         showAlert("success", `Modelo "${name}" atualizado com sucesso!`);
       } else {
-        await axios.post(`/modelos`, payload);
+        await axios.post(`/modelos`, payload); // Rota REST
         showAlert("success", `Modelo "${name}" criado com sucesso!`);
       }
       onSave();
@@ -33,6 +45,8 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
     } catch (err) {
       console.error("Erro ao salvar o modelo:", err);
       showAlert("error", "Erro ao salvar o modelo. Tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +70,7 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
             <div className="form-field">
               <label>Tags Associadas</label>
               <div className="tag-selection-grid">
-                {tags.length > 0 ? tags.map(tag => (
+                {availableTags.length > 0 ? availableTags.map(tag => (
                   <label key={tag.id} className={`tag-pill ${selectedTagIds.includes(tag.id) ? "active" : ""}`}>
                     <input
                       type="checkbox"
@@ -72,8 +86,10 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
             </div>
           </div>
           <footer className="modal-footer">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn-primary">Salvar</button>
+            <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Salvando..." : "Salvar"}
+            </button>
           </footer>
         </form>
       </div>
@@ -84,8 +100,10 @@ const ModelFormModal = ({ model, tags, onClose, onSave, showAlert }) => {
 // ==========================================================================
 // SUB-COMPONENTE: MODAL DE CONFIRMAÇÃO PARA EXCLUIR
 // ==========================================================================
-const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, }) => {
+const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const handleDelete = async () => {
+    setIsLoading(true);
     try {
       await axios.delete(`/modelos/${model.id}`);
       showAlert("success", `Modelo "${model.name}" excluído com sucesso.`);
@@ -94,6 +112,8 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, }) => {
     } catch (err) {
       console.error("Erro ao excluir o modelo:", err);
       showAlert("error", "Erro ao excluir o modelo.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,8 +128,10 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, }) => {
           <p>Você tem certeza que deseja excluir o modelo "<strong>{model.name}</strong>"?</p>
         </div>
         <footer className="modal-footer">
-          <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button type="button" className="btn-danger" onClick={()=> handleDelete()}>Sim, Excluir</button>
+          <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
+          <button type="button" className="btn-danger" onClick={handleDelete} disabled={isLoading}>
+            {isLoading ? "Excluindo..." : "Sim, Excluir"}
+          </button>
         </footer>
       </div>
     </div>
@@ -119,7 +141,7 @@ const DeleteConfirmationModal = ({ model, onClose, onConfirm, showAlert, }) => {
 // ==========================================================================
 // COMPONENTE PRINCIPAL DO ARQUIVO
 // ==========================================================================
-const ModelsManager = ({ modelos, tags, onDataChange, showAlert, }) => {
+const ModelsManager = ({ modelos, onDataChange, showAlert }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentModel: null });
 
   const handleOpenModal = (mode, model = null) => setModalState({ isOpen: true, mode, currentModel: model });
@@ -128,7 +150,7 @@ const ModelsManager = ({ modelos, tags, onDataChange, showAlert, }) => {
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <ModelFormModal model={modalState.currentModel} tags={tags} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} />;
+      return <ModelFormModal model={modalState.currentModel} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} />;
     }
     if (modalState.mode === 'delete') {
       return <DeleteConfirmationModal model={modalState.currentModel} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} />;

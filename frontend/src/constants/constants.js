@@ -20,6 +20,17 @@ export const ALERTS = [
   { id: 3, type: "warning", message: "Atenção: verifique os dados inseridos." },
 ];
 
+export const AREA_OPTIONS = [
+  {
+    label: "Dashboard",
+    value: "Dashboard",
+    icon: <Icons.Graphics size={16} />,
+  },
+  { label: "Modelos", value: "Modelos", icon: <Icons.Model size={16} /> },
+  { label: "Tags", value: "Tags", icon: <Icons.Tags size={16} /> },
+  { label: "Pastas", value: "Pastas", icon: <Icons.Folder size={16} /> },
+];
+
 export const TOOLS = [
   { id: 1, name: "Home", icon: <Icons.Home size={22} />, shortcut: "H" },
   {

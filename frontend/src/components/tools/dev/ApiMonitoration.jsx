@@ -52,11 +52,11 @@ const ApiRequestRow = ({ method, path, onRun, response }) => {
 
 
 // --- Componente Principal ---
-const ApiMonitoration = ({ baseURL }) => {
+const ApiMonitoration = () => {
   const [responses, setResponses] = useState({});
 
   const apiEndpoints = [
-    { name: 'documentos', method: 'GET', path: `/files/documentos` },
+    { name: 'documentos', method: 'GET', path: `/documents` },
     { name: 'pastas', method: 'GET', path: `/folders` },
     { name: 'modelos', method: 'GET', path: `/modelos` },
     { name: 'tags', method: 'GET', path: `/tags` },

@@ -134,6 +134,7 @@ function Block({
             modelos={modelos}
             tags={tags}
             pastas={pastas}
+            documentos={documentos}
             setModelos={setModelos}
             setTags={setTags}
             setPastas={setPastas}
@@ -180,7 +181,7 @@ function Block({
   };
 
   return (
-    <main className="switch-area" style={{ borderTopLeftRadius: pastasAbertas ? "none" : "10px", borderBottomLeftRadius: pastasAbertas ? "none" : "10px" }}>
+    <main className="switch-area" style={{ borderTopLeftRadius: pastasAbertas ? "0px" : "10px", borderBottomLeftRadius: pastasAbertas ? "0px" : "10px" }}>
       {/* Caixa do more */}
       {more && <MoreContent tool={tool} setTool={setTool} setMore={setMore} />}
 

@@ -1,21 +1,21 @@
 import "./EditModels.css";
-import { useState } from "react";
-import { Icons } from "../../../constants/icons";
+import { useRef, useState } from "react";
+import { AREA_OPTIONS } from "../../../constants/constants";
 
-// Importando os componentes filhos que este arquivo gerencia
+// Componentes filhos
 import Dashboard from "./dashboard";
 import TagsManager from "./tagsManager";
 import ModelsManager from "./modelsManager";
 import PastasManager from "./pastasManager";
 
-// Componente reutilizável para as abas de navegação
-export const SegmentedControl = ({ options, activeOption, onSelect }) => (
+// Componente de navegação superior
+export const SegmentedControl = ({ options, activeOption, setActiveOption, onSelect }) => (
   <div className="segmented-control">
     {options.map((option) => (
       <button
         key={option.value}
         className={`segmented-control__button ${activeOption === option.value ? "active" : ""}`}
-        onClick={() => onSelect(option.value)}
+        onClick={() => { onSelect(option.value); setActiveOption(option.value) }}
       >
         {option.icon}
         {option.label}
@@ -24,28 +24,24 @@ export const SegmentedControl = ({ options, activeOption, onSelect }) => (
   </div>
 );
 
-// Componente principal que gerencia as abas
-function EditModels({ modelos, tags, pastas, onDataChange, showAlert, baseURL }) {
-  const [area, setArea] = useState("dashboard");
+function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos }) {
+  const [activeOption, setActiveOption] = useState("Dashboard");
 
-  const areaOptions = [
-    { label: "Dashboard", value: "dashboard", icon: <Icons.Graphics size={16} /> },
-    { label: "Modelos", value: "models", icon: <Icons.Model size={16} /> },
-    { label: "Tags", value: "tags", icon: <Icons.Tags size={16} /> },
-    { label: "Pastas", value: "pastas", icon: <Icons.Folder size={16} /> },
-  ];
+  const dashboardRef = useRef(null);
+  const tagsRef = useRef(null);
+  const modelosRef = useRef(null);
+  const pastasRef = useRef(null);
 
-  const renderArea = () => {
-    switch (area) {
-      case "tags":
-        return <TagsManager tags={tags} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
-      case "models":
-        return <ModelsManager modelos={modelos} tags={tags} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
-      case "pastas":
-        return <PastasManager pastas={pastas} onDataChange={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
-      case "dashboard":
-      default:
-        return <Dashboard tags={tags} modelos={modelos} />;
+  const handleScrollTo = (area) => {
+    const refs = {
+      Dashboard: dashboardRef,
+      Tags: tagsRef,
+      Modelos: modelosRef,
+      Pastas: pastasRef,
+    };
+    const ref = refs[area];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -55,11 +51,51 @@ function EditModels({ modelos, tags, pastas, onDataChange, showAlert, baseURL })
         <h1>Painel de Gerenciamento</h1>
         <p>Gerencie, visualize e analise seus modelos, tags e pastas.</p>
       </header>
+
       <div className="models-page__tabs">
-        <SegmentedControl options={areaOptions} activeOption={area} onSelect={setArea} />
+        <SegmentedControl
+          options={AREA_OPTIONS}
+          activeOption={activeOption}
+          setActiveOption={setActiveOption}
+          onSelect={handleScrollTo}
+        />
       </div>
-      <div className="models-page__content">
-        {renderArea()}
+
+      <div className="models-scroll-container">
+        {/* DASHBOARD */}
+        <section ref={dashboardRef} className="models-section">
+          <h2 className="models-section__title">Dashboard</h2>
+          <Dashboard tags={tags} modelos={modelos} documentos={documentos} setArea={handleScrollTo} />
+        </section>
+
+        {/* MODELOS */}
+        <section ref={modelosRef} className="models-section">
+          <h2 className="models-section__title">Modelos</h2>
+          <ModelsManager
+            modelos={modelos}
+            tags={tags}
+            onDataChange={onDataChange}
+            showAlert={showAlert}
+          />
+        </section>
+
+        {/* TAGS */}
+        <section ref={tagsRef} className="models-section">
+          <h2 className="models-section__title">Tags</h2>
+          <TagsManager tags={tags} onDataChange={onDataChange} showAlert={showAlert} />
+        </section>
+
+        {/* PASTAS */}
+        <section ref={pastasRef} className="models-section">
+          <h2 className="models-section__title">Pastas</h2>
+          <PastasManager
+            pastas={pastas}
+            onDataChange={onDataChange}
+            showAlert={showAlert}
+            documentos={documentos}
+          />
+        </section>
+
       </div>
     </main>
   );

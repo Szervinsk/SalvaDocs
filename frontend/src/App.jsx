@@ -44,6 +44,7 @@ function App() {
   const [documentos, setDocumentos] = useState([]);
   const [modelos, setModelos] = useState([]);
   const [pastas, setPastas] = useState([]);
+  const [showAlternativeTools, setShowAlternativeTools] = useState(false);
 
   // Função para exibir alertas, memorizada para estabilidade
   const showAlert = useCallback((type, message) => {
@@ -227,7 +228,7 @@ function App() {
         {alert && <Alerts type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       </AnimatePresence>
       <div className="main-container">
-        <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} />
+        <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} showAlternativeTools={showAlternativeTools} />
         <div className="background-block">
           {pastasAbertas && (
             <FoldersAction
@@ -259,6 +260,9 @@ function App() {
             showAlert={showAlert}
             onLogout={handleLogout}
             setPastasAbertas={setPastasAbertas}
+            pastasAbertas={pastasAbertas}
+            showAlternativeTools={showAlternativeTools}
+            setShowAlternativeTools={setShowAlternativeTools}
           />
         </div>
       </div>

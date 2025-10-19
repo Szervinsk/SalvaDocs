@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { Icons } from "../../../constants/icons";
 import axios from "axios";
 
+// Tipos de extração disponíveis
+const EXTRACTION_TYPES = ["Manual", "Regex", "IA"];
+
 // ==========================================================================
 // SUB-COMPONENTE: MODAL COM FORMULÁRIO DE TAGS
 // ==========================================================================
@@ -10,10 +13,11 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
   const [formData, setFormData] = useState({
     name: tag?.name || "",
     category: tag?.category || "",
-    type: tag?.type || "Manual",
+    type: tag?.type || EXTRACTION_TYPES[0],
     icon: tag?.icon || "",
     regex: tag?.regex || "",
     prompt: tag?.prompt || "",
+    displayCategory: tag?.displayCategory || "data", // Padrão 'data'
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,11 +30,11 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      if (tag) { // Modo Edição
+      if (tag) {
         await axios.put(`/tags/${tag.id}`, formData);
         showAlert("success", `Tag "${formData.name}" atualizada com sucesso!`);
-      } else { // Modo Criação
-        await axios.post(`/tags`, formData); // Rota corrigida para padrão REST
+      } else {
+        await axios.post(`/tags`, formData); // Rota REST
         showAlert("success", `Tag "${formData.name}" criada com sucesso!`);
       }
       onSave();
@@ -58,16 +62,16 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
                 <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
               </div>
               <div className="form-field">
-                <label htmlFor="category">Categoria</label>
+                <label htmlFor="category">Categoria (para modelos)</label>
                 <input type="text" id="category" name="category" value={formData.category} onChange={handleInputChange} />
               </div>
               <div className="form-field">
                 <label htmlFor="type">Tipo de Extração</label>
                 <div className="custom-select-wrapper">
                   <select id="type" name="type" value={formData.type} onChange={handleInputChange}>
-                    <option value="Manual">Manual</option>
-                    <option value="Regex">Regex</option>
-                    <option value="IA">Inteligência Artificial</option>
+                    {EXTRACTION_TYPES.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -77,6 +81,18 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
                   <select id="icon" name="icon" value={formData.icon} onChange={handleInputChange}>
                     <option value="">Nenhum</option>
                     {Object.keys(Icons).map(iconName => (<option key={iconName} value={iconName}>{iconName}</option>))}
+                  </select>
+                </div>
+              </div>
+              <div className="form-field full-width">
+                <label htmlFor="displayCategory">Categoria de Exibição</label>
+                <div className="custom-select-wrapper">
+                  <select id="displayCategory" name="displayCategory" value={formData.displayCategory} onChange={handleInputChange}>
+                    <option value="data">Dado (Caixinha)</option>
+                    <option value="title">Título Principal</option>
+                    <option value="summary">Bloco de Resumo</option>
+                    <option value="signatory">Signatário</option>
+                    <option value="list">Lista (ex: Documentos)</option>
                   </select>
                 </div>
               </div>
@@ -111,7 +127,6 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
 // ==========================================================================
 const DeleteConfirmationModal = ({ tag, onClose, onConfirm, showAlert }) => {
   const [isLoading, setIsLoading] = useState(false);
-
   const handleDelete = async () => {
     setIsLoading(true);
     try {

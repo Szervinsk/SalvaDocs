@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. LAYOUT PRINCIPAL DA PÁGINA HOME
+   1. LAYOUT GERAL DA PÁGINA HOME
    ========================================================================== */
 .home-container {
   width: 100%;
@@ -8,7 +8,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  overflow: hidden; /* A rolagem será interna */
+  overflow: hidden;
+  background-color: var(--color-background);
 }
 
 .home-header {
@@ -16,6 +17,28 @@
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+}
+
+.welcome {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+.account-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-border);
+}
+.welcome h2 {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+.welcome h3 {
+  margin: 4px 0 0 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
 }
 
 .home-search {
@@ -34,22 +57,20 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 10px var(--spacing-md);
   border: none;
   background-color: transparent;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px; /* Alinha com a borda principal */
+  margin-bottom: -1px;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .home-nav-btn:hover {
   color: var(--color-text-primary);
 }
-
 .home-nav-btn.active {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
@@ -57,21 +78,43 @@
 
 .home-main {
   flex: 1;
-  overflow-y: auto; /* Conteúdo das abas que rola */
+  overflow-y: auto;
   min-height: 0;
+  padding-right: var(
+    --spacing-sm
+  ); /* Espaço para a rolagem não colar na borda */
+}
+
+/* ✨ OCULTA A BARRA DE ROLAGEM ✨ */
+.home-main::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.home-main {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .home-section {
   margin-bottom: var(--spacing-xl);
 }
-
 .home-section > h4 {
   margin-bottom: var(--spacing-md);
-  font-size: var(--font-size-h4);
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold);
+}
+.loading-container {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+.empty-text {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* ==========================================================================
-   2. ABA: ACESSO RÁPIDO
+   2. ABA: VISÃO GERAL
    ========================================================================== */
 .atalhos-container {
   display: grid;
@@ -106,7 +149,6 @@
   color: var(--color-text-secondary);
 }
 
-/* Novos Cards de Ação */
 .action-cards-container {
   display: flex;
   flex-direction: column;
@@ -141,7 +183,6 @@
   color: var(--color-text-secondary);
 }
 
-/* Lista de Atividade Recente */
 .activity-list {
   display: flex;
   flex-direction: column;
@@ -175,45 +216,13 @@
 }
 
 /* ==========================================================================
-   3. ABA: GRÁFICOS
-   ========================================================================== */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-lg);
-}
-.legend-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--font-size-sm);
-}
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-}
-.legend-label {
-  flex: 1;
-  color: var(--color-text-secondary);
-}
-.legend-value {
-  font-weight: var(--font-weight-bold);
-}
-
-/* ==========================================================================
-   4. ABA: DOCUMENTOS (TABELA E FILTROS)
+   3. ABA: DOCUMENTOS (TABELA E FILTROS)
    ========================================================================== */
 .list-documents-container {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  height: 100%;
 }
 .list-filters {
   display: flex;
@@ -236,6 +245,7 @@
   padding: 12px var(--spacing-md);
   text-align: left;
   border-bottom: var(--border-width-sm) solid var(--color-border);
+  white-space: nowrap;
 }
 .documents-table thead {
   position: sticky;
@@ -247,6 +257,14 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   cursor: pointer;
+  user-select: none;
+}
+.documents-table th:hover {
+  color: var(--color-text-primary);
+}
+.documents-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.1s ease;
 }
 .documents-table tbody tr:hover {
   background-color: var(--color-background);

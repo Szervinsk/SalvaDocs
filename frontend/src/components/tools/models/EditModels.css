@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. LAYOUT GERAL DA PÁGINA
+   1. LAYOUT GERAL DA PÁGINA (AJUSTADO PARA SCROLL)
    ========================================================================== */
 .models-page {
   display: flex;
@@ -8,7 +8,8 @@
   height: 100%;
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
-  background-color: var(--color-background); /* Fundo geral da página */
+  background-color: var(--color-background);
+  overflow: hidden; /* A rolagem agora é controlada pelo filho */
 }
 
 .models-page__header h1 {
@@ -22,32 +23,44 @@
   margin: 0;
 }
 
+/* Barra de abas agora é fixa no topo (sticky) */
 .models-page__tabs {
+  position: sticky;
+  top: 0;
   align-self: flex-start;
+  background-color: var(
+    --color-background
+  ); /* Fundo para não ser transparente */
+  padding: var(--spacing-sm) 0;
+  z-index: 20; /* Garante que fique por cima do conteúdo que rola */
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.models-page__content {
+/* Container que efetivamente rola */
+.models-scroll-container {
   flex: 1;
   overflow-y: auto;
+  scroll-behavior: smooth; /* Habilita a rolagem suave */
   min-height: 0;
 }
 
-.modal-body {
-  padding: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+/* Estilo para cada seção principal */
+.models-section {
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border);
+  /* Deixa um espaço no topo ao rolar, para não esconder o título sob a barra de abas */
+  scroll-margin-top: 100px;
 }
-
-.tag-selection-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  background-color: var(--color-background);
-  border-radius: var(--border-radius-sm);
-  max-height: 200px;
-  overflow-y: auto;
+.models-section:last-child {
+  border-bottom: none;
+}
+.models-section__title {
+  font-size: var(--font-size-h3);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 
 /* ==========================================================================
@@ -56,9 +69,7 @@
 .segmented-control {
   display: inline-flex;
   padding: 4px;
-  background-color: var(
-    --color-surface
-  ); /* Alterado para surface para mais contraste */
+  background-color: var(--color-surface);
   border-radius: var(--border-radius-sm);
   border: var(--border-width-sm) solid var(--color-border);
 }
@@ -79,6 +90,11 @@
   transition: all 0.2s ease;
 }
 
+.segmented-control__button:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
 .segmented-control__button.active {
   background-color: var(--color-accent);
   color: var(--color-surface);
@@ -89,14 +105,22 @@
    3. ÁREA: DASHBOARD
    ========================================================================== */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.charts-row {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-direction: row;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
+  width: 260px;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
   background-color: var(--color-surface);
@@ -125,34 +149,37 @@
   display: flex;
   flex-direction: column;
 }
-
 .stat-card__value {
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-bold);
   line-height: 1.1;
 }
-
 .stat-card__label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
 .chart-card {
-  grid-column: 1 / -1; /* Faz o gráfico ocupar a largura total no grid */
+  grid-column: 1 / -1;
   padding: var(--spacing-lg);
+  width: 400px;
   background-color: var(--color-surface);
   border: var(--border-width-sm) solid var(--color-border);
   border-radius: var(--border-radius-md);
 }
 
+.chart-card h4 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: var(--font-size-h4);
+}
+
+/* --- Gráfico de Barras --- */
 .bar-chart {
   display: flex;
   gap: var(--spacing-lg);
   align-items: flex-end;
   height: 150px;
-  margin-top: var(--spacing-md);
 }
-
 .bar-chart__item {
   flex: 1;
   display: flex;
@@ -160,7 +187,6 @@
   align-items: center;
   gap: var(--spacing-sm);
 }
-
 .bar-chart__bar-wrapper {
   width: 100%;
   height: 100%;
@@ -170,31 +196,78 @@
   border-radius: 4px;
   overflow: hidden;
 }
-
 .bar-chart__bar {
   width: 100%;
   background-color: var(--color-accent);
   border-radius: 4px;
   transition: height 0.3s ease-out;
 }
-
 .bar-chart__label {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
 }
 
+/* --- Gráfico de Pizza --- */
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+}
+.pie-chart {
+  width: 150px;
+  height: 150px;
+}
+.pie-chart__slice {
+  fill: none;
+  stroke-width: 25;
+  transition: stroke-width 0.3s ease-out;
+}
+.pie-chart__slice:hover {
+  stroke-width: 30;
+}
+.legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.legend-label {
+  flex: 1;
+  color: var(--color-text-secondary);
+}
+.legend-value {
+  font-weight: var(--font-weight-bold);
+}
+
 /* ==========================================================================
-   4. ÁREAS DE GERENCIAMENTO (TAGS, MODELOS, PASTAS)
+   4. ÁREAS DE GERENCIAMENTO (Tags, Modelos, Pastas)
    ========================================================================== */
-.tags-manager__header {
+.manager-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.manager-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
 }
 
-.tags-manager__header h2 {
+.manager-header h2 {
   margin: 0;
   font-size: var(--font-size-h3);
 }
@@ -203,39 +276,35 @@
   overflow-x: auto;
   border: var(--border-width-sm) solid var(--color-border);
   border-radius: var(--border-radius-sm);
-  background-color: var(
-    --color-surface
-  ); /* Garante fundo branco para a tabela */
+  background-color: var(--color-surface);
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .data-table th,
 .data-table td {
-  padding: 12px var(--spacing-md); /* Aumenta o espaçamento vertical */
+  padding: 12px var(--spacing-md);
   text-align: left;
   border-bottom: var(--border-width-sm) solid var(--color-border);
-  white-space: nowrap; /* Impede que o texto quebre linha */
+  white-space: nowrap;
 }
-
 .data-table thead {
   background-color: var(--color-background);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
-
 .data-table th {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
-
 .data-table tbody tr:hover {
   background-color: var(--color-background);
 }
-
 .data-table .actions-cell {
   display: flex;
   gap: var(--spacing-sm);
@@ -261,38 +330,6 @@
   color: var(--color-accent);
 }
 
-.models-manager {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.models-manager__content {
-  padding: var(--spacing-lg);
-  background-color: var(--color-surface);
-  border: var(--border-width-sm) solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  flex: 1;
-}
-
-.models-list-display {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.models-list-display li {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  background-color: var(--color-background);
-  border-radius: var(--border-radius-sm);
-}
-
 /* ==========================================================================
    5. COMPONENTE: MODAL DE FORMULÁRIO
    ========================================================================== */
@@ -316,6 +353,11 @@
   display: flex;
   flex-direction: column;
   animation: slideInUp 0.3s ease;
+  max-height: 90vh;
+}
+
+.modal-content--small {
+  max-width: 400px;
 }
 
 .modal-header {
@@ -324,11 +366,17 @@
   align-items: center;
   padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: var(--border-width-sm) solid var(--color-border);
+  flex-shrink: 0;
 }
-
 .modal-header h2 {
   margin: 0;
   font-size: var(--font-size-h4);
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  line-height: 1.6;
 }
 
 .modal-footer {
@@ -338,15 +386,16 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border-top: var(--border-width-sm) solid var(--color-border);
   background-color: var(--color-background);
+  flex-shrink: 0;
 }
 
 .tag-form {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .form-grid {
-  padding: var(--spacing-lg);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-lg);
@@ -357,17 +406,14 @@
   flex-direction: column;
   gap: var(--spacing-sm);
 }
-
 .form-field.full-width {
   grid-column: 1 / -1;
 }
-
 .form-field label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
-
 .form-field input[type="text"],
 .form-field select,
 .form-field textarea {
@@ -380,7 +426,6 @@
   color: var(--color-text-primary);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 .form-field input[type="text"]:focus,
 .form-field select:focus,
 .form-field textarea:focus {
@@ -388,31 +433,19 @@
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
 }
-
 .form-field textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-/* ==========================================================================
-   6. ANIMAÇÕES
-   ========================================================================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.tag-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  max-height: 200px;
+  overflow-y: auto;
 }

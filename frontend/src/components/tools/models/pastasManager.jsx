@@ -4,7 +4,7 @@ import { Icons } from "../../../constants/icons";
 import axios from "axios";
 
 // --- Sub-componente: Modal de Formulário de Pasta ---
-const PastaFormModal = ({ pasta, onClose, onSave, showAlert , baseURL}) => {
+const PastaFormModal = ({ pasta, onClose, onSave, showAlert , basdocumentoseURL}) => {
   const [name, setName] = useState(pasta?.name || "");
 
   const handleSubmit = async (e) => {
@@ -50,7 +50,7 @@ const PastaFormModal = ({ pasta, onClose, onSave, showAlert , baseURL}) => {
 };
 
 // --- Sub-componente: Modal de Confirmação para Excluir ---
-const DeleteConfirmationModal = ({ pasta, onClose, onConfirm, showAlert, baseURL }) => {
+const DeleteConfirmationModal = ({ pasta, onClose, onConfirm, showAlert, documentos }) => {
   const handleDelete = async () => {
     try {
       await axios.delete(`/folders/${pasta.id}`);
@@ -84,7 +84,7 @@ const DeleteConfirmationModal = ({ pasta, onClose, onConfirm, showAlert, baseURL
 
 
 // --- Componente Principal do Arquivo ---
-const PastasManager = ({ pastas, onDataChange, showAlert, baseURL }) => {
+const PastasManager = ({ pastas, onDataChange, showAlert, documentos }) => {
   const [modalState, setModalState] = useState({ isOpen: false, mode: null, currentPasta: null });
 
   const handleOpenModal = (mode, pasta = null) => setModalState({ isOpen: true, mode, currentPasta: pasta });
@@ -93,10 +93,10 @@ const PastasManager = ({ pastas, onDataChange, showAlert, baseURL }) => {
   const renderModal = () => {
     if (!modalState.isOpen) return null;
     if (modalState.mode === 'create' || modalState.mode === 'edit') {
-      return <PastaFormModal pasta={modalState.currentPasta} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <PastaFormModal pasta={modalState.currentPasta} onClose={handleCloseModal} onSave={onDataChange} showAlert={showAlert} />;
     }
     if (modalState.mode === 'delete') {
-      return <DeleteConfirmationModal pasta={modalState.currentPasta} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} baseURL={baseURL} />;
+      return <DeleteConfirmationModal pasta={modalState.currentPasta} onClose={handleCloseModal} onConfirm={onDataChange} showAlert={showAlert} />;
     }
     return null;
   };
@@ -122,7 +122,7 @@ const PastasManager = ({ pastas, onDataChange, showAlert, baseURL }) => {
             {pastas.map((pasta) => (
               <tr key={pasta.id}>
                 <td>{pasta.name}</td>
-                <td>{pasta.documentos?.length || 0}</td>
+                <td>{documentos.filter(documento => documento.folderId === pasta.id).length}</td>
                 <td className="actions-cell">
                   <button className="icon-button" title="Editar Pasta" onClick={() => handleOpenModal('edit', pasta)}><Icons.EditNote size={16} /></button>
                   <button className="icon-button icon-button--danger" title="Excluir Pasta" onClick={() => handleOpenModal('delete', pasta)}><Icons.Delete size={16} /></button>
