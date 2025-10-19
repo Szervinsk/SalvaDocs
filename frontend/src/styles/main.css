@@ -1,0 +1,22 @@
+/* BASE/ */
+
+@import 'base/_variables.css';
+@import 'base/_components.css';
+@import 'base/_global.css';
+@import 'base/_keyFrames.css';
+
+/* LAYOUT */
+@import 'layout/_layout.css';
+
+/* STYLES DOS COMPONENTES */
+@import '../components/openDocs/open-docs.css';
+
+@import '../components/auth/auth.css';
+@import '../components/bars/library/library.css';
+@import '../components/bars/navbar/navbar.css';
+@import '../components/bars/searchBar/searchbar.css';
+
+@import '../components/tools/analyse/analysis.css';
+@import '../components/tools/configurations/configurations.css';
+@import '../components/tools/home/home.css';
+@import '../components/tools/models/EditModels.css';

@@ -1,0 +1,210 @@
+/* ==========================================================================
+   1. LAYOUT GERAL DA PÁGINA
+   ========================================================================== */
+.account-page {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+  overflow-y: auto;
+}
+
+.account-header h1 {
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--spacing-xs);
+}
+
+.account-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-xl) 0;
+}
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   2. SIDEBAR DO PERFIL (COLUNA ESQUERDA)
+   ========================================================================== */
+.account-sidebar {
+  position: sticky;
+  top: var(--spacing-xl);
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+}
+
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 100px;
+  height: 100px;
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--color-accent), #a8baff);
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  border: 4px solid var(--color-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: var(--font-size-h4);
+  margin: 0;
+}
+
+.profile-email {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 4px 0 var(--spacing-lg) 0;
+  word-break: break-all;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-top: auto; /* Empurra os botões para baixo */
+}
+
+/* Botão estilizado como link */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s ease;
+}
+.btn-link:hover {
+  background-color: var(--color-background);
+}
+
+/* ==========================================================================
+   3. CONTEÚDO PRINCIPAL (COLUNA DIREITA)
+   ========================================================================== */
+.account-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.details-card {
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+}
+
+.details-card__header {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+}
+
+.details-card__header h3 {
+  margin: 0;
+  font-size: var(--font-size-h4);
+}
+
+.details-card__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-row,
+.info-row--action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.details-card__body > *:not(:last-child) {
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+}
+
+.info-row__label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.info-row__value {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* --- Estilos para o Formulário de Edição --- */
+.form-input {
+  width: 50%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-background);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
+}
+
+/* --- Estilos para a Zona de Perigo --- */
+.danger-zone {
+  border-color: var(--color-danger);
+}
+.danger-zone .details-card__header {
+  background-color: rgba(220, 53, 69, 0.05);
+  color: var(--color-danger);
+}
+.danger-zone .info-row--action strong {
+  font-weight: var(--font-weight-bold);
+}
+.danger-zone .info-row--action p {
+  margin: 4px 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   4. RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 900px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+  .account-sidebar {
+    position: static;
+  }
+  .form-input {
+    width: 100%;
+  }
+}

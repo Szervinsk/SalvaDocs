@@ -1,0 +1,494 @@
+/* ==========================================================================
+   1. LAYOUTS DE TELA GERAIS
+   ========================================================================== */
+
+/* --- Tela 1: Seleção de Modelo --- */
+.model-selection-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+  overflow-y: auto;
+}
+.model-selection-header {
+  text-align: center;
+}
+.model-selection-header h1 {
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--spacing-xs);
+}
+.model-selection-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  max-width: 50ch;
+  margin: 0 auto;
+}
+.model-search-bar {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* --- Tela 2: Editor de Análise (Duas Colunas) --- */
+.analysis-editor-screen {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+.analysis-editor__main-content {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border-right: 1px solid var(--color-border);
+}
+.analysis-editor__sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  height: 100%;
+  background-color: var(--color-background);
+}
+
+/* ==========================================================================
+   2. SIDEBAR DE ETAPAS (EDITETAPAS)
+   ========================================================================== */
+.etapas-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--spacing-lg);
+}
+.etapas-header {
+  padding-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+.etapas-header h4 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+.stepper-container {
+  display: flex;
+  flex-direction: column;
+}
+.step-item {
+  display: flex;
+  position: relative;
+  gap: var(--spacing-md);
+  cursor: pointer;
+}
+.step-item.disabled {
+  cursor: not-allowed;
+}
+/* A linha que conecta os passos */
+.step-connector {
+  position: absolute;
+  top: 36px; /* Começa abaixo do ícone */
+  left: 17px; /* Centralizado no ícone */
+  width: 2px;
+  height: calc(100% - 20px); /* Ajuste de altura */
+  background-color: var(--color-border);
+}
+.step-item:last-child .step-connector {
+  display: none; /* Esconde o conector do último item */
+}
+.step-item.completed .step-connector {
+  background-color: var(--color-accent);
+}
+.step-icon-wrapper {
+  z-index: 1;
+}
+.step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+.step-item:not(.disabled):hover .step-icon {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.step-item.active .step-icon {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+}
+.step-item.completed .step-icon {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface);
+  color: var(--color-accent);
+}
+.step-content {
+  padding-bottom: var(--spacing-xl);
+}
+.step-content h5 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease;
+  margin: 0;
+}
+.step-content p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+.step-item:not(.disabled):hover .step-content h5,
+.step-item.active .step-content h5,
+.step-item.completed .step-content h5 {
+  color: var(--color-text-primary);
+}
+.step-item.disabled .step-content h5,
+.step-item.disabled .step-content p {
+  color: var(--color-border);
+}
+
+/* ==========================================================================
+   3. CONTEÚDO DAS ETAPAS (Layout Compartilhado)
+   ========================================================================== */
+.analysis-step-page {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  background-color: var(--color-surface);
+  overflow-y: auto;
+}
+.workflow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.workflow-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.workflow-header__title h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.page-description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  max-width: 70ch;
+  margin: 0;
+}
+.workflow-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--spacing-lg);
+  flex-shrink: 0;
+}
+.footer-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* ==========================================================================
+   4. COMPONENTES DAS ETAPAS
+   ========================================================================== */
+/* --- 4.1 Seleção de Modelo (Cards) --- */
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+}
+.model-card {
+  display: flex;
+  flex-direction: column;
+  height: 175px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.model-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+  box-shadow: var(--box-shadow-light);
+}
+.model-card__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-sm);
+  background-color: rgba(89, 125, 255, 0.1);
+  color: var(--color-accent);
+}
+.model-card__info h4 {
+  margin: 0 0 4px 0;
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+}
+.model-card__info p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xl);
+}
+.empty-state-container h4 {
+  font-size: var(--font-size-h4);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+.empty-state-container p {
+  margin: 0;
+  max-width: 40ch;
+}
+
+/* --- 4.2 Edição de Tags --- */
+.tag-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+.selection-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-text:hover:not(:disabled) {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+.btn-text:disabled {
+  color: var(--color-border);
+  cursor: not-allowed;
+}
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+.tag-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background-color: rgba(89, 125, 255, 0.1);
+}
+.tag-pill.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-surface);
+}
+
+/* --- 4.3 Upload de Arquivo --- */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-xl);
+  background-color: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dropzone:hover,
+.dropzone.is-dragging {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background-color: rgba(89, 125, 255, 0.05);
+}
+.file-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  margin-top: var(--spacing-md);
+}
+.file-preview__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.file-preview__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-danger);
+  color: var(--color-surface);
+  border-radius: var(--border-radius-sm);
+  flex-shrink: 0;
+}
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+.setting-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+}
+.setting-row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+.setting-row__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.setting-row h4 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+.setting-row p {
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.alter-name-wrapper {
+  padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  background-color: var(--color-surface);
+}
+
+/* --- 4.4 Resumo da Análise --- */
+.summary-card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+}
+.summary-list {
+  display: flex;
+  flex-direction: column;
+}
+.summary-item {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md);
+}
+.summary-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+.summary-item dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.summary-item dd {
+  margin: 0;
+  color: var(--color-text-secondary);
+  word-break: break-word;
+}
+.summary-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+.tag-pill-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   5. ANIMAÇÕES
+   ========================================================================== */
+.analysis-step-page.shake .dropzone {
+  animation: shake 0.5s ease;
+}
+@keyframes shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-4px);
+  }
+  40%,
+  60% {
+    transform: translateX(4px);
+  }
+}

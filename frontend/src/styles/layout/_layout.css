@@ -1,0 +1,121 @@
+/* ==========================================================================
+   1. RESET E ESTILOS BASE
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   2. LAYOUT PRINCIPAL DA APLICAÇÃO (App/Abas)
+   ========================================================================== */
+
+.main-container {
+  display: flex;
+  flex-direction: row; /* se tu mudar de novo essa porra eu te mato */
+  flex: 1;
+  overflow: hidden;
+  align-items: center;
+}
+
+/* Contém a Sidebar (FoldersAction) e o Conteúdo (Block) */
+.background-block {
+  flex: 1; 
+  display: flex; /* Alinha a sidebar e o conteúdo principal lado a lado */
+  overflow: hidden;
+  position: relative;
+  padding: var(--spacing-md);
+  height: calc(100vh - (var(--spacing-md) * 2));
+  gap: 0; /* O espaçamento será controlado pela borda/estilo dos filhos */
+}
+
+/* ==========================================================================
+   3. LAYOUT DO COMPONENTE BLOCK (CONTEÚDO)
+   ========================================================================== */
+
+/* .switch-area é o <main> dentro do Block.jsx */
+.switch-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background);
+  border: var(--border-width-md) solid var(--color-border);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  box-shadow: var(--box-shadow-light);
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* .middle-area é a área rolável do conteúdo */
+.middle-area {
+  flex: 1;
+  display: flex; /* Mantenha isso para o .main-content se expandir */
+  position: relative; /* ESSENCIAL para que o OpenDocs (com position: absolute) se posicione corretamente */
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.main-content {
+  flex: 1;
+  transition: filter 0.3s ease;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   4. LAYOUT DO COMPONENTE FOLDERSACTION (SIDEBAR)
+   ========================================================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: var(--border-width-md) solid var(--color-border);
+  border-right: none;
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  width: 280px;
+  flex-shrink: 0;
+  transition: width 0.3s ease, padding 0.3s ease;
+  overflow-x: hidden;
+  /* overflow-y: auto; é controlado internamente pelo .folders-list */
+}
+
+.sidebar.reduzido {
+  width: 75px;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+}
+
+.folders-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* ==========================================================================
+   5. RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 768px) {
+  .background-block {
+    flex-direction: column;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+
+  .sidebar, .switch-area {
+    border-radius: var(--border-radius-md);
+    border: var(--border-width-md) solid var(--color-border);
+  }
+}

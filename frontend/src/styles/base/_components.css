@@ -1,0 +1,430 @@
+/* ==========================================================================
+    BARRAS (NAVBAR, ACTION, STATUS)
+   ========================================================================== */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  height: var(--header-height);
+  background: var(--color-surface);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  flex-shrink: 0;
+}
+
+.tools-Header {
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-block: 10px;
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   LAYOUT PRINCIPAL DA ACTION BAR E DA STATUS BAR
+   ========================================================================== */
+.action-bar,
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.action-bar {
+  height: 50px;
+  border-bottom: var(--border-width-md) solid var(--color-border);
+}
+
+.status-bar {
+  height: 60px;
+  border-top: var(--border-width-md) solid var(--color-border);
+}
+
+.action-bar__info,
+.status-bar__info {
+  display: flex;
+  align-items: center;
+}
+
+.action-bar__actions,
+.status-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ==========================================================================
+  COMPONENTE INFOBLOCK (REUTILIZÁVEL)
+   ========================================================================== */
+.info-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-block__title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-block__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: 4px;
+}
+
+.info-block__value {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.info-block__placeholder {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Espaçador para quando não há nada a ser exibido mas a altura precisa ser mantida */
+.info-block__placeholder--spacer {
+  height: 38px;
+}
+
+/* ==========================================================================
+ ESTILOS DE ÍCONES (REUTILIZÁVEIS)
+   ========================================================================== */
+.icon--accent {
+  color: var(--color-accent);
+}
+
+.icon--default {
+  color: var(--color-text-secondary);
+}
+
+.icon-btn,
+.icon-button {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--color-accent);
+  background-color: rgba(var(--color-accent-rgb), 0.1);
+}
+
+/* ==========================================================================
+   2. BOTÕES
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: var(--font-family-base);
+}
+
+.btn-primary {
+  width: 150px;
+  height: 40px;
+  padding: var(--spacing-sm);
+  gap: 12px;
+  color: var(--color-surface);
+  background: var(--color-accent);
+  border: var(--border-width-md) solid var(--color-accent);
+  box-shadow: 0 2px #999;
+  border-radius: 10px;
+}
+
+.btn-primary:active {
+  box-shadow: 0 1px #888;
+  transform: translateY(2px);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.btn-secondary:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-danger {
+  background-color: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  color: var(--color-danger);
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  color: var(--color-surface);
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-mini {
+  background-color: var(--color-surface);
+  border: var(--border-width-md) solid var(--color-border);
+  box-shadow: var(--box-shadow-light);
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+}
+
+.btn-mini:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ==========================================================================
+   3. OUTROS COMPONENTES
+   ========================================================================== */
+
+/* --- Alertas --- */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  min-width: 200px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  box-shadow: var(--box-shadow-medium);
+  border-radius: var(--border-radius-md);
+  z-index: 1000;
+  animation: fadeIn 0.4s ease;
+}
+
+.alert.success {
+  border-left: 4px solid var(--color-success-text);
+}
+.alert.error {
+  border-left: 4px solid var(--color-error-text);
+}
+.alert.warning {
+  border-left: 4px solid var(--color-warning-border);
+}
+
+/* --- Switch (Toggle) --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: var(--color-switch-inactive);
+  border-radius: var(--border-radius-lg);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: var(--color-accent);
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* ==========================================================================
+   MENU DROPDOWN 'MAIS OPÇÕES'
+   ========================================================================== */
+
+/* Container principal do menu */
+.more-dropdown {
+  background-color: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 280px; /* Um pouco mais largo para a descrição */
+  position: absolute;
+  top: 60px; /* Posição relativa à action-bar */
+  right: 20px;
+  z-index: 100;
+  overflow: hidden; /* Garante que os itens internos respeitem o border-radius */
+
+  /* Animação de entrada */
+  animation: fadeIn 0.2s ease-out;
+}
+
+.more-dropdown__header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+}
+
+.more-dropdown__header h4 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.more-dropdown__list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs);
+}
+
+/* Item individual do menu */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+
+  /* Reset do botão */
+  background: none;
+  border: none;
+  text-align: left;
+
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-background);
+}
+
+.dropdown-item__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.dropdown-item__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item__name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.dropdown-item__desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   COMPONENTE: CUSTOM SELECT (Dropdown)
+   ========================================================================== */
+
+/* 1. O contêiner que envolve o <select> e a seta customizada */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%; /* Faz o select ocupar a largura do seu contêiner pai */
+}
+
+/* 2. O estilo principal do elemento <select> */
+.custom-select {
+  /* Reset da aparência padrão do navegador */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Estilização */
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  /* Adiciona espaço extra à direita para não sobrepor a seta */
+  padding-right: calc(var(--spacing-md) * 2 + 16px);
+
+  background-color: var(--color-background);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+
+  /* Tipografia */
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-family: inherit; /* Herda a fonte do 'body' */
+
+  transition: all 0.3s ease;
+}
+
+/* 3. Estilo para o estado de :hover */
+.custom-select:hover {
+  border-color: var(--color-text-secondary);
+}
+
+/* 4. Estilo para o estado de :focus (acessibilidade) */
+.custom-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(89, 125, 255, 0.2); /* Usa a cor de accent com transparência */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,45 @@
+/* CLASSES UTILITÁRIAS */
+
+.italic {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.thin {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.controle {
+  color: var(--color-accent);
+  margin: 0 5px;
+}
+
+.danger:hover {
+  color: var(--color-danger);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.delete {
+  color: var(--color-danger);
+  margin: 0 10px;
+}
+
+/* Flexbox Utilities */
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+

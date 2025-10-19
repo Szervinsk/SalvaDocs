@@ -1,0 +1,153 @@
+/* ==========================================================================
+   1. LAYOUT PRINCIPAL DA PÁGINA
+   ========================================================================== */
+.configurations-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.configurations-header h1 {
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--spacing-xs);
+}
+
+.configurations-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.config-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+
+/* ==========================================================================
+   2. CARD DE CONFIGURAÇÃO INDIVIDUAL
+   ========================================================================== */
+.config-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background-color: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+}
+
+.config-card__info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.config-card__info h3 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.config-card__info p {
+  margin: 4px 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.config-card__control {
+  min-width: 200px;
+}
+
+
+/* ==========================================================================
+   3. COMPONENTE: CONTROLE SEGMENTADO
+   ========================================================================== */
+.segmented-control {
+  display: flex;
+  padding: 4px;
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  border: var(--border-width-sm) solid var(--color-border);
+}
+
+.segmented-control__button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 12px;
+  border: none;
+  background-color: transparent;
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segmented-control__button.active {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================================================
+   4. COMPONENTE: TOGGLE SWITCH
+   ========================================================================== */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-border);
+  border-radius: 28px;
+  transition: background-color 0.2s ease;
+}
+
+/* O "pino" que desliza */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+/* Estilo quando está ATIVADO */
+.toggle-switch input:checked + .slider {
+  background-color: var(--color-accent);
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(22px);
+}

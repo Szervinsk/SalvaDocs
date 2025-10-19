@@ -1,0 +1,120 @@
+/* ==========================================================================
+   1. LAYOUT GERAL DA PÁGINA
+   ========================================================================== */
+.api-monitor-page {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  overflow-y: auto;
+  background-color: var(--color-background);
+}
+
+.api-monitor-header h1 {
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--spacing-xs);
+}
+
+.api-monitor-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 70ch;
+}
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+
+/* ==========================================================================
+   2. CARD DE REQUISIÇÃO
+   ========================================================================== */
+.request-card {
+  background-color: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow-light);
+}
+
+.request-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.method-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: white;
+}
+.method--get { background-color: #0d6efd; } /* Azul */
+.method--post { background-color: #198754; } /* Verde */
+.method--put { background-color: #ffc107; color: black; } /* Amarelo */
+.method--delete { background-color: #dc3545; } /* Vermelho */
+
+.request-path {
+  flex: 1;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  background-color: var(--color-background);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+}
+
+.request-info .btn-secondary {
+  gap: var(--spacing-sm);
+}
+
+/* ==========================================================================
+   3. ÁREA DE RESPOSTA
+   ========================================================================== */
+.response-area {
+  border-top: var(--border-width-sm) solid var(--color-border);
+  overflow: hidden; /* Necessário para animação */
+}
+
+.response-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-background);
+  font-size: var(--font-size-sm);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: var(--font-weight-bold);
+}
+.status--success { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+.status--error { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+
+.response-time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+
+.response-body {
+  margin: 0;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  max-height: 400px;
+  overflow: auto;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
