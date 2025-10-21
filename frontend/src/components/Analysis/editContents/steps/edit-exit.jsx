@@ -26,6 +26,7 @@ function EditExit({
   setAlterName,
   setFileName,
   selectedTags,
+  tags,
   selectedModel,
   erroArquivo,
   pastas,
@@ -139,7 +140,7 @@ function EditExit({
         <AnimatePresence>
           {alterName && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="alter-name-wrapper">
-              <AlterNameWithTags selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName} />
+              <AlterNameWithTags selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName} tags={tags}/>
             </motion.div>
           )}
         </AnimatePresence>

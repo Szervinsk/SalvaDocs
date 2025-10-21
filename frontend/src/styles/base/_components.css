@@ -151,6 +151,9 @@
   height: 40px;
   padding: var(--spacing-sm);
   gap: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: var(--color-surface);
   background: var(--color-accent);
   border: var(--border-width-md) solid var(--color-accent);
@@ -164,9 +167,12 @@
 }
 
 .btn-secondary {
+  display: flex;
+  justify-content: center;
   background-color: var(--color-surface);
   border: var(--border-width-md) solid var(--color-border);
   box-shadow: var(--box-shadow-light);
+  align-items: center;
   width: 150px;
   height: 40px;
   border-radius: 10px;

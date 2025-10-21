@@ -3,18 +3,19 @@ import { Icons } from "../../../constants/icons";
 import "./account.css";
 import axios from "axios";
 
-function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
+function Account({ user, onUserUpdate, onLogout, showAlert }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || "",
-    email: user?.email || "",
+    empresa: user?.empresa || "",
+    apiKey: "",
   });
 
-  // Reseta o formulário se o objeto 'user' mudar (ex: após logout/login)
   useEffect(() => {
     setFormData({
       username: user?.username || "",
-      email: user?.email || "",
+      empresa: user?.empresa || "",
+      apiKey: "",
     });
   }, [user]);
 
@@ -37,18 +38,24 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Se estava editando e clicou em Cancelar, reseta os dados do formulário
-      setFormData({ username: user.username, email: user.email });
+      setFormData({ username: user.username, empresa: user.empresa || "", apiKey: "" });
     }
     setIsEditing(prev => !prev);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {};
+    if (formData.username !== user.username) payload.username = formData.username;
+    if (formData.empresa !== (user.empresa || "")) payload.empresa = formData.empresa;
+    if (formData.apiKey) payload.apiKey = formData.apiKey;
+    if (Object.keys(payload).length === 0) {
+      setIsEditing(false);
+      return;
+    }
     try {
-      // A rota não precisa do ID na URL, pois o backend usa o token.
-      const response = await axios.put(`${baseURL}/users`, formData);
-      onUserUpdate(response.data); // Atualiza o estado global do usuário no App.jsx
+      const response = await axios.put("/users", payload);
+      onUserUpdate(response.data);
       setIsEditing(false);
       showAlert("success", "Perfil atualizado com sucesso!");
     } catch (err) {
@@ -58,11 +65,11 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm("Você tem CERTEZA que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados serão perdidos.")) {
+    if (window.confirm("Você tem CERTEZA que deseja excluir sua conta? Esta ação é irreversível.")) {
       try {
-        await axios.delete(`${baseURL}/users`);
+        await axios.delete(`/users`);
         showAlert("success", "Sua conta foi excluída com sucesso.");
-        onLogout(); // Chama a função de logout do App.jsx
+        onLogout();
       } catch (err) {
         console.error("Erro ao excluir conta:", err);
         showAlert("error", err.response?.data?.error || "Não foi possível excluir o perfil.");
@@ -70,11 +77,23 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
     }
   };
 
+  const handleResetWelcome = async () => {
+    try {
+      // Chama a nova rota no backend
+      await axios.put('/users/welcome/reset');
+      showAlert("success", "A tela de boas-vindas será exibida no próximo login.");
+      // Atualiza o estado local do usuário para refletir a mudança imediatamente
+      onUserUpdate({ ...user, welcomeDismissed: false });
+    } catch (err) {
+      showAlert("error", "Não foi possível resetar a tela de boas-vindas.");
+    }
+  };
+
   return (
     <div className="account-page">
       <header className="account-header">
         <h1>Minha Conta</h1>
-        <p>Gerencie suas informações pessoais e de segurança.</p>
+        <p>Gerencie suas informações pessoais, de segurança e chaves de API.</p>
       </header>
 
       <form onSubmit={handleSubmit} className="account-layout">
@@ -87,12 +106,12 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
             <p className="profile-email">{user.email}</p>
             <div className="profile-actions">
               {isEditing ? (
-                <>
-                  <button type="submit" className="btn-primary">Salvar Alterações</button>
-                  <button type="button" className="btn-secondary" onClick={handleEditToggle}>Cancelar</button>
-                </>
+                <div style={{display: "flex" , gap: "5px"}}>
+                  <button type="submit" className="btn-primary">Salvar</button>
+                  <div className="btn-secondary" style={{cursor: "pointer"}} onClick={handleEditToggle}>Cancelar</div>
+                </div>
               ) : (
-                <div className="btn-link" onClick={handleEditToggle}>Editar Perfil</div>
+                <div className="btn-primary" style={{width: "100%" , cursor: "pointer"}} onClick={handleEditToggle}>Editar Perfil</div>
               )}
             </div>
           </div>
@@ -100,23 +119,19 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
 
         <main className="account-main">
           <div className="details-card">
-            <div className="details-card__header"><h3>Detalhes da Conta</h3></div>
+            <div className="details-card__header"><h3>Informações Pessoais</h3></div>
             <div className="details-card__body">
               <div className="info-row">
                 <div className="info-row__label"><Icons.User size={16} /><span>Nome de Usuário</span></div>
-                {isEditing ? (
-                  <input type="text" name="username" className="form-input" value={formData.username} onChange={handleInputChange} />
-                ) : (
-                  <span className="info-row__value">{user?.username}</span>
-                )}
+                {isEditing ? <input type="text" name="username" className="form-input" value={formData.username} onChange={handleInputChange} required /> : <span className="info-row__value">{user?.username}</span>}
               </div>
               <div className="info-row">
-                <div className="info-row__label"><Icons.Model size={16} /><span>Email</span></div>
-                {isEditing ? (
-                  <input type="email" name="email" className="form-input" value={formData.email} onChange={handleInputChange} />
-                ) : (
-                  <span className="info-row__value">{user?.email}</span>
-                )}
+                <div className="info-row__label"><Icons.Business size={16} /><span>Empresa</span></div>
+                {isEditing ? <input type="text" name="empresa" className="form-input" value={formData.empresa} onChange={handleInputChange} placeholder="Opcional" /> : <span className="info-row__value">{user?.empresa || "-"}</span>}
+              </div>
+              <div className="info-row">
+                <div className="info-row__label"><Icons.Email size={16} /><span>Email</span></div>
+                <span className="info-row__value">{user?.email}</span>
               </div>
               <div className="info-row">
                 <div className="info-row__label"><Icons.Calendar size={16} /><span>Membro desde</span></div>
@@ -126,15 +141,25 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
           </div>
 
           <div className="details-card">
-            <div className="details-card__header"><h3>Segurança</h3></div>
+            <div className="details-card__header"><h3>Gerenciamento e Segurança</h3></div>
             <div className="details-card__body">
+              <div className="info-row">
+                <div className="info-row__label"><Icons.Key size={16} /><span>Status da Chave Gemini</span></div>
+                <span className={`info-row__value tag-plan ${user.hasApiKey ? 'active' : ''}`}>{user.hasApiKey ? "Configurada" : "Não configurada"}</span>
+              </div>
+              {isEditing && (
+                <div className="info-row">
+                  <div className="info-row__label"><Icons.Add size={16} /><span>Nova Chave API Gemini</span></div>
+                  <input type="password" name="apiKey" className="form-input" value={formData.apiKey} onChange={handleInputChange} placeholder="Cole sua nova chave para atualizar" />
+                </div>
+              )}
               <div className="info-row--action">
                 <span>Altere sua senha para manter sua conta segura.</span>
                 <button type="button" className="btn-secondary">Alterar Senha</button>
               </div>
               <div className="info-row--action">
-                <span>Altere sua chave de API para integrações.</span>
-                <button type="button" className="btn-secondary">Alterar Chave</button>
+                <span>Veja o tour de boas-vindas novamente.</span>
+                <button type="button" className="btn-secondary" onClick={handleResetWelcome}>Ver Boas-Vindas</button>
               </div>
             </div>
           </div>
@@ -143,10 +168,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, baseURL }) {
             <div className="details-card__header"><h3>Zona de Perigo</h3></div>
             <div className="details-card__body">
               <div className="info-row--action">
-                <div>
-                  <strong>Excluir esta conta</strong>
-                  <p>Uma vez que você exclui sua conta, não há volta. Tenha certeza.</p>
-                </div>
+                <div><strong>Excluir esta conta</strong><p>Uma vez que você exclui sua conta, não há volta. Tenha certeza.</p></div>
                 <button type="button" className="btn-danger" onClick={handleDeleteAccount}>Excluir Conta</button>
               </div>
             </div>

@@ -31,6 +31,7 @@ const AuthInput = ({ id, label, type, value, onChange, placeholder, children }) 
 function Cadastro({ onSubmit, err, loading, switchToLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [empresa, setEmpresa] = useState(""); 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -39,6 +40,7 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
   const passOk = password.length >= 6;
   const match = password === confirm;
 
+  // A validação 'canSubmit' não precisa incluir 'empresa', pois é um campo opcional
   const canSubmit = useMemo(
     () => name && isValidEmail(email) && passOk && match && !loading,
     [name, email, passOk, match, loading]
@@ -46,7 +48,7 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (canSubmit) onSubmit({ username: name, email, password });
+    if (canSubmit) onSubmit({ username: name, email, password, empresa });
   };
 
   return (
@@ -70,6 +72,14 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="seu@email.com"
+      />
+      <AuthInput
+        id="signup-empresa"
+        label="Empresa (Opcional)"
+        type="text"
+        value={empresa}
+        onChange={(e) => setEmpresa(e.target.value)}
+        placeholder="Informe o nome da sua empresa"
       />
       <AuthInput
         id="signup-password"
@@ -101,7 +111,6 @@ function Cadastro({ onSubmit, err, loading, switchToLogin }) {
           {loading ? "Cadastrando..." : "Criar Conta"}
         </button>
       </div>
-
 
       <p className="auth-switch">
         Já tem uma conta?{" "}

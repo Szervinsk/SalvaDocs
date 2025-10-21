@@ -221,7 +221,7 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizar
         <Header doc={docSelecionado} onClose={onClose} onDelete={handleDelete} />
 
         <div className="od-content-wrapper">
-          <main className="od-main-content">
+          <main className="od-main-content" style={{width: !visualizarPDF ? "100%" : ""}}>
 
             {/* 1. Título (da categoria 'title') */}
             <section className="od-title-section">

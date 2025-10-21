@@ -110,7 +110,7 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
           <tbody>
             {sortedAndFilteredDocuments.map((doc) => (
               <tr key={doc.id} onClick={() => handleDocumentClick(doc)}>
-                <td className="doc-name">{doc.templateName || doc.name}</td>
+                <td className="doc-name">{doc.resolvedTemplate || doc.name}</td>
                 <td>{doc.folder ? <span className="doc-folder">{doc.folder.name}</span> : "-"}</td>
                 <td><span className="tag-count">{doc.tags.length} tags</span></td>
                 <td>{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</td>

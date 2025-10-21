@@ -11,6 +11,8 @@ import { BiSolidBusiness } from "react-icons/bi";
 // Bootstrap Icons (bs)
 import { SlGraph } from "react-icons/sl";
 
+import { IoMdKey } from "react-icons/io";
+
 // Phosphor Icons (pi)
 import { PiSpinnerGapBold } from "react-icons/pi";
 
@@ -37,7 +39,7 @@ import { IoAdd, IoClose, IoRocketOutline } from "react-icons/io5";
 import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutDashboard, LuTextSearch , LuClipboard} from "react-icons/lu";
 
 // Material Design (md)
-import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt } from "react-icons/md";
+import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt , MdAlternateEmail } from "react-icons/md";
 
 // Phosphor Icons (pi)
 import { PiArchive, PiChartPie, PiFilePdf, PiListChecks } from "react-icons/pi";
@@ -66,6 +68,8 @@ export const Icons = {
   ArrowRight: FiArrowRight,
   ArrowLeft: FiArrowLeft,
   Tools: FaTools,
+  Key: IoMdKey,
+  Email: MdAlternateEmail,
 
   // ============================
   // Ações Comuns

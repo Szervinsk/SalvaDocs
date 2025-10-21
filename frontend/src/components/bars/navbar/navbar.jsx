@@ -14,7 +14,7 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
 
   const navVariants = {
     expanded: { width: 280 },
-    collapsed: { width: 80 },
+    collapsed: { width: 100 },
   };
 
   const textVariants = {
@@ -43,9 +43,11 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.h2 variants={textVariants} initial="hidden" animate="visible" exit="hidden" className="app-title">
-                  SalvaDocs
+                  <h2 className="app-title">SalvaDocs</h2>
                 </motion.h2>
               )}
+
+
             </AnimatePresence>
           </div>
           <button className="toggle-btn" onClick={toggleSidebar} title={isCollapsed ? "Expandir" : "Recolher"}>
@@ -65,7 +67,7 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
               </motion.div>
             ) : (
               <div className="search-icon-wrapper">
-                <Icons.Search size={20} />
+                <Icons.Search size={20} onClick={()=> setIsCollapsed(!isCollapsed)}/>
               </div>
             )}
           </AnimatePresence>
@@ -75,8 +77,8 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
           <>
             <hr />
             <div className="tools-Header">
-              <Icons.Tools size={10} className="icons-r" />
-              <h5>Ferramentas</h5>
+              <Icons.Tools size={15} className="icons-r" />
+              {!isCollapsed && <h5>Ferramentas</h5>}
             </div>
 
             {tools_filtradas.length > 0 ? (
@@ -89,10 +91,12 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
                 >
                   <div className="flex-row" style={{ gap: "10px" }}>
                     <div className="tool-item__icon">{item.icon}</div>
-                    <span className="tool-item__label">{item.name}</span>
+                    {!isCollapsed && (
+                      <span className="tool-item__label">{item.name}</span>
+                    )}
                   </div>
 
-                  {item.shortcut && (
+                  {item.shortcut && !isCollapsed && (
                     <kbd className="tool-item__shortcut">
                       shift + {item.shortcut}
                     </kbd>
@@ -100,18 +104,12 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
                 </button>
               ))
             ) : (
-              <h5 className="thin" style={{marginBottom: "10px"}}>Não foram encontradas ferramentas</h5>
+              <h5 className="thin" style={{ marginBottom: "10px" }}>Não foram encontradas ferramentas</h5>
             )}
           </>
 
           {showAlternativeTools && (
             <>
-              <hr />
-              <div className="tools-Header">
-                <Icons.Tools size={15} className="icons-r" />
-                <h5>Outras ferramentas</h5>
-              </div>
-
               {other_tools_filtradas.length > 0 ? (
                 other_tools_filtradas.map((item) => (
                   <button
@@ -122,10 +120,12 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
                   >
                     <div className="flex-row" style={{ gap: "10px" }}>
                       <div className="tool-item__icon">{item.icon}</div>
-                      <span className="tool-item__label">{item.name}</span>
+                      {!isCollapsed && (
+                        <span className="tool-item__label">{item.name}</span>
+                      )}
                     </div>
 
-                    {item.shortcut && (
+                    {item.shortcut && !isCollapsed && (
                       <kbd className="tool-item__shortcut">
                         shift + {item.shortcut}
                       </kbd>

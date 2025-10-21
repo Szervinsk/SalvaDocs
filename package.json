@@ -1,25 +1,53 @@
 {
-  "name": "salvadocs",
+  "name": "salvadocs-desktop",
   "version": "1.0.0",
   "description": "Aplicativo de software livre com intuito de resumir documentos do trabalho...",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1",
-  "dev": "concurrently \"npm:dev --prefix backend\" \"npm:start --prefix frontend\""
-},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Szervinsk/SalvaDocs.git"
+    "dev:web": "concurrently \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
+    "start": "electron .",
+    "dist": "npm run build:frontend && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
+    "package": "npm run build:frontend && electron-packager . SalvaDocs --platform=win32 --arch=x64 --out=dist_electron --overwrite --prune=true",
+    "build:frontend": "npm run build --prefix frontend"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Szervinsk/SalvaDocs/issues"
-  },
-  "homepage": "https://github.com/Szervinsk/SalvaDocs#readme",
+  "author": "Szervinsk",
+  "license": "MIT",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^31.0.1",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.szervinsk.salvadocs",
+    "productName": "SalvaDocs",
+    "files": [
+      "main.js",
+      "backend/**/*",
+      "frontend/build/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/node_modules",
+        "to": "app/backend/node_modules"
+      }
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist_electron"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }

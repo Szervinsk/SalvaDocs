@@ -84,15 +84,18 @@
 ================================= */
 .auth-form {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   width: 100%;
-  max-width: 360px;
+  min-width: 500px;
   gap: var(--spacing-md);
 }
 
 .auth-form__header {
   text-align: center;
   margin-bottom: var(--spacing-sm);
+  width: 100%;
 }
 
 .auth-form__header h2 {
@@ -106,9 +109,10 @@
 }
 
 /* ===============================
-   CAMPOS DE ENTRADA
+CAMPOS DE ENTRADA
 ================================= */
 .input-wrapper {
+  width: 70%;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);

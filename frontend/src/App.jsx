@@ -9,6 +9,7 @@ import Navbar from "./components/bars/navbar/navbar";
 import FoldersAction from "./components/bars/library/folders-action";
 import AuthForm from "./components/auth/authForm";
 import Alerts from "./components/alerts/alerts";
+import Welcome from "./components/alerts/Welcome";
 
 // Configuração global do Axios
 axios.defaults.withCredentials = true;
@@ -45,6 +46,35 @@ function App() {
   const [modelos, setModelos] = useState([]);
   const [pastas, setPastas] = useState([]);
   const [showAlternativeTools, setShowAlternativeTools] = useState(false);
+
+
+  // Estado para aplicar o boas vindas para o usuário
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  // Efeito para decidir se mostra o welcome
+  useEffect(() => {
+    if (isLogged && user && !user.welcomeDismissed) {
+      setShowWelcome(true);
+    }
+  }, [isLogged, user]);
+
+  // Função para marcar o welcome como visto no backend
+  const handleFinishWelcome = async () => {
+    try {
+      await axios.put('/users/welcome'); // Chama a rota que criamos
+      // Atualiza o estado local para não mostrar de novo nesta sessão
+      setUser(prev => ({ ...prev, welcomeDismissed: true }));
+      setShowWelcome(false);
+    } catch (err) {
+      console.error("Erro ao dispensar boas-vindas:", err);
+      setShowWelcome(false); // Fecha mesmo se a API falhar
+    }
+  };
+
+  // Função para navegar para a página de conta
+  const goToAccountPage = () => {
+    setTool(5); // O ID da ferramenta "Minha Conta"
+  };
 
   // Função para exibir alertas, memorizada para estabilidade
   const showAlert = useCallback((type, message) => {
@@ -227,6 +257,16 @@ function App() {
       <AnimatePresence>
         {alert && <Alerts type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {showWelcome && (
+          <Welcome 
+            onFinish={handleFinishWelcome}
+            goToAccount={goToAccountPage}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="main-container">
         <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} showAlternativeTools={showAlternativeTools} />
         <div className="background-block">

@@ -1,4 +1,3 @@
-// models/index.js
 import { Sequelize } from "sequelize";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,10 +13,18 @@ import FolderModel from "./folder.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// O caminho do banco de dados agora é dinâmico.
+// 1. Ele tenta usar a variável de ambiente 'DB_STORAGE_PATH' (fornecida pelo main.js no executável).
+// 2. Se essa variável não existir (como no modo de desenvolvimento), ele usa o caminho padrão na raiz do projeto.
+const storagePath =
+  process.env.DB_STORAGE_PATH || path.join(process.cwd(), "database.sqlite");
+
+console.log(`[Sequelize] Usando banco de dados em: ${storagePath}`); // Log para depuração
+
 // Configuração da conexão com o banco de dados (SQLite)
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: path.join(process.cwd(), "database.sqlite"),
+  storage: storagePath, // Usa o caminho dinâmico que definimos acima
   logging: false,
 });
 
