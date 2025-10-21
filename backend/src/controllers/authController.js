@@ -1,13 +1,11 @@
-// src/controllers/authController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import models from "../models/index.js";
-
+import models, { sequelize } from "../models/index.js";
 import { JWT_SECRET, JWT_REFRESH_SECRET } from "../config/jwt.js";
 
 export const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body; // Alterado de 'name' para 'username'
+    const { username, email, password, empresa } = req.body;
 
     const existing = await models.User.findOne({ where: { email } });
     if (existing) return res.status(400).json({ error: "Email já registrado" });
@@ -17,10 +15,11 @@ export const register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      empresa: empresa || null, // Agora a variável 'empresa' existe e será usada corretamente
     });
 
     const userResponse = user.toJSON();
-    delete userResponse.password; // Nunca retorne o hash da senha
+    delete userResponse.password;
 
     res
       .status(201)
@@ -51,9 +50,9 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true em produção (HTTPS)
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      path: "/api/auth", // Escopo do cookie para as rotas de autenticação
+      path: "/api/auth",
     });
 
     const userResponse = user.toJSON();
@@ -73,7 +72,6 @@ export const refreshToken = (req, res) => {
 
   jwt.verify(token, JWT_REFRESH_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ error: "Refresh token inválido" });
-
     const newAccessToken = jwt.sign({ id: decoded.id }, JWT_SECRET, {
       expiresIn: "15m",
     });
@@ -84,18 +82,26 @@ export const refreshToken = (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("refreshToken", { path: "/api/auth" });
   res.status(200).json({ message: "Logout realizado com sucesso" });
-};''
+};
 
+// Função 'me' corrigida para usar o 'sequelize' importado
 export const me = async (req, res) => {
   try {
-    // req.user é fornecido pelo authMiddleware
     const user = await models.User.findByPk(req.user.id, {
-      attributes: ["id", "username", "email", "createdAt"], // Nunca inclua a senha
+      attributes: [
+        "id",
+        "username",
+        "email",
+        "createdAt",
+        "empresa",
+        "welcomeDismissed",
+        [sequelize.literal("apiKey IS NOT NULL"), "hasApiKey"],
+      ],
     });
-    if (!user)
+    if (!user) {
       return res.status(404).json({ error: "Usuário não encontrado." });
-
-    res.json(user);
+    }
+    res.json(user); // O .json() do Express vai serializar o objeto corretamente
   } catch (err) {
     console.error("Erro ao buscar dados do usuário:", err);
     res.status(500).json({ error: "Erro ao buscar usuário" });

@@ -69,7 +69,7 @@ const DocumentItem = ({ doc, docSelecionado, onClick }) => {
 // ==========================================================================
 // SUB-COMPONENTE: BLOCO DE PASTA (COM LÓGICA DE EDIÇÃO)
 // ==========================================================================
-const FolderBlock = ({ pasta, isEditing, onRename, onCancelEdit, docSelecionado, onDocClick, abrirPastaSeFiltrada, onContextMenu }) => {
+const FolderBlock = ({ pasta, isEditing, onRename, onCancelEdit, docSelecionado, onDocClick, abrirPastaSeFiltrada, onContextMenu, isReduzido, setIsReduzido }) => {
   const [isAberta, setIsAberta] = useState(false);
   const [inputValue, setInputValue] = useState(pasta.name);
 
@@ -95,25 +95,33 @@ const FolderBlock = ({ pasta, isEditing, onRename, onCancelEdit, docSelecionado,
   return (
     <div className="folder-block">
       <div className={`folder-header ${isAberta ? "active" : ""}`} onClick={() => !isEditing && setIsAberta(p => !p)}>
-        <div className="folder-info">
-          <Icons.Folder size={20} />
-          {isEditing ? (
-            <input
-              type="text"
-              className="folder-rename-input"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={onCancelEdit}
-              autoFocus
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <h3>{pasta.name}</h3>
-          )}
-        </div>
-        {!isEditing && (
+        {isReduzido ? (
+          <div className="folder-info" onClick={()=> setIsReduzido(!isReduzido)}>
+            <Icons.Folder size={20} />
+          </div>
+        ) : (
           <div className="folder-info">
+            <Icons.Folder size={20} />
+            {isEditing ? (
+              <input
+                type="text"
+                className="folder-rename-input"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={onCancelEdit}
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <h3>{pasta.name}</h3>
+            )}
+          </div>
+        )}
+
+
+        {!isEditing && !isReduzido && (
+          <div className="folder-controls">
             <span className="doc-count">{pasta.documentos?.length || 0}</span>
             <button className="icon-btn more-options-btn" title="Mais opções" onClick={(e) => {
               e.stopPropagation();
@@ -148,7 +156,7 @@ const FolderBlock = ({ pasta, isEditing, onRename, onCancelEdit, docSelecionado,
 // ==========================================================================
 // COMPONENTE PRINCIPAL (FOLDERSACTION)
 // ==========================================================================
-function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSelecionado, onDataChange, showAlert, baseURL }) {
+function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSelecionado, onDataChange, showAlert }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isReduzido, setIsReduzido] = useState(false);
   const [viewRecentDocs, setViewRecentDocs] = useState(false);
@@ -244,9 +252,13 @@ function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSele
         </button>
       </div>
 
-      {!isReduzido && (
+      {!isReduzido ? (
         <div className="sidebar-controls">
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Buscar..." />
+        </div>
+      ) : (
+        <div className="search-icon-wrapper" style={{ width: "70%" }}>
+          <Icons.Search size={20} onClick={() => setIsReduzido(!isReduzido)} />
         </div>
       )}
 
@@ -266,6 +278,8 @@ function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSele
                   onDocClick={handleDocumentClick}
                   abrirPastaSeFiltrada={deveAbrir}
                   onContextMenu={handleContextMenu}
+                  isReduzido={isReduzido}
+                  setIsReduzido={setIsReduzido}
                 />
               );
             })

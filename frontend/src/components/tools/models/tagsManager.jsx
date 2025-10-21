@@ -3,23 +3,33 @@ import { useState, useEffect } from "react";
 import { Icons } from "../../../constants/icons";
 import axios from "axios";
 
-// Tipos de extração disponíveis
-const EXTRACTION_TYPES = ["Manual", "Regex", "IA"];
-
 // ==========================================================================
-// SUB-COMPONENTE: MODAL COM FORMULÁRIO DE TAGS
+// SUB-COMPONENTE: MODAL COM FORMULÁRIO DE TAGS (Refatorado)
 // ==========================================================================
 const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
   const [formData, setFormData] = useState({
     name: tag?.name || "",
     category: tag?.category || "",
-    type: tag?.type || EXTRACTION_TYPES[0],
     icon: tag?.icon || "",
     regex: tag?.regex || "",
     prompt: tag?.prompt || "",
-    displayCategory: tag?.displayCategory || "data", // Padrão 'data'
+    displayCategory: tag?.displayCategory || "data",
   });
+
+  // O 'type' agora é um estado separado para controle manual
+  const [extractionType, setExtractionType] = useState(tag?.type || "Manual");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Efeito que determina o tipo de extração automaticamente
+  useEffect(() => {
+    if (formData.prompt) {
+      setExtractionType("IA");
+    } else if (formData.regex) {
+      setExtractionType("Regex");
+    } else {
+      setExtractionType("Manual");
+    }
+  }, [formData.prompt, formData.regex]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,13 +39,16 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    // Combina o formData com o tipo de extração final
+    const payload = { ...formData, type: extractionType };
+
     try {
       if (tag) {
-        await axios.put(`/tags/${tag.id}`, formData);
-        showAlert("success", `Tag "${formData.name}" atualizada com sucesso!`);
+        await axios.put(`/tags/${tag.id}`, payload);
+        showAlert("success", `Tag "${payload.name}" atualizada com sucesso!`);
       } else {
-        await axios.post(`/tags`, formData); // Rota REST
-        showAlert("success", `Tag "${formData.name}" criada com sucesso!`);
+        await axios.post(`/tags`, payload);
+        showAlert("success", `Tag "${payload.name}" criada com sucesso!`);
       }
       onSave();
       onClose();
@@ -49,12 +62,13 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content modal-content--large" onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit} className="tag-form">
           <header className="modal-header">
             <h2>{tag ? "Editar Tag" : "Criar Nova Tag"}</h2>
             <button type="button" className="icon-button" onClick={onClose}><Icons.Close size={20} /></button>
           </header>
+
           <div className="modal-body">
             <div className="form-grid">
               <div className="form-field">
@@ -66,16 +80,6 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
                 <input type="text" id="category" name="category" value={formData.category} onChange={handleInputChange} />
               </div>
               <div className="form-field">
-                <label htmlFor="type">Tipo de Extração</label>
-                <div className="custom-select-wrapper">
-                  <select id="type" name="type" value={formData.type} onChange={handleInputChange}>
-                    {EXTRACTION_TYPES.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="form-field">
                 <label htmlFor="icon">Ícone</label>
                 <div className="custom-select-wrapper">
                   <select id="icon" name="icon" value={formData.icon} onChange={handleInputChange}>
@@ -84,7 +88,7 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
                   </select>
                 </div>
               </div>
-              <div className="form-field full-width">
+              <div className="form-field">
                 <label htmlFor="displayCategory">Categoria de Exibição</label>
                 <div className="custom-select-wrapper">
                   <select id="displayCategory" name="displayCategory" value={formData.displayCategory} onChange={handleInputChange}>
@@ -92,24 +96,39 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
                     <option value="title">Título Principal</option>
                     <option value="summary">Bloco de Resumo</option>
                     <option value="signatory">Signatário</option>
-                    <option value="list">Lista (ex: Documentos)</option>
+                    <option value="list">Lista</option>
                   </select>
                 </div>
               </div>
             </div>
-            {formData.type === "Regex" && (
+
+            {/* Seção de Tipo de Extração */}
+            <div className="extraction-type-section">
+              <label>Tipo de Extração</label>
+              <div className="segmented-control">
+                <button type="button" className={`segmented-control__button ${extractionType === 'Manual' ? 'active' : ''}`} onClick={() => setExtractionType('Manual')}>Manual</button>
+                <button type="button" className={`segmented-control__button ${extractionType === 'Regex' ? 'active' : ''}`} onClick={() => setExtractionType('Regex')}>Regex</button>
+                <button type="button" className={`segmented-control__button ${extractionType === 'IA' ? 'active' : ''}`} onClick={() => setExtractionType('IA')}>IA</button>
+              </div>
+            </div>
+
+            {/* Campos Condicionais */}
+            {extractionType === "Regex" && (
               <div className="form-field full-width">
                 <label htmlFor="regex">Padrão Regex</label>
                 <input type="text" id="regex" name="regex" value={formData.regex} onChange={handleInputChange} placeholder="Ex: /([0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2})/" />
+                <p className="field-hint">O valor a ser extraído deve estar no primeiro grupo de captura `(...)`.</p>
               </div>
             )}
-            {formData.type === "IA" && (
+            {extractionType === "IA" && (
               <div className="form-field full-width">
                 <label htmlFor="prompt">Prompt de IA</label>
-                <textarea id="prompt" name="prompt" value={formData.prompt} onChange={handleInputChange} rows="4" placeholder="Ex: Extraia o nome completo do autor principal..."></textarea>
+                <textarea id="prompt" name="prompt" value={formData.prompt} onChange={handleInputChange} rows="4" placeholder="Ex: Extraia o nome completo do autor principal do documento."></textarea>
+                <p className="field-hint">Descreva claramente a informação que a IA deve encontrar no texto.</p>
               </div>
             )}
           </div>
+
           <footer className="modal-footer">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={isLoading}>

@@ -66,11 +66,18 @@
   background: var(--color-text-secondary);
 }
 
+.folder-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .folder-block {
   margin-bottom: var(--spacing-xs);
 }
 .folder-header {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-xs);

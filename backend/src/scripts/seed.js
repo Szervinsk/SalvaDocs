@@ -21,7 +21,7 @@ import path from "path";
     const pastasData = [
       { name: "Despachos" },
       { name: "Relatórios Gerais" },
-      { name: "Documentos Internos" },
+      { name: "Documentos" },
     ];
     for (const pasta of pastasData) {
       await models.Folder.findOrCreate({ where: { name: pasta.name } });

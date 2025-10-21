@@ -4,24 +4,24 @@ import models from "../models/index.js";
 // DESCRIÇÃO: Atualiza os dados de um usuário (username, email).
 export const updateUser = async (req, res) => {
   try {
-    // O ID do usuário vem do token JWT, garantindo que ele só possa editar a si mesmo.
-    const userId = req.user.id; 
-    const { username, email } = req.body;
+    const userId = req.user.id;
+    const { username, empresa, apiKey } = req.body;
 
     const user = await models.User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
 
-    // Atualiza os campos
-    user.username = username || user.username;
-    user.email = email || user.email;
-    
+    // Atualiza apenas os campos fornecidos
+    if (username) user.username = username;
+    if (empresa !== undefined) user.empresa = empresa;
+    if (apiKey) user.apiKey = apiKey; // Salva a nova chave API
+
     await user.save();
 
-    // Retorna o usuário atualizado (sem a senha)
     const userResponse = user.toJSON();
     delete userResponse.password;
+    delete userResponse.apiKey; // Nunca retorne a chave API completa
 
     res.json(userResponse);
   } catch (err) {
@@ -30,6 +30,39 @@ export const updateUser = async (req, res) => {
   }
 };
 
+// ROTA: PUT /api/users/welcome
+// DESCRIÇÃO: Marca a tela de boas-vindas como vista.
+export const dismissWelcome = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await models.User.update(
+      { welcomeDismissed: true },
+      { where: { id: userId } }
+    );
+    res.status(200).json({ message: "Boas-vindas dispensado com sucesso." });
+  } catch (err) {
+    console.error("Erro ao dispensar boas-vindas:", err);
+    res.status(500).json({ error: "Erro interno." });
+  }
+};
+
+// ROTA: PUT /api/users/welcome/reset
+// DESCRIÇÃO: Reseta o status, fazendo a tela de boas-vindas aparecer novamente.
+export const resetWelcome = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await models.User.update(
+      { welcomeDismissed: false }, // Define o valor como 'false'
+      { where: { id: userId } }
+    );
+    res
+      .status(200)
+      .json({ message: "Status de boas-vindas resetado com sucesso." });
+  } catch (err) {
+    console.error("Erro ao resetar boas-vindas:", err);
+    res.status(500).json({ error: "Erro interno." });
+  }
+};
 
 // ROTA: DELETE /api/users/:id
 // DESCRIÇÃO: Deleta a conta de um usuário.
@@ -45,7 +78,7 @@ export const deleteUser = async (req, res) => {
     await user.destroy();
 
     // Limpa o cookie de refresh token ao deletar a conta
-    res.clearCookie("refreshToken", { path: '/api/auth' });
+    res.clearCookie("refreshToken", { path: "/api/auth" });
     res.status(200).json({ message: "Usuário deletado com sucesso." });
   } catch (err) {
     console.error("Erro ao deletar usuário:", err);

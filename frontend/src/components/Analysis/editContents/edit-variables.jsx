@@ -64,6 +64,7 @@ function EditVariables({
         file={file}
         setFile={setFile}
         pastas={pastas}
+        tags={tags}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
         sendFiles={sendFiles}

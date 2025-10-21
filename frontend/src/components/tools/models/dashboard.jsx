@@ -106,9 +106,8 @@ const Dashboard = ({ tags, modelos, documentos, setArea }) => {
       .sort((a, b) => b.value - a.value);
 
     const tagsByType = [
-      { label: "ia", value: tags.filter((t) => t.type === "ia").length },
-      { label: "regex", value: tags.filter((t) => t.type === "regex").length },
-      { label: "Manual", value: tags.filter((t) => t.type === "").length },
+      { label: "Ia", value: tags.filter((t) => t.type === "IA").length },
+      { label: "Regex", value: tags.filter((t) => t.type === "Regex").length },
     ].filter((item) => item.value > 0);
 
     return { tagsPerModel, tagsByType };

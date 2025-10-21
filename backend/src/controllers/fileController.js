@@ -1,9 +1,6 @@
-// Local: ../controllers/fileController.js
-
 import fs from "fs";
 import models from "../models/index.js";
 import { extractDataFromFile } from "../services/extractService.js";
-// Importa a nova função centralizada do serviço Gemini
 import { extractDataWithGemini } from "../services/geminiService.js";
 
 // ==========================================================================
@@ -12,9 +9,6 @@ import { extractDataWithGemini } from "../services/geminiService.js";
 
 /**
  * Substitui placeholders como {tag_name} em uma string de template com os valores extraídos.
- * @param {string} templateName - A string do template.
- * @param {Array} tags - Um array de objetos de TagInstance.
- * @returns {string|null} - A string com os valores substituídos.
  */
 function replaceTemplateTags(templateName, tags = []) {
   if (!templateName) return null;
@@ -27,14 +21,12 @@ function replaceTemplateTags(templateName, tags = []) {
   });
 }
 
-// A função generatePromptForMultipleTags foi MOVIDA para o geminiService.js
-
 // ==========================================================================
 // CONTROLLERS EXPORTADOS
 // ==========================================================================
 
 /**
- * ROTA: POST /api/files/upload
+ * ROTA: POST /api/documents/upload
  * DESCRIÇÃO: Função principal que recebe um arquivo, associa a uma pasta,
  * cria o documento, analisa as tags (Regex e IA) e retorna o documento completo.
  */
@@ -46,7 +38,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
 
     // --- 1. Receber e Validar Dados do Frontend ---
     const { model, templateName, folderId } = req.body;
-    const ownerId = req.user?.id || null;
+    const ownerId = req.user?.id; // O ID do usuário vem do authMiddleware
 
     if (!folderId) {
       return res
@@ -54,14 +46,19 @@ export const uploadFileAndAnalyze = async (req, res) => {
         .json({ error: "A pasta de destino é obrigatória." });
     }
 
-    // --- 2. Processar IDs das Tags ---
-    const parsedTagIds = req.body.tags ? JSON.parse(req.body.tags) : [];
+    // --- 2. Buscar Usuário e Chave API ---
+    const user = await models.User.findByPk(ownerId, {
+      attributes: ["apiKey"],
+    });
+    const userApiKey = user?.apiKey || null; // Pega a chave do usuário, se existir
 
+    // --- 3. Processar IDs das Tags e Buscar Tags Base ---
+    const parsedTagIds = req.body.tags ? JSON.parse(req.body.tags) : [];
     const selectedTags = await models.TagBase.findAll({
       where: { id: parsedTagIds },
     });
 
-    // --- 3. Criar o Documento no Banco de Dados ---
+    // --- 4. Criar o Documento no Banco de Dados ---
     const document = await models.Document.create({
       name: req.file.originalname,
       path: `uploads/${req.file.filename}`,
@@ -72,20 +69,20 @@ export const uploadFileAndAnalyze = async (req, res) => {
       folderId: folderId,
     });
 
-    // --- 4. Extrair Dados e Processar Tags (IA e Regex) ---
+    // --- 5. Extrair Dados e Processar Tags (IA e Regex) ---
     const extractedData =
       (await extractDataFromFile(req.file.path, selectedTags)) || {};
-    const iaTags = selectedTags.filter((t) => t.type === "ia");
-    const regexTags = selectedTags.filter((t) => t.type === "regex");
+    const iaTags = selectedTags.filter((t) => t.type === "IA");
+    const regexTags = selectedTags.filter((t) => t.type === "Regex");
     const allTagInstances = [];
 
-    // Processamento de IA - AGORA MUITO MAIS LIMPO
+    // Processamento de IA
     if (iaTags.length > 0) {
       try {
-        // Apenas uma chamada para o serviço, que lida com toda a complexidade.
         const geminiResults = await extractDataWithGemini(
           iaTags,
-          extractedData.text || ""
+          extractedData.text || "",
+          userApiKey // Passa a chave do usuário para o serviço
         );
 
         for (const tag of iaTags) {
@@ -98,7 +95,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
             value,
             type: "ia",
             icon: tag.icon,
-            displayCategory: tag.displayCategory,
+            displayCategory: tag.displayCategory, // Salva o displayCategory
             documentId: document.id,
           });
         }
@@ -110,14 +107,14 @@ export const uploadFileAndAnalyze = async (req, res) => {
             value: "Erro na extração IA",
             type: "ia",
             icon: tag.icon,
-            displayCategory: tag.displayCategory,
+            displayCategory: tag.displayCategory, // Salva o displayCategory mesmo em erro
             documentId: document.id,
           })
         );
       }
     }
 
-    // Processamento de Regex (sem alterações)
+    // Processamento de Regex
     for (const tag of regexTags) {
       const extracted = (extractedData.tags || []).find(
         (t) => t.name === tag.name
@@ -125,19 +122,19 @@ export const uploadFileAndAnalyze = async (req, res) => {
       allTagInstances.push({
         name: tag.name,
         value: extracted?.value || null,
-        type: "regex",
+        type: "Regex",
         icon: tag.icon,
-        displayCategory: tag.displayCategory,
+        displayCategory: tag.displayCategory, // Salva o displayCategory
         documentId: document.id,
       });
     }
 
-    // --- 5. Salvar Todas as Instâncias de Tags ---
+    // --- 6. Salvar Todas as Instâncias de Tags ---
     if (allTagInstances.length > 0) {
       await models.TagInstance.bulkCreate(allTagInstances);
     }
 
-    // --- 6. Buscar e Retornar o Documento Completo ---
+    // --- 7. Buscar e Retornar o Documento Completo ---
     const documentoCompleto = await models.Document.findByPk(document.id, {
       include: [
         { model: models.TagInstance, as: "tags" },
@@ -165,7 +162,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
 };
 
 /**
- * ROTA: GET /api/files
+ * ROTA: GET /api/documents
  * DESCRIÇÃO: Retorna todos os documentos com suas tags e pastas associadas.
  */
 export const getAllDocuments = async (req, res) => {
@@ -212,7 +209,7 @@ export const getAllDocuments = async (req, res) => {
 };
 
 /**
- * ROTA: DELETE /api/files/:id
+ * ROTA: DELETE /api/documents/:id
  * DESCRIÇÃO: Deleta um documento, suas tags e o arquivo físico do servidor.
  */
 export const deleteDoc = async (req, res) => {
@@ -228,6 +225,8 @@ export const deleteDoc = async (req, res) => {
       fs.unlinkSync(document.path);
     }
 
+    // A exclusão em cascata (onDelete: 'CASCADE') no model TagInstance cuida disso,
+    // mas uma chamada explícita é uma garantia extra.
     await models.TagInstance.destroy({ where: { documentId } });
     await document.destroy();
 

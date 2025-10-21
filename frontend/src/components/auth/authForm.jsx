@@ -81,7 +81,7 @@ function AuthForm({ onLoginSubmit, onSignupSubmit }) {
               animate="visible"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{ width: "100%" }}
+              style={{ width: "100%" , display: "flex",  justifyContent: "center" }}
             >
               {mode === "login" ? (
                 <Login
