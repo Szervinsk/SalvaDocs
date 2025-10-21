@@ -24,26 +24,8 @@ export const SegmentedControl = ({ options, activeOption, setActiveOption, onSel
   </div>
 );
 
-function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos }) {
+function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos, handleScrollTo, modelosRef, tagsRef, pastasRef, dashboardRef}) {
   const [activeOption, setActiveOption] = useState("Dashboard");
-
-  const dashboardRef = useRef(null);
-  const tagsRef = useRef(null);
-  const modelosRef = useRef(null);
-  const pastasRef = useRef(null);
-
-  const handleScrollTo = (area) => {
-    const refs = {
-      Dashboard: dashboardRef,
-      Tags: tagsRef,
-      Modelos: modelosRef,
-      Pastas: pastasRef,
-    };
-    const ref = refs[area];
-    if (ref?.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   return (
     <main className="models-page">

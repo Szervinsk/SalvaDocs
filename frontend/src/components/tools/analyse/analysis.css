@@ -82,17 +82,16 @@
 .step-item.disabled {
   cursor: not-allowed;
 }
-/* A linha que conecta os passos */
 .step-connector {
   position: absolute;
-  top: 36px; /* Começa abaixo do ícone */
-  left: 17px; /* Centralizado no ícone */
+  top: 36px;
+  left: 17px;
   width: 2px;
-  height: calc(100% - 20px); /* Ajuste de altura */
+  height: calc(100% - 20px);
   background-color: var(--color-border);
 }
 .step-item:last-child .step-connector {
-  display: none; /* Esconde o conector do último item */
+  display: none;
 }
 .step-item.completed .step-connector {
   background-color: var(--color-accent);
@@ -200,6 +199,7 @@
 /* ==========================================================================
    4. COMPONENTES DAS ETAPAS
    ========================================================================== */
+
 /* --- 4.1 Seleção de Modelo (Cards) --- */
 .model-grid {
   display: grid;
@@ -208,9 +208,10 @@
   padding-top: var(--spacing-md);
 }
 .model-card {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  height: 175px;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--color-surface);
@@ -225,6 +226,11 @@
   border-color: var(--color-accent);
   box-shadow: var(--box-shadow-light);
 }
+.model-card-content {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
 .model-card__icon {
   display: grid;
   place-items: center;
@@ -233,17 +239,41 @@
   border-radius: var(--border-radius-sm);
   background-color: rgba(89, 125, 255, 0.1);
   color: var(--color-accent);
+  flex-shrink: 0;
 }
 .model-card__info h4 {
   margin: 0 0 4px 0;
   font-size: var(--font-size-h4);
   font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 .model-card__info p {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
+}
+.model-card__edit-btn {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+.model-card:hover .model-card__edit-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+.model-card__edit-btn:hover {
+  background-color: var(--color-background);
+  color: var(--color-accent);
 }
 .empty-state-container {
   display: flex;
@@ -386,7 +416,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   overflow: hidden;
-  overflow-y: auto;
 }
 .setting-row {
   display: flex;
@@ -469,12 +498,10 @@
 }
 
 /* ==========================================================================
-   COMPONENTE: ALTER NAME WITH TAGS
+   5. COMPONENTE: ALTER NAME WITH TAGS
    ========================================================================== */
-
 .alter-name-container {
   display: flex;
-  margin-top: 10px;
   flex-direction: column;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
@@ -493,7 +520,6 @@
   color: var(--color-text-primary);
   transition: all 0.2s ease;
 }
-
 .filename-input:focus {
   outline: none;
   border-color: var(--color-accent);
@@ -511,7 +537,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: 4px 10px;
-  border-radius: 999px; /* Formato de pílula */
+  border-radius: 999px;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-surface);
@@ -520,7 +546,6 @@
   cursor: pointer;
   transition: all 0.15s ease;
 }
-
 .tag-pill-sm:hover {
   transform: translateY(-1px);
   border-color: var(--color-accent);
@@ -529,11 +554,16 @@
 }
 
 /* ==========================================================================
-   5. ANIMAÇÕES
+   6. ANIMAÇÕES
    ========================================================================== */
 .analysis-step-page.shake .dropzone {
   animation: shake 0.5s ease;
 }
+
+.rotating {
+  animation: rotation 2s linear infinite;;
+}
+
 @keyframes shake {
   10%,
   90% {
@@ -551,5 +581,13 @@
   40%,
   60% {
     transform: translateX(4px);
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  } to {
+    transform: rotate(360deg);
   }
 }

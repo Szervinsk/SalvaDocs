@@ -66,6 +66,19 @@ export const MORE_TOOLS = [
   },
 ];
 
+export const UTILS = [
+  {id: 1,
+    name: "Editar",
+    icon: <Icons.EditNote size={20} />,
+    tool: 6
+  },
+  {id: 2,
+    name: "Deletar",
+    icon: <Icons.Delete size={20} />,
+    tool: 6
+  },
+]
+
 // Pastas iniciais
 export const PASTAS = [
   { id: 1, name: "Despacho", color: "#f44336" }, // vermelho

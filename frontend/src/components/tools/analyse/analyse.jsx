@@ -35,6 +35,7 @@ export function AnalyseDoc({
   tags,
   baseURL,
   pastas,
+  handleScrollTo,
 }) {
 
   const goToEtapa = (targetId) => {
@@ -83,6 +84,7 @@ export function AnalyseDoc({
         baseURL={baseURL}
         tags={tags}
         pastas={pastas}
+        handleScrollTo={handleScrollTo}
       />
     </>
   );

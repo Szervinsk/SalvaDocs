@@ -12,6 +12,7 @@ function EditVariables({
   selectedTags,
   setSelectedTags,
   file,
+  modelos,
   setFile,
   erroArquivo,
   setDocSelecionado,
@@ -74,6 +75,7 @@ function EditVariables({
         alterName={alterName}
         setFileName={setFileName}
         limitador={limitador}
+        modelos={modelos}
         setLimitador={setLimitador}
         selectedFolder={selectedFolder}
         setSelectedFolder={setSelectedFolder}

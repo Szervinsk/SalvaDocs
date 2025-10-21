@@ -1,8 +1,7 @@
 import { Icons } from "../../../../constants/icons";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AlterNameWithTags from "./alterName";
-import axios from "axios"; // Import axios se ainda não estiver importado
 
 // --- Sub-componente reutilizável para cada linha de configuração ---
 const SettingRow = ({ icon, title, description, control }) => (
@@ -27,11 +26,13 @@ function EditExit({
   setFileName,
   selectedTags,
   tags,
+  modelos,
   selectedModel,
   erroArquivo,
   pastas,
   selectedFolder,
   setSelectedFolder,
+
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
@@ -140,7 +141,7 @@ function EditExit({
         <AnimatePresence>
           {alterName && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="alter-name-wrapper">
-              <AlterNameWithTags selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName} tags={tags}/>
+              <AlterNameWithTags selectedTags={selectedTags} selectedModel={selectedModel} setFileName={setFileName} tags={tags} modelos={modelos}/>
             </motion.div>
           )}
         </AnimatePresence>

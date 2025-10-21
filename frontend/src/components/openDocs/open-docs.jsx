@@ -195,13 +195,10 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizar
   };
 
   const handleDownload = () => {
-    const fileUrl = `${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`;
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.setAttribute('download', docSelecionado.name);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    const downloadUrl = `/documents/download/${docSelecionado.id}`;
+
+    // Acessar esta URL fará o backend forçar o download com o nome correto.
+    window.open(downloadUrl, '_blank');
   };
 
   const { titleTag, summaryTags, signatoryTag, listTags, dataTags } = useTagCategorization(docSelecionado?.tags);
@@ -221,7 +218,7 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizar
         <Header doc={docSelecionado} onClose={onClose} onDelete={handleDelete} />
 
         <div className="od-content-wrapper">
-          <main className="od-main-content" style={{width: !visualizarPDF ? "100%" : ""}}>
+          <main className="od-main-content" style={{ width: !visualizarPDF ? "100%" : "" }}>
 
             {/* 1. Título (da categoria 'title') */}
             <section className="od-title-section">
@@ -254,15 +251,17 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose, visualizar
 
           </main>
 
-          {/* <header className="od-viewer-header">
-              <p>{docSelecionado.name}</p>
-              <button className="icon-button" onClick={handleDownload} title="Baixar PDF">
-                <Icons.Download size={16} />
-              </button>
-            </header> */}
 
           {visualizarPDF && (
             <aside className="od-pdf-viewer">
+
+              <header className="od-viewer-header">
+                <p>{docSelecionado.name}</p>
+                <button className="icon-button" onClick={handleDownload} title="Baixar PDF">
+                  <Icons.Download size={16} />
+                </button>
+              </header>
+
               <div className="od-pdf-frame">
                 <iframe
                   src={`${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(/\\/g, '/')}`}

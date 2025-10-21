@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icons } from "../../constants/icons";
 import SearchBar from "../bars/searchBar/searchbar";
 import axios from "axios";
@@ -9,11 +9,22 @@ import EditEtapas from "./editContents/edit-etapas";
 // ==========================================================================
 // SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO
 // ==========================================================================
-const ModelSelectionScreen = ({ modelos, onModelSelect, searchQuery, setSearchQuery }) => {
+const ModelSelectionScreen = ({ modelos, onModelSelect, searchQuery, setSearchQuery, setTool, handleScrollTo }) => {
+  // Estado removido: const [showEditIcon, setShowEditIcon] = useState(null);
+
   // Filtra os modelos em tempo real com base na busca do usuário
   const filteredModelos = modelos.filter(model =>
     model.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Função para parar a propagação e navegar para a edição
+  const handleEditClick = (e, modelName) => {
+    e.stopPropagation(); // Impede que o clique no ícone selecione o modelo
+    setTool(3);
+    handleScrollTo("Modelos");
+    // Futuramente, você pode passar o modelName para a página de gerenciamento
+    // para que ela já abra este modelo para edição.
+  };
 
   return (
     <div className="model-selection-page">
@@ -33,22 +44,31 @@ const ModelSelectionScreen = ({ modelos, onModelSelect, searchQuery, setSearchQu
       {filteredModelos.length > 0 ? (
         <div className="model-grid">
           {filteredModelos.map((model) => (
-            <div
+            <button
               key={model.id}
               className="model-card"
               onClick={() => onModelSelect(model)}
+              title={model.description || `Selecionar modelo ${model.name}`}
             >
-              <div className="flex-row space-between">
+              <div className="model-card-content">
                 <div className="model-card__icon">
                   <Icons.ScannerDocument size={24} />
                 </div>
-                <p>{model.tagsBase.length} tags</p>
+                <div className="model-card__info">
+                  <h4>{model.name}</h4>
+                  <p>{model.tagsBase?.length || 0} tags</p>
+                </div>
               </div>
-              <div className="model-card__info">
-                <h4>{model.name}</h4>
-                <p>{model.description || "Modelo para extração de dados."}</p>
-              </div>
-            </div>
+              
+              {/* Este ícone agora é controlado puramente por CSS */}
+              <button 
+                className="model-card__edit-btn" 
+                title={`Editar ${model.name}`}
+                onClick={(e) => handleEditClick(e, model.name)}
+              >
+                <Icons.EditNote size={18} />
+              </button>
+            </button>
           ))}
         </div>
       ) : (
@@ -87,6 +107,7 @@ function AnalysisPage({
   setDocSelecionado,
   setDocumentos,
   setTool,
+  handleScrollTo, // Recebendo a função do EditModels
 
   // Props de controle de UI
   erroArquivo,
@@ -114,27 +135,20 @@ function AnalysisPage({
   };
 
   // Função chamada ao clicar em um card de modelo.
-  // Ela busca as tags associadas àquele modelo e define os estados.
   const handleModelSelection = async (model) => {
     try {
-      // Busca os detalhes do modelo, incluindo as tags associadas
       const response = await axios.get(`/modelos/${model.id}`);
       const tagsDoModelo = response.data.tagsBase || [];
-
-      // Extrai apenas os IDs das tags e define o estado
       const idsDasTagsDoModelo = tagsDoModelo.map(tag => tag.id);
       setSelectedTags(idsDasTagsDoModelo);
-
-      // Define o modelo selecionado, o que troca a visualização para a tela de edição
       setSelectedModel(model);
-
     } catch (error) {
       console.error("Erro ao buscar as tags do modelo:", error);
       showAlert("error", `Não foi possível carregar as tags para o modelo ${model.name}.`);
     }
   };
 
-  // Renderização condicional: ou mostra a tela de seleção, ou a tela de edição
+  // Renderização condicional
   return (
     selectedModel ? (
       // --- TELA 2: Editor de Análise ---
@@ -158,6 +172,7 @@ function AnalysisPage({
             setTool={setTool}
             user={user}
             pastas={pastas}
+            modelos={modelos}
           />
         </div>
         <div className="analysis-editor__sidebar">
@@ -179,6 +194,8 @@ function AnalysisPage({
         onModelSelect={handleModelSelection}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        setTool={setTool}
+        handleScrollTo={handleScrollTo}
       />
     )
   );

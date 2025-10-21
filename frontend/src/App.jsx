@@ -277,6 +277,8 @@ function App() {
               loading={loading}
               docSelecionado={docSelecionado}
               setDocSelecionado={setDocSelecionado}
+              onDataChange={refreshData}
+              showAlert={showAlert}
             />
           )}
           <Block
