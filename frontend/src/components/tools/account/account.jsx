@@ -3,7 +3,7 @@ import { Icons } from "../../../constants/icons";
 import "./account.css";
 import axios from "axios";
 
-function Account({ user, onUserUpdate, onLogout, showAlert }) {
+function Account({ user, onUserUpdate, onLogout, showAlert, onDataChange }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || "",
@@ -58,6 +58,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert }) {
       onUserUpdate(response.data);
       setIsEditing(false);
       showAlert("success", "Perfil atualizado com sucesso!");
+      onDataChange();
     } catch (err) {
       console.error("Erro ao atualizar perfil:", err);
       showAlert("error", err.response?.data?.error || "Não foi possível atualizar o perfil.");
@@ -155,7 +156,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert }) {
               )}
               <div className="info-row--action">
                 <span>Altere sua senha para manter sua conta segura.</span>
-                <button type="button" className="btn-secondary">Alterar Senha</button>
+                <button type="button" className="btn-secondary" onClick={()=> showAlert("warning", "Feature ainda não implementada!")}>Alterar Senha</button>
               </div>
               <div className="info-row--action">
                 <span>Veja o tour de boas-vindas novamente.</span>

@@ -55,7 +55,7 @@ export async function extractDataWithGemini(iaTags, text, userApiKey = null) {
 
   let activeGenAI;
 
-  // ✨ AJUSTE PRINCIPAL: ESCOLHE QUAL CHAVE USAR ✨
+  // verifica se a chave está aí
   if (userApiKey) {
     // Se o usuário forneceu uma chave, cria uma instância específica para ele.
     activeGenAI = new GoogleGenerativeAI(userApiKey);

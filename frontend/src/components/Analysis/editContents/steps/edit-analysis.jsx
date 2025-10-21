@@ -128,7 +128,7 @@ function EditAnalise({
         <button className="btn-primary" style={{width: "200px"}} onClick={handleSubmit} disabled={loading}>
           {loading ? (
             <>
-              <Icons.Spinner size={16} className="spinner" /> {/* Supondo que você tenha um ícone de spinner */}
+              <Icons.Spinner size={16} className="spinner rotating" /> 
               Analisando...
             </>
           ) : (

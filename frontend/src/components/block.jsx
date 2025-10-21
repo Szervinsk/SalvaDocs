@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icons } from "../constants/icons";
 import { ETAPAS } from "../constants/constants";
 import { AnimatePresence } from "framer-motion";
@@ -86,6 +86,25 @@ function Block({
     return false;
   };
 
+  const dashboardRef = useRef(null);
+  const tagsRef = useRef(null);
+  const modelosRef = useRef(null);
+  const pastasRef = useRef(null);
+
+  // função do editmodelos para rolar diretamente para o campo
+  const handleScrollTo = (area) => {
+    const refs = {
+      Dashboard: dashboardRef,
+      Tags: tagsRef,
+      Modelos: modelosRef,
+      Pastas: pastasRef,
+    };
+    const ref = refs[area];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   // Função que decide qual componente de ferramenta renderizar
   const handleSelectTool = (id) => {
     switch (id) {
@@ -123,7 +142,7 @@ function Block({
             user={user}
             setTool={setTool}
             tags={tags}
-          
+            handleScrollTo={handleScrollTo}
             setDocumentos={setDocumentos}
             pastas={pastas}
           />
@@ -140,7 +159,11 @@ function Block({
             setPastas={setPastas}
             onDataChange={onDataChange}
             showAlert={showAlert}
-          
+            handleScrollTo={handleScrollTo}
+            modelosRef={modelosRef}
+            tagsRef={tagsRef}
+            pastasRef={pastasRef}
+            dashboardRef={dashboardRef}
           />
         );
       case 4:
@@ -159,7 +182,7 @@ function Block({
         );
       case 5:
         return <Account user={user} onUserUpdate={setUser}
-          onLogout={onLogout} showAlert={showAlert} />;
+          onLogout={onLogout} showAlert={showAlert} onDataChange={onDataChange} />;
       case 6:
         return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} />;
       case 7:
@@ -211,6 +234,7 @@ function Block({
               onClose={() => setDocSelecionado(null)}
               visualizarPDF={visualizarPDF}
               setVisualizarPDF={setVisualizarPDF}
+              onDataChange={onDataChange}
             />
           )}
         </AnimatePresence>

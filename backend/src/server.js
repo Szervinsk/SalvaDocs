@@ -11,6 +11,7 @@ import fs from "fs"; // Importe o 'fs' para ler o arquivo de tags
 import { sequelize } from "./models/index.js";
 import models from "./models/index.js";
 import apiRoutes from "./routes/api.js";
+import { populateDatabase } from "./scripts/seedLogic.js"; // Importa a lógica central
 
 dotenv.config();
 const app = express();
@@ -46,14 +47,14 @@ app.use("/api", apiRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// ✨ FUNÇÃO DE SEED (LÓGICA DO SEU seed.js, MAS SEGURA) ✨
+// FUNÇÃO DE SEED (AGORA MUITO MAIS LIMPA E SEGURA)
 async function runInitialSeed() {
   try {
     console.log(
       "\n[Seed] Verificando se o banco de dados precisa ser populado..."
     );
 
-    // Verifica se já existem dados para não popular novamente
+    // Verifica se já existem dados (ex: Pastas) para não popular novamente
     const folderCount = await models.Folder.count();
     if (folderCount > 0) {
       console.log(
@@ -64,46 +65,8 @@ async function runInitialSeed() {
 
     console.log("[Seed] Banco de dados vazio. Iniciando a população...");
 
-    // 1. Cria as Pastas Padrão
-    const pastasData = [
-      { name: "Despachos" },
-      { name: "Relatórios Gerais" },
-      { name: "Documentos Internos" },
-    ];
-    await models.Folder.bulkCreate(pastasData);
-    console.log("✅ Pastas criadas!");
-
-    // 2. Cria os Modelos Padrão
-    const [despacho] = await models.Modelo.upsert({ name: "Despacho" });
-    const [parecer] = await models.Modelo.upsert({ name: "Parecer" });
-    const [programa] = await models.Modelo.upsert({ name: "Programa" });
-    console.log("✅ Modelos criados!");
-
-    // 3. Cria as Tags e Associa aos Modelos
-    // O caminho precisa ser relativo ao local onde o script está rodando
-    const tagsPath = path.resolve(__dirname, "constants/tags.json");
-    if (fs.existsSync(tagsPath)) {
-      const tagsJSON = JSON.parse(fs.readFileSync(tagsPath, "utf8"));
-      for (const t of tagsJSON) {
-        const [tag] = await models.TagBase.findOrCreate({
-          where: { name: t.name },
-          defaults: t,
-        });
-        if (t.category?.toLowerCase() === "despacho")
-          await despacho.addTagsBase(tag);
-        if (t.category?.toLowerCase() === "parecer")
-          await parecer.addTagsBase(tag);
-        if (t.category?.toLowerCase() === "programa")
-          await programa.addTagsBase(tag);
-      }
-      console.log("✅ Tags criadas e associadas!");
-    } else {
-      console.warn(
-        "[Seed] Aviso: arquivo 'tags.json' não encontrado. As tags não foram populadas."
-      );
-    }
-
-    console.log("\n🏁 Processo de seed inicial concluído com sucesso!");
+    // Chama a lógica de população centralizada
+    await populateDatabase();
   } catch (err) {
     console.error("❌ Erro durante o processo de seed inicial:", err);
   }
@@ -113,11 +76,11 @@ async function start() {
   try {
     console.log("Verificando e sincronizando o banco de dados...");
 
-    // sequelize.sync() cria as tabelas SE ELAS NÃO EXISTIREM (seguro)
+    // sequelize.sync() cria as tabelas SE ELAS NÃO EXISTIREM (seguro, não destrutivo)
     await sequelize.sync();
     console.log("Banco de dados sincronizado com sucesso!");
 
-    // ✨ CHAMA A FUNÇÃO DE SEED APÓS SINCRONIZAR ✨
+    // Chama a função de seed APÓS sincronizar
     await runInitialSeed();
 
     app.listen(PORT, () =>

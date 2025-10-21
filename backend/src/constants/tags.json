@@ -63,6 +63,14 @@
     "category": "despacho",
     "displayCategory": "data"
   },
+ {
+    "name": "Gdoc SEI",
+    "icon": "Archive",
+    "type": "Regex",
+    "regex": "\\b(?:GDOC|Doc\\. Id\\.|Doc\\. SEI\\/GDF)\\s*(?:n[º°]?\\s*)?(\\d{6,}|\\d+\\/\\d{4})\\b",
+    "category": "despacho",
+    "displayCategory": "data"
+  },
   {
     "name": "Data",
     "icon": "Calendar",
@@ -114,8 +122,8 @@
   {
     "name": "Número da Norma",
     "icon": "Number",
-    "type": "regex",
-    "regex": "\\b(?:Norma|Portaria|Resolução|Decreto)\\s*(?:N[º°]?)?\\s*([\\d.\\/]+)",
+    "type": "Regex",
+    "regex": "\\b(?:Nora|Portaria|Resolução|Decreto)\\s*(?:N[º°]?)?\\s*([\\d.\\/]+)",
     "category": "norma",
     "displayCategory": "data"
   },
@@ -146,7 +154,7 @@
   {
     "name": "Origem",
     "icon": "Send",
-    "type": "regex",
+    "type": "Regex",
     "regex": "\\b(?:De|Origem)\\s*[:\\-]?\\s*(.+?)(?:\\n|Para:|À:)",
     "category": "despacho",
     "displayCategory": "data"

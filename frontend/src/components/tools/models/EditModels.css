@@ -51,7 +51,7 @@
   padding-bottom: var(--spacing-xl);
   border-bottom: 1px solid var(--color-border);
   /* Deixa um espaço no topo ao rolar, para não esconder o título sob a barra de abas */
-  scroll-margin-top: 100px;
+  scroll-margin-bottom: 300px;
 }
 .models-section:last-child {
   border-bottom: none;
