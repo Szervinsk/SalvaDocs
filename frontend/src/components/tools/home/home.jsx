@@ -1,56 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "../../../constants/icons";
 import "./home.css";
 import SearchBar from "../../bars/searchBar/searchbar";
+import Dashboard from "../../tools/models/dashboard"
 
 // ==========================================================================
-// SUB-COMPONENTES PARA CADA ABA
+// SUB-COMPONENTE: TABELA DE DOCUMENTOS (AGORA COM STATUS E PROGRESSO)
 // ==========================================================================
-
-// --- ABA 1: VISÃO GERAL ---
-const VisaoGeral = ({ documentos, setTool, setSelectedModel }) => (
-  <motion.div
-    key="visao-geral"
-    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-    transition={{ duration: 0.3, ease: "easeInOut" }}
-    className="home-section-container"
-  >
-
-    <section className="home-section">
-      <h4>Atalhos Rápidos</h4>
-      <div className="atalhos-container">
-        <div className="atalho-card" onClick={() => setTool(3)}><Icons.Model size={25} /><h5>Gerenciar Conteúdo</h5><p>Edite modelos, tags e pastas.</p></div>
-        <div className="atalho-card" onClick={() => setTool(2)}><Icons.ScannerDocument size={25} /><h5>Analisar Documento</h5><p>Inicie uma nova análise.</p></div>
-        <div className="atalho-card" onClick={() => setTool(4)}><Icons.Adjustments size={25} /><h5>Configurações</h5><p>Personalize sua experiência.</p></div>
-      </div>
-    </section>
-
-    <section className="home-section">
-      <h4>Atividade Recente</h4>
-      <div className="activity-list">
-        {documentos.length > 0 ? (
-          documentos.slice(0, 3).map((doc) => (
-            <div key={doc.id} className="activity-item">
-              <div className="activity-icon"><Icons.Archive size={16} /></div>
-              <div className="activity-content">
-                <p><strong>{doc.templateName || doc.name}</strong> foi analisado</p>
-                <span>{new Date(doc.createdAt).toLocaleString("pt-BR", { dateStyle: 'short', timeStyle: 'short' })}</span>
-              </div>
-            </div>
-          ))
-        ) : <p className="empty-text">Nenhuma atividade recente.</p>}
-      </div>
-    </section>
-  </motion.div>
-);
-
-
-// --- ABA 2: DOCUMENTOS ---
-const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, searchQuery }) => {
+const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, searchQuery, setSearchQuery, filtros, setFiltros }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'descending' });
   const [filterPasta, setFilterPasta] = useState('');
   const [filterModelo, setFilterModelo] = useState('');
+  const [filterStatus, setFilterStatus] = useState(''); // Novo filtro de status
 
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -60,49 +22,103 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
     setSortConfig({ key, direction });
   };
 
-  const sortedAndFilteredDocuments = [...documentos]
-    .filter(doc => {
-      const searchMatch = (doc.templateName || doc.name || "").toLowerCase().includes(searchQuery.toLowerCase());
-      const pastaMatch = filterPasta ? doc.folder?.id === parseInt(filterPasta) : true;
-      const modeloMatch = filterModelo ? doc.model === filterModelo : true;
-      return searchMatch && pastaMatch && modeloMatch;
-    })
-    .sort((a, b) => {
-      const valA = sortConfig.key === 'folder' ? a.folder?.name.toLowerCase() : (a[sortConfig.key] || '').toString().toLowerCase();
-      const valB = sortConfig.key === 'folder' ? b.folder?.name.toLowerCase() : (b[sortConfig.key] || '').toString().toLowerCase();
-      if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
-      if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
-      return 0;
-    });
+  const sortedAndFilteredDocuments = useMemo(() =>
+    [...documentos]
+      .filter(doc => {
+        const searchMatch = (doc.templateName || doc.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+        const pastaMatch = filterPasta ? doc.folder?.id === parseInt(filterPasta) : true;
+        const modeloMatch = filterModelo ? doc.model === filterModelo : true;
+        const statusMatch = filterStatus ? doc.status === filterStatus : true;
+        return searchMatch && pastaMatch && modeloMatch && statusMatch;
+      })
+      .sort((a, b) => {
+        let valA = a[sortConfig.key];
+        let valB = b[sortConfig.key];
+
+        if (sortConfig.key === 'folder') {
+          valA = a.folder?.name || '';
+          valB = b.folder?.name || '';
+        }
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+        if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
+        return 0;
+      })
+    , [documentos, searchQuery, filterPasta, filterModelo, filterStatus, sortConfig]);
+
+  // Componente para o badge de Status
+  const StatusBadge = ({ status }) => (
+    <span className={`status-badge status--${status?.toLowerCase()}`}>{status || "N/A"}</span>
+  );
+
+  // Componente para a barra de progresso das Tags
+  const TagProgress = ({ found, total }) => {
+    const percent = total > 0 ? (found / total) * 100 : 0;
+    return (
+      <div className="tag-progress-cell">
+        <span className="tag-progress-text">{found}/{total}</span>
+        <div className="tag-progress-bar">
+          <div className="tag-progress-fill" style={{ width: `${percent}%` }}></div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <motion.div
       key="listas"
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="list-documents-container"
+      className="content-card-section"
     >
-      <div className="list-filters">
-        <div className="custom-select-wrapper">
-          <select className="custom-select" value={filterPasta} onChange={e => setFilterPasta(e.target.value)}>
-            <option value="">Todas as Pastas</option>
-            {pastas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-        </div>
-        <div className="custom-select-wrapper">
-          <select className="custom-select" value={filterModelo} onChange={e => setFilterModelo(e.target.value)}>
-            <option value="">Todos os Modelos</option>
-            {modelos.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
-          </select>
+      <div className="section-header list-header-top">
+        <h3 className="section-title"><Icons.DocumentText size={18} /> Todos os Documentos</h3>
+        <div className="header-actions">
+          <div className="home-search small-search">
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Buscar documento..." />
+          </div>
+          <button className="section-filter-button" onClick={() => setFiltros((prev) => !prev)}><Icons.Filter size={14} /> {filtros ? "Esconder filtros" : "Exibir filtros"}</button>
         </div>
       </div>
+
+      {filtros && (
+        <>
+
+          <div className="list-filters">
+            <div className="custom-select-wrapper">
+              <select className="custom-select" value={filterPasta} onChange={e => setFilterPasta(e.target.value)}>
+                <option value="">Todas as Pastas</option>
+                {pastas.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <div className="custom-select-wrapper">
+              <select className="custom-select" value={filterModelo} onChange={e => setFilterModelo(e.target.value)}>
+                <option value="">Todos os Modelos</option>
+                {modelos.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
+              </select>
+            </div>
+            <div className="custom-select-wrapper">
+              <select className="custom-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <option value="">Todos os Status</option>
+                <option value="Completo">Completo</option>
+                <option value="Parcial">Parcial</option>
+                <option value="Erro">Erro</option>
+              </select>
+            </div>
+          </div>
+        </>
+      )}
+
       <div className="table-wrapper">
         <table className="documents-table">
           <thead>
             <tr>
-              <th onClick={() => requestSort('templateName')}>Nome</th>
+              <th onClick={() => requestSort('name')}>Nome</th>
               <th onClick={() => requestSort('folder')}>Pasta</th>
-              <th>Tags</th>
+              <th onClick={() => requestSort('status')}>Status</th>
+              <th>Progresso (Tags)</th>
               <th onClick={() => requestSort('createdAt')}>Criado em</th>
               <th>Ações</th>
             </tr>
@@ -110,9 +126,10 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
           <tbody>
             {sortedAndFilteredDocuments.map((doc) => (
               <tr key={doc.id} onClick={() => handleDocumentClick(doc)}>
-                <td className="doc-name">{doc.resolvedTemplate || doc.name}</td>
+                <td className="doc-name">{doc.name}</td>
                 <td>{doc.folder ? <span className="doc-folder">{doc.folder.name}</span> : "-"}</td>
-                <td><span className="tag-count">{doc.tags.length} tags</span></td>
+                <td><StatusBadge status={doc.status} /></td>
+                <td><TagProgress found={doc.tagsFound} total={doc.tagsTotal} /></td>
                 <td>{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</td>
                 <td>
                   <button className="icon-button" onClick={(e) => { e.stopPropagation(); handleDocumentClick(doc); }} title="Ver detalhes">
@@ -136,81 +153,102 @@ function Home({
   user,
   documentos,
   pastas,
+  tags,
   modelos,
+  setArea,
   loading,
   setDocSelecionado,
   setTool,
-  setSelectedModel
+  dataView, 
+  setDataView
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [option, setOption] = useState(1);
+  const [filtros, setFiltros] = useState(false);
 
   const handleDocumentClick = (doc) => {
     setDocSelecionado(prev => (prev?.id === doc.id ? null : doc));
   };
 
-  const getFriendlyDate = () => {
-    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-  };
-
-  const HOME_TYPES = [
-    { id: 1, name: "Visão Geral", icon: <Icons.Home size={16} /> },
-    { id: 2, name: "Documentos", icon: <Icons.DocumentText size={16} /> },
-  ];
-
-  const renderContent = () => {
-    if (loading) {
-      return <div className="loading-container"><p className="loading-text">Carregando informações...</p></div>;
+  const stats = useMemo(() => {
+    return {
+      concluidos: documentos.filter(d => d.status === 'Completo').length,
+      pendentes: documentos.filter(d => d.status === 'Parcial').length,
+      comErro: documentos.filter(d => d.status === 'Erro').length,
     }
-    switch (option) {
-      case 1:
-        return <VisaoGeral documentos={documentos} setTool={setTool} setSelectedModel={setSelectedModel} />;
-      case 2:
-        return <ListaDocumentos
-          documentos={documentos}
-          pastas={pastas}
-          modelos={modelos}
-          handleDocumentClick={handleDocumentClick}
-          searchQuery={searchQuery}
-        />;
-      default:
-        return null;
-    }
-  };
+  }, [documentos]);
 
   return (
     <div className="home-container">
+      {/* 1. BANNER DE NOVIDADES */}
+      <div className="intro-banner">
+        <span className="intro-banner-icon"><Icons.Lamp size={20} /></span>
+        <p className="intro-banner-text">Novidade! Introduzindo o SalvaDocs AI 2.0: Análise 20% mais rápida e precisa. <a href="#">Saiba mais</a></p>
+        <button className="intro-banner-close"><Icons.Close size={16} /></button>
+      </div>
+
+      {/* 2. CABEÇALHO PRINCIPAL */}
       <header className="home-header">
-        <div className="welcome">
-          <div className="account-img"></div>
-          <div>
-            <h2>Olá, {user?.username}!</h2>
-            <h3>{getFriendlyDate()}</h3>
+        <div className="header-left">
+          <div className="welcome">
+            <h1>Documentos</h1>
+            <p className="subtitle">Explore, filtre e gerencie todo o seu histórico de extrações.</p>
           </div>
         </div>
-        {option === 2 && ( // ✨ Corrigido de option === 3 para option === 2 ✨
-          <div className="home-search">
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder="Pesquisar por nome ou pasta..." />
-          </div>
-        )}
+        <div className="header-actions">
+          <button className="action-button primary" onClick={() => setTool(2)}><Icons.Add size={16} /> Nova Análise</button>
+        </div>
       </header>
 
-      <nav className="home-nav">
-        {HOME_TYPES.map((type) => (
-          <button
-            key={type.id}
-            className={`home-nav-btn ${option === type.id ? "active" : ""}`}
-            onClick={() => setOption(type.id)}
-          >
-            {type.icon}
-            <span>{type.name}</span>
-          </button>
-        ))}
+      {/* 3. CARDS DE ESTATÍSTICAS (AGORA DINÂMICOS) */}
+      <nav className="stats-nav">
+        <div className="stats-tabs">
+          <div className="stats-tab-item">
+            <Icons.Check size={16} className="stats-icon status--completo" />
+            <div className="stats-info">
+              <span className="stats-label">Concluídos</span>
+              <span className="stats-value">{stats.concluidos}</span>
+            </div>
+          </div>
+          <div className="stats-tab-item">
+            <Icons.Clock size={16} className="stats-icon status--parcial" />
+            <div className="stats-info">
+              <span className="stats-label">Parciais</span>
+              <span className="stats-value">{stats.pendentes}</span>
+            </div>
+          </div>
+          <div className="stats-tab-item">
+            <Icons.AlertTriangle size={16} className="stats-icon status--erro" />
+            <div className="stats-info">
+              <span className="stats-label">Com Erro</span>
+              <span className="stats-value">{stats.comErro}</span>
+            </div>
+          </div>
+        </div>
+        <div className="stats-analysis-link">
+          <button className="btn-secondary" onClick={() => setDataView((prev) => !prev)}>{dataView ? "Ver tabela de modelos" : "Ver Análise Detalhada"}<Icons.ArrowRight size={14} /></button>
+        </div>
       </nav>
 
+      {/* 4. CONTEÚDO PRINCIPAL (A TABELA) */}
       <main className="home-main">
         <AnimatePresence mode="wait">
-          {renderContent()}
+          {loading ? (
+            <div className="loading-container"><p className="loading-text">Carregando informações...</p></div>
+          ) : (dataView ? (
+            <Dashboard tags={tags} modelos={modelos} documentos={documentos} pastas={pastas} setArea={setArea} />
+          ) : (
+            <ListaDocumentos
+              documentos={documentos}
+              pastas={pastas}
+              modelos={modelos}
+              handleDocumentClick={handleDocumentClick}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filtros={filtros}
+              setFiltros={setFiltros}
+            />
+          )
+          )}
         </AnimatePresence>
       </main>
     </div>
