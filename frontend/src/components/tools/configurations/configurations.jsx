@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Icons } from "../../../constants/icons"; // Certifique-se que o caminho dos ícones está correto
 import "./configurations.css";
 
-function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas, visualizarPDF, setVisualizarPDF, showAlert, setShowAlternativeTools, showAlternativeTools }) {
+function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas, visualizarPDF, setVisualizarPDF, showAlert }) {
   // O estado da fonte foi movido para cá, pois é uma configuração local desta página
   const [fontSize, setFontSize] = useState("16px");
 
@@ -152,19 +152,6 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
               <h3>Visualizar ferramentas ocultas</h3>
               <p>Exibir ou ocultar ferramentas alternativas</p>
             </div>
-          </div>
-          <div className="config-card__control">
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={showAlternativeTools}
-                onChange={() => {
-                  setShowAlternativeTools(!showAlternativeTools)
-                  showAlert("success", "Configuração salva com sucesso!")
-                }}
-              />
-              <span className="slider"></span>
-            </label>
           </div>
         </div>
 

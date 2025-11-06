@@ -1,5 +1,5 @@
 import "./styles/main.css";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import axios from "axios";
 
@@ -33,20 +33,20 @@ function App() {
   const [user, setUser] = useState(null);
   const [tool, setTool] = useState(1);
   const [alert, setAlert] = useState(null);
-  const [loading, setLoading] = useState(true); // Controla o estado inicial de "verificando sessão"
+  const [loading, setLoading] = useState(true);
 
   // Estados de Configuração
   const [darkMode, setDarkMode] = useState(false);
   const [pastasAbertas, setPastasAbertas] = useState(true);
+  const [dataView, setDataView] = useState(false);
+  const [showAlternativeTools, setShowAlternativeTools] = useState(false);
 
-  // Estados de Dados (A FONTE DA VERDADE)
+  // Estados de Dados
   const [selectedModel, setSelectedModel] = useState(null);
   const [docSelecionado, setDocSelecionado] = useState(null);
   const [documentos, setDocumentos] = useState([]);
   const [modelos, setModelos] = useState([]);
   const [pastas, setPastas] = useState([]);
-  const [showAlternativeTools, setShowAlternativeTools] = useState(false);
-
 
   // Estado para aplicar o boas vindas para o usuário
   const [showWelcome, setShowWelcome] = useState(false);
@@ -157,17 +157,36 @@ function App() {
     if (event.shiftKey) {
       event.preventDefault();
       switch (event.key.toUpperCase()) {
-        case 'H': setTool(1); break; // Home
-        case 'A': setTool(2); break; // Analisar
+        case 'H': setTool(1); break; // Home (agora é Analisar)
+        case 'A': setTool(2); break; // Analisar (agora é Relatório)
         case 'G': setTool(3); break; // Gerenciar (EditModels)
+        case 'B': setTool(5); break; // "B"ots (routes)
+        // Atalhos para o modal de conta
         case 'D': setTool(4); break; // "D"efinições (Configurações)
-        case 'E': setTool(5); break; // "E"u (Conta)
-        case 'M': setTool(6); break; // Monitoramento
-        case 'P': setTool(7); break; // Sobre o "P"rojeto
+        case 'E': setTool(6); break; // "E"u (Conta)
+        case 'M': setTool(7); break; // Monitoramento
+        case 'P': setTool(8); break; // Sobre o "P"rojeto
         default: return;
       }
     }
   }, [setTool]);
+
+  // Refs para a rolagem do EditModels
+  const tagsRef = useRef(null);
+  const modelosRef = useRef(null);
+  const pastasRef = useRef(null);
+
+  const handleScrollTo = (area) => {
+    const refs = {
+      Tags: tagsRef,
+      Modelos: modelosRef,
+      Pastas: pastasRef,
+    };
+    const ref = refs[area];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -260,7 +279,7 @@ function App() {
 
       <AnimatePresence>
         {showWelcome && (
-          <Welcome 
+          <Welcome
             onFinish={handleFinishWelcome}
             goToAccount={goToAccountPage}
           />
@@ -268,7 +287,21 @@ function App() {
       </AnimatePresence>
 
       <div className="main-container">
-        <Navbar setTool={setTool} tool={tool} user={user} onLogout={handleLogout} showAlternativeTools={showAlternativeTools} />
+        <Navbar
+          setTool={setTool}
+          tool={tool}
+          user={user}
+          onLogout={handleLogout}
+          showAlternativeTools={showAlternativeTools}
+          setDarkMode={setDarkMode}
+          darkMode={darkMode}
+          dataView={dataView}
+          setDataView={setDataView}
+          tagsRef={tagsRef}
+          modelosRef={modelosRef}
+          pastasRef={pastasRef}
+          handleScrollTo={handleScrollTo} />
+
         <div className="background-block">
           {pastasAbertas && (
             <FoldersAction
@@ -285,14 +318,14 @@ function App() {
             pastas={pastas}
             modelos={modelos}
             documentos={documentos}
-            onDataChange={refreshData}
-            setPastas={setPastas}
-            setModelos={setModelos}
             setDocumentos={setDocumentos}
+            onDataChange={refreshData}
             user={user}
             setUser={setUser}
             tool={tool}
             setTool={setTool}
+            dataView={dataView} // Passa o estado
+            setDataView={setDataView} // Passa o setter
             docSelecionado={docSelecionado}
             setDocSelecionado={setDocSelecionado}
             selectedModel={selectedModel}
@@ -303,8 +336,15 @@ function App() {
             onLogout={handleLogout}
             setPastasAbertas={setPastasAbertas}
             pastasAbertas={pastasAbertas}
-            showAlternativeTools={showAlternativeTools}
-            setShowAlternativeTools={setShowAlternativeTools}
+            loading={loading}
+            onToggleFavorite={() => { }} // Placeholder para a função de favorito
+            favoriteModelIds={[]} // Placeholder para os favoritos
+
+            // Passa as refs de rolagem
+            tagsRef={tagsRef}
+            modelosRef={modelosRef}
+            pastasRef={pastasRef}
+            handleScrollTo={handleScrollTo}
           />
         </div>
       </div>
