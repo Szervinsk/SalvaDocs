@@ -1,4 +1,5 @@
-import fs from "fs";
+import fs from "fs/promises";
+import path from "path";
 import models from "../models/index.js";
 import "dotenv/config";
 import { extractDataFromFile } from "../services/extractService.js";
@@ -13,10 +14,11 @@ function replaceTemplateTags(templateName, tags = []) {
 
   return templateName.replace(/{(.*?)}/g, (_, tagName) => {
     const tag = tags.find(
-      (t) => t.name.toLowerCase() === tagName.toLowerCase() && t.value
+      (t) =>
+        t.name.toLowerCase() === tagName.toLowerCase() &&
+        t.value &&
+        t.value !== "Não encontrado"
     );
-    // Se a tag for encontrada e tiver um valor, use o valor.
-    // Se não, mantenha o placeholder original (ex: {Data}).
     return tag?.value ? tag.value : `{${tagName}}`;
   });
 }
@@ -41,28 +43,29 @@ export const uploadFileAndAnalyze = async (req, res) => {
         .json({ error: "A pasta de destino é obrigatória." });
     }
 
-    // --- 2. Buscar Tags e Extrair Dados PRIMEIRO ---
+    // --- 2. Buscar Tags, Usuário e Extrair Dados PRIMEIRO ---
     const parsedTagIds = req.body.tags ? JSON.parse(req.body.tags) : [];
     const selectedTags = await models.TagBase.findAll({
       where: { id: parsedTagIds },
     });
+
+    const user = await models.User.findByPk(ownerId, {
+      attributes: ["apiKey"],
+    });
+    const userApiKey = user?.apiKey || null;
 
     const extractedData =
       (await extractDataFromFile(req.file.path, selectedTags)) || {};
     const iaTags = selectedTags.filter((t) => t.type === "IA");
     const regexTags = selectedTags.filter((t) => t.type === "Regex");
 
-    // Este array conterá os OBJETOS das tags com seus valores preenchidos
     const allTagInstancesData = [];
+    let tagsFoundCount = 0;
+    let hasError = false;
 
     // Processamento de IA
     if (iaTags.length > 0) {
       try {
-        const user = await models.User.findByPk(ownerId, {
-          attributes: ["apiKey"],
-        });
-        const userApiKey = user?.apiKey || null;
-
         const geminiResults = await extractDataWithGemini(
           iaTags,
           extractedData.text || "",
@@ -73,6 +76,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
           let value = geminiResults[tag.name] ?? null;
           if (value && typeof value === "object")
             value = JSON.stringify(value, null, 2);
+          if (value) tagsFoundCount++; // Conta como encontrada
           allTagInstancesData.push({
             name: tag.name,
             value,
@@ -83,6 +87,7 @@ export const uploadFileAndAnalyze = async (req, res) => {
         }
       } catch (err) {
         console.error("Erro no processamento Gemini:", err.message);
+        hasError = true;
         iaTags.forEach((tag) =>
           allTagInstancesData.push({
             name: tag.name,
@@ -100,39 +105,51 @@ export const uploadFileAndAnalyze = async (req, res) => {
       const extracted = (extractedData.tags || []).find(
         (t) => t.name === tag.name
       );
+      const value = extracted?.value || null; // Valor é null se não for encontrado
+
+      if (value) tagsFoundCount++; // Conta como encontrada
+
       allTagInstancesData.push({
         name: tag.name,
-        value: extracted?.value || "Não encontrado", // Usar "Não encontrado" como padrão
+        value: value || "Não encontrado",
         type: "Regex",
         icon: tag.icon,
         displayCategory: tag.displayCategory,
       });
     }
 
-    // --- 3. Resolver o Nome do Arquivo ---
-    // Usa os dados extraídos em 'allTagInstancesData' para preencher o templateName
+    // --- 3. Resolver o Nome do Arquivo e Status ---
     const resolvedName =
       replaceTemplateTags(templateName, allTagInstancesData) ||
       req.file.originalname;
 
-    // --- 4. Criar o Documento no Banco (AGORA com o nome correto) ---
+    const tagsTotal = selectedTags.length;
+    let documentStatus = "Parcial";
+    if (hasError) {
+      documentStatus = "Erro";
+    } else if (tagsTotal > 0 && tagsFoundCount === tagsTotal) {
+      documentStatus = "Completo";
+    }
+
+    // --- 4. Criar o Documento no Banco ---
     const document = await models.Document.create({
-      name: resolvedName, 
+      name: resolvedName,
       path: `uploads/${req.file.filename}`,
       size: req.file.size,
       model: model || "Desconhecido",
-      templateName: templateName || null, // Salva o "molde" (ex: "Despacho {Data}.pdf")
+      templateName: templateName || null,
       ownerId: ownerId,
       folderId: folderId,
+      status: documentStatus,
+      tagsTotal: tagsTotal,
+      tagsFound: tagsFoundCount,
     });
 
     // --- 5. Salvar as Instâncias de Tags ---
-    // Adiciona o ID do documento recém-criado a cada instância de tag
     const tagsToCreate = allTagInstancesData.map((tag) => ({
       ...tag,
       documentId: document.id,
     }));
-
     if (tagsToCreate.length > 0) {
       await models.TagInstance.bulkCreate(tagsToCreate);
     }
@@ -144,8 +161,6 @@ export const uploadFileAndAnalyze = async (req, res) => {
         { model: models.Folder, as: "folder" },
       ],
     });
-
-    // Adiciona o resolvedTemplate na resposta para consistência com o frontend
     const docJson = documentoCompleto.toJSON();
     docJson.resolvedTemplate = resolvedName;
 
@@ -154,9 +169,14 @@ export const uploadFileAndAnalyze = async (req, res) => {
       document: docJson,
     });
   } catch (err) {
-    console.error("Erro geral no upload e análise:", err.message);
-    if (req.file?.path && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    console.error("Erro geral no upload e análise:", err);
+    // ✨ AJUSTE 3: Usa fs.unlink assíncrono ✨
+    if (req.file?.path) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkErr) {
+        console.error("Erro ao apagar arquivo órfão:", unlinkErr.message);
+      }
     }
     return res.status(500).json({ error: "Erro ao processar o arquivo." });
   }
@@ -164,11 +184,24 @@ export const uploadFileAndAnalyze = async (req, res) => {
 
 /**
  * ROTA: GET /api/documents
- * DESCRIÇÃO: Retorna todos os documentos com suas tags e pastas associadas.
  */
 export const getAllDocuments = async (req, res) => {
   try {
     const documentos = await models.Document.findAll({
+      attributes: [
+        "id",
+        "name",
+        "path",
+        "size",
+        "model",
+        "templateName",
+        "ownerId",
+        "folderId",
+        "createdAt",
+        "status",
+        "tagsTotal",
+        "tagsFound",
+      ],
       include: [
         {
           model: models.TagInstance,
@@ -193,8 +226,6 @@ export const getAllDocuments = async (req, res) => {
 
     const documentosComTemplate = documentos.map((doc) => {
       const docJson = doc.toJSON();
-      // O campo 'name' já é o nome resolvido. Mas o 'templateName' é o molde.
-      // O frontend espera 'resolvedTemplate', então vamos usar o 'name' que já está pronto.
       docJson.resolvedTemplate = docJson.name;
       return docJson;
     });
@@ -208,9 +239,9 @@ export const getAllDocuments = async (req, res) => {
   }
 };
 
-//  ROTA: GET /api/documents/download/:id
-//  DESCRIÇÃO: Força o download de um arquivo com seu nome amigável.
- 
+/**
+ * ROTA: GET /api/documents/download/:id
+ */
 export const downloadDocument = async (req, res) => {
   try {
     const documentId = req.params.id;
@@ -220,22 +251,20 @@ export const downloadDocument = async (req, res) => {
       return res.status(404).json({ error: "Documento não encontrado" });
     }
 
-    // Pega o caminho FÍSICO do arquivo no disco
-    const filePath = path.resolve(document.path); 
+    const filePath = path.resolve(document.path);
+    const downloadName = document.name;
 
-    if (fs.existsSync(filePath)) {
-      // Pega o nome AMIGÁVEL salvo no banco (o resolvedName)
-      const downloadName = document.name; 
-
-      // res.download() envia o arquivo e define o cabeçalho 'Content-Disposition'
-      // Isso FORÇA o navegador a baixar o arquivo com o nome que você definir.
+    try {
+      await fs.access(filePath); // Verifica se o arquivo existe
       res.download(filePath, downloadName, (err) => {
         if (err) {
           console.error("Erro ao enviar o arquivo:", err);
         }
       });
-    } else {
-      res.status(404).json({ error: "Arquivo físico não encontrado no servidor." });
+    } catch (fileErr) {
+      res
+        .status(404)
+        .json({ error: "Arquivo físico não encontrado no servidor." });
     }
   } catch (err) {
     console.error("Erro ao processar download:", err);
@@ -245,7 +274,7 @@ export const downloadDocument = async (req, res) => {
 
 /**
  * ROTA: DELETE /api/documents/:id
- * DESCRIÇÃO: Deleta um documento, suas tags e o arquivo físico do servidor. */
+ */
 export const deleteDoc = async (req, res) => {
   try {
     const documentId = req.params.id;
@@ -258,27 +287,22 @@ export const deleteDoc = async (req, res) => {
     if (document.path) {
       try {
         const filePath = path.resolve(document.path);
-        await fs.access(filePath); // Verifica se o arquivo existe
-        await fs.unlink(filePath); // Deleta o arquivo
+        await fs.access(filePath);
+        await fs.unlink(filePath);
         console.log(`Arquivo físico ${filePath} deletado com sucesso.`);
       } catch (fileErr) {
-        // Se o arquivo não existir ou der erro, apenas registra no log
-        // mas NÃO impede a exclusão do registro do banco de dados.
-        console.warn(`Aviso: Não foi possível deletar o arquivo ${document.path}. Erro: ${fileErr.message}`);
+        console.warn(
+          `Aviso: Não foi possível deletar o arquivo ${document.path}. Erro: ${fileErr.message}`
+        );
       }
     }
 
-    // A exclusão em cascata (onDelete: 'CASCADE' no model TagInstance)
-    // deve cuidar de apagar as tags. Esta linha é uma garantia extra.
     await models.TagInstance.destroy({ where: { documentId } });
-    
-    // Deleta o documento do banco
     await document.destroy();
 
     return res
       .status(200)
       .json({ message: "Documento e arquivo apagados com sucesso" });
-      
   } catch (err) {
     console.error("Erro ao apagar documento:", err);
     return res.status(500).json({ error: "Erro ao apagar documento" });

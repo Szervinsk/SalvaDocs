@@ -8,9 +8,6 @@ import { AiOutlineHome, AiOutlineReload, AiOutlineCloseCircle } from "react-icon
 // BoxIcons (bi)
 import { BiSolidBusiness } from "react-icons/bi";
 
-// Bootstrap Icons (bs)
-import { SlGraph } from "react-icons/sl";
-
 import { IoMdKey } from "react-icons/io";
 
 // Phosphor Icons (pi)
@@ -20,7 +17,7 @@ import { PiSpinnerGapBold } from "react-icons/pi";
 import { GrScorecard } from "react-icons/gr";
 
 // Font Awesome (fa)
-import { FaCheck, FaClockRotateLeft, FaPenNib, FaQuestion, FaRegFolder, FaRegLightbulb, FaTags, FaTrash } from "react-icons/fa6";
+import { FaCheck, FaClockRotateLeft, FaPenNib, FaQuestion, FaRegFolder, FaRegLightbulb, FaTags, FaTrash, FaRegStar } from "react-icons/fa6";
 
 // Feather (fi)
 import { FiFileText, FiSend, FiSun, FiMoon, FiCheckCircle, FiAlertTriangle, FiInfo, FiUploadCloud, FiArrowLeft, FiArrowRight, FiEye, FiEyeOff, FiCode, FiDownload } from "react-icons/fi"; // Adicionados CheckCircle, AlertTriangle, Info
@@ -39,10 +36,12 @@ import { IoAdd, IoClose, IoRocketOutline } from "react-icons/io5";
 import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutDashboard, LuTextSearch , LuClipboard} from "react-icons/lu";
 
 // Material Design (md)
-import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt , MdAlternateEmail } from "react-icons/md";
+import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt , MdAlternateEmail, MdFilterAlt ,MdOutlineDataUsage} from "react-icons/md";
 
 // Phosphor Icons (pi)
 import { PiArchive, PiChartPie, PiFilePdf, PiListChecks } from "react-icons/pi";
+
+import { RiRobot2Line } from "react-icons/ri";
 
 // Tabler Icons (tb)
 import { TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
@@ -61,6 +60,7 @@ export const Icons = {
   // ============================
   Home: AiOutlineHome,
   Dashboard: LuLayoutDashboard,
+  Bot: RiRobot2Line,
   BackIn: TbLayoutSidebarRight,
   DoorOpen: LuDoorOpen,
   ArrowDown: IoIosArrowDown,
@@ -86,6 +86,8 @@ export const Icons = {
   MoreHorizontal: MdOutlineMoreHoriz,
   Eye: FiEye,
   EyeOff: FiEyeOff,
+  Star: FaRegStar,
+
 
   // ============================
   // Feedback e Status
@@ -123,6 +125,7 @@ export const Icons = {
   Model: LuLayoutDashboard,
   Code: FiCode,
   Clipboard: LuClipboard,
+  Filter: MdFilterAlt,
   
   // Modelos Específicos (Pranchetas)
   Despacho: HiOutlineClipboardDocument,
@@ -136,7 +139,7 @@ export const Icons = {
   TextSearch: LuTextSearch,
   FileSearch: LuFileSearch,
   ChartPie: PiChartPie,
-  Graphics: SlGraph,
+  Graphics: MdOutlineDataUsage,
   Rocket: IoRocketOutline,
   Spinner: PiSpinnerGapBold,
   

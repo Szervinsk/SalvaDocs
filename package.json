@@ -31,6 +31,10 @@
       {
         "from": "backend/node_modules",
         "to": "app/backend/node_modules"
+      },
+      {
+        "from": "backend/bots",
+        "to": "app/backend/bots"
       }
     ],
     "directories": {

@@ -9,7 +9,7 @@
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
   background-color: var(--color-background);
-  overflow: hidden; /* A rolagem agora é controlada pelo filho */
+  overflow: hidden; /* A rolagem é controlada pelo filho */
 }
 
 .models-page__header h1 {
@@ -44,23 +44,30 @@
   scroll-behavior: smooth; /* Habilita a rolagem suave */
   min-height: 0;
 }
+/* Esconde a barra de rolagem */
+.models-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+.models-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-/* Estilo para cada seção principal */
+/* Estilo para cada seção principal (Dashboard, Tags, Modelos, Pastas) */
 .models-section {
-  padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--color-border);
   /* Deixa um espaço no topo ao rolar, para não esconder o título sob a barra de abas */
-  scroll-margin-bottom: 300px;
+  scroll-margin-top: 100px;
 }
-.models-section:last-child {
-  border-bottom: none;
-}
+
 .models-section__title {
   font-size: var(--font-size-h3);
   margin-bottom: var(--spacing-lg);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 /* ==========================================================================
@@ -96,6 +103,7 @@
 }
 
 .segmented-control__button.active {
+  /* O 'active' não é mais usado na rolagem, mas mantemos o estilo */
   background-color: var(--color-accent);
   color: var(--color-surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -107,33 +115,35 @@
 .dashboard-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  align-items: center;
 }
 
-.charts-row {
+.stats-row {
   display: flex;
   gap: var(--spacing-lg);
   flex-direction: row;
+  padding: var(--spacing-sm);
+}
+
+.stats-analysis-percent {
+  font-weight: 100;
+  color: var(--color-text-secondary)
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  width: 260px;
   gap: var(--spacing-md);
+  min-width: 200px;
   padding: var(--spacing-md);
   background-color: var(--color-surface);
   border: var(--border-width-sm) solid var(--color-border);
   border-radius: var(--border-radius-md);
   transition: all 0.2s ease;
 }
-
 .stat-card:hover {
   transform: translateY(-4px);
   border-color: var(--color-accent);
 }
-
 .stat-card__icon {
   display: grid;
   place-items: center;
@@ -144,7 +154,6 @@
   color: var(--color-accent);
   border-radius: 50%;
 }
-
 .stat-card__info {
   display: flex;
   flex-direction: column;
@@ -159,21 +168,24 @@
   color: var(--color-text-secondary);
 }
 
+.charts-row {
+  margin-block: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
 .chart-card {
   grid-column: 1 / -1;
   padding: var(--spacing-lg);
-  width: 400px;
   background-color: var(--color-surface);
   border: var(--border-width-sm) solid var(--color-border);
   border-radius: var(--border-radius-md);
 }
-
 .chart-card h4 {
   margin: 0 0 var(--spacing-lg) 0;
   font-size: var(--font-size-h4);
 }
 
-/* --- Gráfico de Barras --- */
 .bar-chart {
   display: flex;
   gap: var(--spacing-lg);
@@ -208,7 +220,6 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* --- Gráfico de Pizza --- */
 .pie-chart-container {
   display: flex;
   align-items: center;
@@ -259,24 +270,32 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  /* ✨ NOVO: Estilo de card para cada seção de gerenciamento ✨ */
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
 }
 
 .manager-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .manager-header h2 {
   margin: 0;
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
 }
 
 .table-wrapper {
   overflow-x: auto;
-  border: var(--border-width-sm) solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--color-surface);
+  border: none; /* A borda agora está no .manager-container */
+  border-radius: 0;
+  background-color: transparent;
 }
 
 .data-table {
@@ -285,16 +304,16 @@
 }
 .data-table th,
 .data-table td {
-  padding: 12px var(--spacing-md);
+  padding: 12px 0;
   text-align: left;
   border-bottom: var(--border-width-sm) solid var(--color-border);
   white-space: nowrap;
 }
+.data-table tr:last-child td {
+  border-bottom: none;
+}
 .data-table thead {
-  background-color: var(--color-background);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background-color: transparent;
 }
 .data-table th {
   font-size: var(--font-size-xs);
@@ -308,6 +327,16 @@
 .data-table .actions-cell {
   display: flex;
   gap: var(--spacing-sm);
+}
+
+/* Remove o padding da primeira e última coluna para alinhar com o card */
+.data-table th:first-child,
+.data-table td:first-child {
+  padding-left: 0;
+}
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 0;
 }
 
 .tag-type-badge {
@@ -355,7 +384,6 @@
   animation: slideInUp 0.3s ease;
   max-height: 90vh;
 }
-
 .modal-content--small {
   max-width: 400px;
 }
@@ -394,13 +422,11 @@
   flex-direction: column;
   height: 100%;
 }
-
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-lg);
 }
-
 .form-field {
   display: flex;
   flex-direction: column;
@@ -448,4 +474,31 @@
   border: 1px solid var(--color-border);
   max-height: 200px;
   overflow-y: auto;
+}
+.empty-text {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ==========================================================================
+   6. ANIMAÇÕES
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

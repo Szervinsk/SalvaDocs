@@ -37,7 +37,7 @@ body {
   overflow: hidden;
   position: relative;
   padding: var(--spacing-md);
-  height: calc(100vh - (var(--spacing-md) * 2));
+  height: calc(100vh - var(--spacing-xs));
   gap: 0; /* O espaçamento será controlado pela borda/estilo dos filhos */
 }
 

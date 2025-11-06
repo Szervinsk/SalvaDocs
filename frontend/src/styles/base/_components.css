@@ -10,7 +10,6 @@
   height: var(--header-height);
   background: var(--color-surface);
   border-bottom: var(--border-width-sm) solid var(--color-border);
-  box-shadow: var(--box-shadow-light);
   flex-shrink: 0;
 }
 
@@ -173,7 +172,9 @@
   border: var(--border-width-md) solid var(--color-border);
   box-shadow: var(--box-shadow-light);
   align-items: center;
-  width: 150px;
+  min-width: 150px;
+  padding: 2px 6px;
+  width: fit-content;
   height: 40px;
   border-radius: 10px;
 }

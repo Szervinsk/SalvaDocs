@@ -1,5 +1,3 @@
-import { Icons } from "../../constants/icons";
-import { MORE_TOOLS } from "../../constants/constants";
 
 function MoreContent({ setTool, setMore }) {
 
@@ -14,21 +12,7 @@ function MoreContent({ setTool, setMore }) {
         <h4>Mais Opções</h4>
       </div>
       <div className="more-dropdown__list">
-        {MORE_TOOLS.map((item) => (
-          <button
-            key={item.id}
-            className="dropdown-item"
-            onClick={() => handleItemClick(item.id)}
-          >
-            <div className="dropdown-item__icon">
-              {item.icon}
-            </div>
-            <div className="dropdown-item__info">
-              <span className="dropdown-item__name">{item.name}</span>
-              <span className="dropdown-item__desc">{item.description}</span>
-            </div>
-          </button>
-        ))}
+        dasdasd
       </div>
     </div>
   );

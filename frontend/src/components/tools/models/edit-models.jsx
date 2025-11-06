@@ -1,9 +1,8 @@
 import "./EditModels.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react"; // Importe o useEffect
 import { AREA_OPTIONS } from "../../../constants/constants";
 
 // Componentes filhos
-import Dashboard from "./dashboard";
 import TagsManager from "./tagsManager";
 import ModelsManager from "./modelsManager";
 import PastasManager from "./pastasManager";
@@ -24,8 +23,64 @@ export const SegmentedControl = ({ options, activeOption, setActiveOption, onSel
   </div>
 );
 
-function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos, handleScrollTo, modelosRef, tagsRef, pastasRef, dashboardRef}) {
-  const [activeOption, setActiveOption] = useState("Dashboard");
+function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos, handleScrollTo, modelosRef, tagsRef, pastasRef }) {
+  const [activeOption, setActiveOption] = useState("Modelos"); // Inicia no Modelos
+  
+  // Crie uma ref para o container de rolagem
+  const scrollContainerRef = useRef(null);
+
+  // Efeito para observar a rolagem
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Mapeia as refs (que vêm do Block.jsx) para os seus nomes
+    const sectionMapping = [
+      { ref: modelosRef, name: "Modelos" },
+      { ref: tagsRef, name: "Tags" },
+      { ref: pastasRef, name: "Pastas" }
+    ];
+
+    // O observer callback é disparado quando uma seção entra/sai da "mira"
+    const observerCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Encontra o nome da seção que acabou de entrar na mira
+          const visibleSection = sectionMapping.find(s => s.ref.current === entry.target);
+          if (visibleSection) {
+            setActiveOption(visibleSection.name);
+          }
+        }
+      });
+    };
+
+    // Cria o observer
+    const observer = new IntersectionObserver(observerCallback, {
+      root: container, // A rolagem acontece dentro deste elemento
+      // Define a "mira" como uma linha horizontal no meio da tela
+      // O item é "ativo" quando passa por 50% da altura do container
+      rootMargin: "-50% 0px -50% 0px",
+      threshold: 0
+    });
+
+    // Coloca o observer para "assistir" cada seção
+    sectionMapping.forEach(s => {
+      if (s.ref.current) {
+        observer.observe(s.ref.current);
+      }
+    });
+
+    // Limpa o observer quando o componente é desmontado
+    return () => {
+      sectionMapping.forEach(s => {
+        if (s.ref.current) {
+          observer.unobserve(s.ref.current);
+        }
+      });
+    };
+  // Roda o efeito sempre que as refs mudarem
+  }, [modelosRef, tagsRef, pastasRef, scrollContainerRef]);
+
 
   return (
     <main className="models-page">
@@ -43,12 +98,7 @@ function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos
         />
       </div>
 
-      <div className="models-scroll-container">
-        {/* DASHBOARD */}
-        <section ref={dashboardRef} className="models-section">
-          <h2 className="models-section__title">Dashboard</h2>
-          <Dashboard tags={tags} modelos={modelos} documentos={documentos} setArea={handleScrollTo} />
-        </section>
+      <div className="models-scroll-container" ref={scrollContainerRef}>
 
         {/* MODELOS */}
         <section ref={modelosRef} className="models-section">
@@ -64,7 +114,11 @@ function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos
         {/* TAGS */}
         <section ref={tagsRef} className="models-section">
           <h2 className="models-section__title">Tags</h2>
-          <TagsManager tags={tags} onDataChange={onDataChange} showAlert={showAlert} />
+          <TagsManager 
+            tags={tags} 
+            onDataChange={onDataChange} 
+            showAlert={showAlert} 
+          />
         </section>
 
         {/* PASTAS */}
@@ -77,7 +131,6 @@ function EditModels({ modelos, tags, pastas, onDataChange, showAlert, documentos
             documentos={documentos}
           />
         </section>
-
       </div>
     </main>
   );

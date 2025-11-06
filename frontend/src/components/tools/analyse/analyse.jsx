@@ -28,6 +28,7 @@ export function AnalyseDoc({
   docSelecionado,
   setDocSelecionado,
   setDocumentos,
+  documentos,
   onVoltar,
   triggerShake,
   setTool,
@@ -72,6 +73,7 @@ export function AnalyseDoc({
         closeAlert={closeAlert}
         setCloseAlert={setCloseAlert}
         setDocumentos={setDocumentos}
+        documentos={documentos}
         user={user}
         docSelecionado={docSelecionado}
         setDocSelecionado={setDocSelecionado}

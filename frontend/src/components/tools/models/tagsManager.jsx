@@ -18,6 +18,7 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
 
   // O 'type' agora é um estado separado para controle manual
   const [extractionType, setExtractionType] = useState(tag?.type || "Manual");
+
   const [isLoading, setIsLoading] = useState(false);
 
   // Efeito que determina o tipo de extração automaticamente
@@ -47,7 +48,7 @@ const TagFormModal = ({ tag, onClose, onSave, showAlert }) => {
         await axios.put(`/tags/${tag.id}`, payload);
         showAlert("success", `Tag "${payload.name}" atualizada com sucesso!`);
       } else {
-        await axios.post(`/tags`, payload);
+        await axios.post(`/tags/create`, payload);
         showAlert("success", `Tag "${payload.name}" criada com sucesso!`);
       }
       onSave();

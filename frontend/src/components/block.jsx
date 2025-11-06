@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Icons } from "../constants/icons";
 import { ETAPAS } from "../constants/constants";
 import { AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import Home from "./tools/home/home";
 import EditModels from "./tools/models/edit-models";
 import Configurations from "./tools/configurations/configurations";
 import Account from "./tools/account/account";
+import Routes from "./tools/routes/routes";
 import OpenDocs from "./openDocs/open-docs";
 import ActionBar from "./bars/actionStatusBars/action-bar";
 import StatusBar from "./bars/actionStatusBars/status-bar";
@@ -18,14 +19,14 @@ import MoreContent from "./more/moreContent";
 import AboutPage from "./tools/aboutPage/AboutPage";
 
 function Block({
-  // Props recebidas do App.jsx
+  // Props de Dados e Estado do App.jsx
   pastas,
   modelos,
   documentos,
-  onDataChange,
-  setPastas,
-  setModelos,
   setDocumentos,
+  onDataChange,
+  dataView, // Recebe o estado da visão (false=Docs, true=Dashboard)
+  setDataView, // Recebe o setter
   user,
   tool,
   setTool,
@@ -40,10 +41,18 @@ function Block({
   onLogout,
   setPastasAbertas,
   pastasAbertas,
-  setShowAlternativeTools,
-  showAlternativeTools
+  onToggleFavorite,
+  favoriteModelIds,
+  loading,
+
+  // Props de Refs para rolagem
+  tagsRef,
+  modelosRef,
+  pastasRef,
+  dashboardRef,
+  handleScrollTo
 }) {
-  // Estados locais do Block, para gerenciar o fluxo interno
+  // Estados locais do Block (para o fluxo de Análise)
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
   const [file, setFile] = useState(null);
@@ -52,9 +61,9 @@ function Block({
   const [more, setMore] = useState(false);
   const [visualizarPDF, setVisualizarPDF] = useState(true);
 
-  // Limpa estados específicos da análise quando o usuário muda de ferramenta
+  // Limpa estados específicos da análise
   useEffect(() => {
-    if (tool !== 2) {
+    if (tool !== 1) { // Tool 1 agora é "Analisar"
       setSelectedModel(null);
       setSelectedTags([]);
       setFile(null);
@@ -62,7 +71,7 @@ function Block({
     }
   }, [tool, setSelectedModel]);
 
-  // Busca a lista completa de tags uma vez, para usar nos componentes filhos
+  // Busca todas as tags
   useEffect(() => {
     axios.get(`/tags`)
       .then((res) => {
@@ -70,13 +79,14 @@ function Block({
       })
       .catch(err => {
         console.error("Erro ao buscar todas as tags:", err);
-        showAlert("error", "Não foi possível carregar as tags (block).");
+        showAlert("error", "Não foi possível carregar as tags.");
       });
   }, [showAlert]);
 
+  // Função para acionar o tremor e alerta de bloqueio
   const triggerShake = () => {
     setTremer(true);
-    setTimeout(() => setTremer(false), 4000);
+    setTimeout(() => setTremer(false), 500);
     showAlert("warning", "Ação bloqueada: anexe um arquivo para prosseguir.");
   };
 
@@ -86,48 +96,19 @@ function Block({
     return false;
   };
 
-  const dashboardRef = useRef(null);
-  const tagsRef = useRef(null);
-  const modelosRef = useRef(null);
-  const pastasRef = useRef(null);
-
-  // função do editmodelos para rolar diretamente para o campo
-  const handleScrollTo = (area) => {
-    const refs = {
-      Dashboard: dashboardRef,
-      Tags: tagsRef,
-      Modelos: modelosRef,
-      Pastas: pastasRef,
-    };
-    const ref = refs[area];
-    if (ref?.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-
   // Função que decide qual componente de ferramenta renderizar
   const handleSelectTool = (id) => {
     switch (id) {
-      case 1:
-        return (
-          <Home
-            user={user}
-            setDocSelecionado={setDocSelecionado}
-            documentos={documentos}
-            pastas={pastas}
-            modelos={modelos}
-            setTool={setTool}
-            setSelectedModel={setSelectedModel}
-          />
-        );
-      case 2:
+      case 1: // Analisar
         return (
           <AnalyseDoc
-            setModelos={setModelos}
             modelos={modelos}
+            etapas={ETAPAS}
+            tags={tags}
+            pastas={pastas}
+            user={user}
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
-            etapas={ETAPAS}
             etapaAtual={etapaAtual}
             setEtapaAtual={setEtapaAtual}
             selectedTags={selectedTags}
@@ -136,37 +117,61 @@ function Block({
             setFile={setFile}
             tremer={tremer}
             setDocSelecionado={setDocSelecionado}
-            triggerShake={triggerShake}
-            isEtapaDisabled={isEtapaDisabled}
-            showAlert={showAlert}
-            user={user}
-            setTool={setTool}
-            tags={tags}
-            handleScrollTo={handleScrollTo}
+            documentos={documentos}
             setDocumentos={setDocumentos}
-            pastas={pastas}
+            setTool={setTool}
+            handleScrollTo={handleScrollTo}
+            erroArquivo={false} // Resetar erro?
+            isEtapaDisabled={isEtapaDisabled}
+            onBlocked={triggerShake}
+            showAlert={showAlert}
+            onToggleFavorite={onToggleFavorite}
+            favoriteModelIds={favoriteModelIds}
           />
         );
-      case 3:
+      case 2: // Relatório (Home)
+        return (
+          <Home
+            user={user}
+            documentos={documentos}
+            pastas={pastas}
+            tags={tags}
+            setArea={handleScrollTo} // Para os StatCards
+            modelos={modelos}
+            loading={loading}
+            setDocSelecionado={setDocSelecionado}
+            setTool={setTool}
+            dataView={dataView}
+            setDataView={setDataView}
+          />
+        );
+      case 3: // Gerenciar (EditModels)
+      case 30:
+      case 31:
+      case 32:
         return (
           <EditModels
             modelos={modelos}
             tags={tags}
             pastas={pastas}
             documentos={documentos}
-            setModelos={setModelos}
-            setTags={setTags}
-            setPastas={setPastas}
             onDataChange={onDataChange}
             showAlert={showAlert}
             handleScrollTo={handleScrollTo}
             modelosRef={modelosRef}
             tagsRef={tagsRef}
             pastasRef={pastasRef}
-            dashboardRef={dashboardRef}
+            dashboardRef={dashboardRef} // Passa a ref do dashboard
+            initialSection={id} // Passa o ID para a rolagem inicial
           />
         );
-      case 4:
+      case 4: // Rotas (Bot)
+      case 41:
+      case 42:
+        return <Routes user={user} showAlert={showAlert} onDataChange={onDataChange} />;
+      case 5: // Monitoramento APIs
+        return <ApiMonitoration />;
+      case 6: // Configurações
         return (
           <Configurations
             darkMode={darkMode}
@@ -176,36 +181,28 @@ function Block({
             visualizarPDF={visualizarPDF}
             setVisualizarPDF={setVisualizarPDF}
             showAlert={showAlert}
-            showAlternativeTools={showAlternativeTools}
-            setShowAlternativeTools={setShowAlternativeTools}
           />
         );
-      case 5:
-        return <Account user={user} onUserUpdate={setUser}
-          onLogout={onLogout} showAlert={showAlert} onDataChange={onDataChange} />;
-      case 6:
-        return <ApiMonitoration modelos={modelos} tags={tags} pastas={pastas} documentos={documentos} />;
-      case 7:
+      case 7: // Sobre o projeto
         return <AboutPage />;
-      default:
-        // Se nenhuma ferramenta for selecionada, volta para a Home
+      case 8: // Conta
         return (
-          <Home
+          <Account
             user={user}
-            setDocSelecionado={setDocSelecionado}
-            documentos={documentos}
-            pastas={pastas}
-            modelos={modelos}
-            setTool={setTool}
-            setSelectedModel={setSelectedModel}
+            onUserUpdate={setUser}
+            onLogout={onLogout}
+            showAlert={showAlert}
           />
         );
+      default:
+        // Se 'tool' for null ou inválido, volta para Analisar (Tool 1)
+        setTool(1);
+        return null;
     }
   };
 
   return (
     <main className="switch-area" style={{ borderTopLeftRadius: pastasAbertas ? "0px" : "10px", borderBottomLeftRadius: pastasAbertas ? "0px" : "10px" }}>
-      {/* Caixa do more */}
       {more && <MoreContent tool={tool} setTool={setTool} setMore={setMore} />}
 
       <ActionBar
@@ -233,14 +230,14 @@ function Block({
               showAlert={showAlert}
               onClose={() => setDocSelecionado(null)}
               visualizarPDF={visualizarPDF}
-              setVisualizarPDF={setVisualizarPDF}
               onDataChange={onDataChange}
+              baseURL={axios.defaults.baseURL.replace("/api", "")}
             />
           )}
         </AnimatePresence>
       </div>
 
-      {(tool === 2 && selectedModel) && (
+      {(tool === 1 && selectedModel) && (
         <StatusBar
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}

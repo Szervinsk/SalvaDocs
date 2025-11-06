@@ -1,0 +1,97 @@
+/* ==========================================================================
+   1. LAYOUT PRINCIPAL DA PÁGINA DE MONITORAMENTO
+   ========================================================================== */
+.bot-monitor-container {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+.bot-monitor-container h3 {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+}
+
+.bot-monitor-container p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* --- Botão Principal --- */
+.bot-monitor-container .btn-primary {
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+  color: var(--color-text-secondary);
+}
+
+
+/* ==========================================================================
+   2. ÁREA DE LOGS E RESULTADOS
+   ========================================================================== */
+.log-area {
+  flex: 1; /* Faz a área de log ocupar o espaço restante */
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow-light);
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.log-area h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-text-primary);
+}
+
+/* Estilo para a caixa de pré-formatação do log */
+.log-area pre {
+  flex: 1;
+  background-color: var(--color-background);
+  color: #333; /* Texto escuro para logs (pode ser ajustado para tema escuro) */
+  font-family: monospace;
+  font-size: 0.8rem;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  overflow: auto; /* Permite rolagem dentro da caixa de log */
+  white-space: pre-wrap; /* Quebra linha longas */
+}
+
+/* Estilos para Feedback no Log (Opcional, se você adicionar cores no Python) */
+.log-area pre span.error-log {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+.log-area pre span.success-log {
+    color: #198754; /* Verde sucesso */
+    font-weight: bold;
+}
+
+/* --- Spinner Animation (Se o ícone for o Ícone de Recarregar) --- */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
