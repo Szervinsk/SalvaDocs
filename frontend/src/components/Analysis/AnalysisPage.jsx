@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Icons } from "../../constants/icons";
 import SearchBar from "../bars/searchBar/searchbar";
 import axios from "axios";
+import "../tools/analyse/analysis.css";
+import { motion, AnimatePresence } from "framer-motion";
 
 import EditVariables from "./editContents/edit-variables";
 import EditEtapas from "./editContents/edit-etapas";
@@ -9,92 +11,196 @@ import EditEtapas from "./editContents/edit-etapas";
 // ==========================================================================
 // SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO
 // ==========================================================================
-const ModelSelectionScreen = ({ modelos, onModelSelect, searchQuery, setSearchQuery, setTool, handleScrollTo }) => {
-  // Estado removido: const [showEditIcon, setShowEditIcon] = useState(null);
+const ModelSelectionScreen = ({
+  tags,
+  modelos,
+  onModelSelect,
+  searchQuery,
+  setSearchQuery,
+  setTool,
+  handleScrollTo,
+  documentos,
+  onToggleFavorite,
+  favoriteModelIds
+}) => {
+  const [seeModels, setSeeModels] = useState(false);
 
-  // Filtra os modelos em tempo real com base na busca do usuário
-  const filteredModelos = modelos.filter(model =>
-    model.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  // Função para parar a propagação e navegar para a edição
+  const filteredModelos = useMemo(() =>
+    modelos.filter(model =>
+      model.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [modelos, searchQuery]);
+
   const handleEditClick = (e, modelName) => {
-    e.stopPropagation(); // Impede que o clique no ícone selecione o modelo
+    e.stopPropagation();
     setTool(3);
     handleScrollTo("Modelos");
-    // Futuramente, você pode passar o modelName para a página de gerenciamento
-    // para que ela já abra este modelo para edição.
+  };
+
+  const suggestedActions = useMemo(() =>
+    modelos // ✨ CORREÇÃO: Adicionado 'modelos' aqui
+      .filter(m => favoriteModelIds.includes(m.id))
+      .map(model => ({
+        id: model.id,
+        label: `Analisar ${model.name}`,
+        icon: <Icons.Star size={14} />,
+        action: () => onModelSelect(model)
+      })),
+    [modelos, favoriteModelIds, onModelSelect] 
+  );
+
+  const createModelAction = {
+    label: "Criar Novo Modelo",
+    icon: <Icons.Add size={14} />,
+    action: () => { setTool(3); handleScrollTo("Modelos"); }
+  };
+
+  const handleFavoriteClick = (e, modelId) => {
+    e.stopPropagation();
+    onToggleFavorite(modelId);
+  };
+
+  const showModelList = searchQuery.length > 0 || seeModels;
+
+  const listVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.2, ease: "easeIn" } },
   };
 
   return (
     <div className="model-selection-page">
       <header className="model-selection-header">
-        <h1>Comece uma Nova Análise</h1>
-        <p>Selecione um modelo de extração para iniciar o processo.</p>
+        <h1>O que vamos analisar hoje?</h1>
+        <p>Você tem <span className="highlight-text">{modelos.length} modelos</span> e <span className="highlight-text">{tags.length} tags</span> prontas para uso.</p>
       </header>
 
       <div className="model-search-bar">
         <SearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Buscar modelo..."
+          placeholder="Buscar modelo por nome (ex: Despacho)..."
+          showTabs={true}
         />
       </div>
 
-      {filteredModelos.length > 0 ? (
-        <div className="model-grid">
-          {filteredModelos.map((model) => (
-            <button
-              key={model.id}
-              className="model-card"
-              onClick={() => onModelSelect(model)}
-              title={model.description || `Selecionar modelo ${model.name}`}
-            >
-              <div className="model-card-content">
-                <div className="model-card__icon">
-                  <Icons.ScannerDocument size={24} />
+      <div className="toggle-view-actions">
+        <button className="btn-text" onClick={() => setSeeModels(!seeModels)}>
+          {showModelList ? <Icons.Close size={14} /> : <Icons.FileList size={14} />}
+          {showModelList ? "Ocultar Modelos" : "Ver Todos os Modelos"}
+        </button>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {showModelList ? (
+          <motion.div
+            key="model-list"
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            style={{ width: "100%" }}
+          >
+            {filteredModelos.length > 0 ? (
+              <div className="model-grid-results">
+                {filteredModelos.map((model) => {
+                  const isFavorite = favoriteModelIds.includes(model.id);
+                  return (
+                    <button
+                      key={model.id}
+                      className="model-card"
+                      onClick={() => onModelSelect(model)}
+                      title={model.description || `Selecionar modelo ${model.name}`}
+                    >
+                      <div className="model-card-content">
+                        <Icons.ScannerDocument size={15} />
+                        <h4>{model.name}</h4>
+                      </div>
+                      <div className="model-card__actions">
+                        <button
+                          className={`model-card__favorite-btn ${isFavorite ? 'is-favorite' : ''}`}
+                          title={isFavorite ? "Remover favorito" : `Favoritar ${model.name}`}
+                          onClick={(e) => handleFavoriteClick(e, model.id)}
+                        >
+                          <Icons.Star size={18} />
+                        </button>
+                        <button
+                          className="model-card__edit-btn"
+                          title={`Editar ${model.name}`}
+                          onClick={(e) => handleEditClick(e, model.name)}
+                        >
+                          <Icons.EditNote size={18} />
+                        </button>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="empty-state-container">
+                <Icons.Search size={40} />
+                <h4>Nenhum modelo encontrado para "{searchQuery}"</h4>
+                <p>Tente ajustar sua busca ou adicione novos modelos no painel de gerenciamento.</p>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="suggestions"
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <div className="suggested-actions">
+              {suggestedActions.map((action) => (
+                <button key={action.label} className="action-pill favorite" onClick={action.action}>
+                  {action.icon}
+                  <span>{action.label}</span>
+                </button>
+              ))}
+              <button className="action-pill" onClick={createModelAction.action}>
+                {createModelAction.icon}
+                <span>{createModelAction.label}</span>
+              </button>
+            </div>
+
+            <footer className="model-selection-footer">
+              <div className="stats-card-row">
+                <div className="stats-card">
+                  <h4>Documentos Analisados</h4>
+                  <div className="stats-card__chart-bar">
+                    <div className="bar-fill" style={{ width: `${Math.min(documentos.length * 10, 100)}%` }}></div>
+                    <span className="stats-card__value">
+                      <h5>{documentos.length} documentos foram analisados</h5>
+                    </span>
+                  </div>
                 </div>
-                <div className="model-card__info">
-                  <h4>{model.name}</h4>
-                  <p>{model.tagsBase?.length || 0} tags</p>
+                <div className="stats-card">
+                  <header><h4>Precisão Média</h4></header>
+                  <div className="flex-row">
+                    <div className="stats-card__chart-pie" style={{ "--p": 92 }}>92%</div>
+                    <span className="stats-card__value"><h5>Taxa de acerto ao atingir os dados</h5></span>
+                  </div>
                 </div>
               </div>
-              
-              {/* Este ícone agora é controlado puramente por CSS */}
-              <button 
-                className="model-card__edit-btn" 
-                title={`Editar ${model.name}`}
-                onClick={(e) => handleEditClick(e, model.name)}
-              >
-                <Icons.EditNote size={18} />
-              </button>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="empty-state-container">
-          <Icons.Search size={40} />
-          <h4>Nenhum modelo encontrado</h4>
-          <p>Tente ajustar sua busca ou adicione novos modelos no painel de gerenciamento.</p>
-        </div>
-      )}
+            </footer>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
 
 // ==========================================================================
-// COMPONENTE PRINCIPAL (AnalyseDoc / AnalysisPage)
+// COMPONENTE PRINCIPAL (AnalysisPage)
 // ==========================================================================
 function AnalysisPage({
-  // Props de dados recebidas do componente pai (Block)
   modelos,
   etapas,
   tags,
   pastas,
   user,
-
-  // Props de estado e setters
   selectedModel,
   setSelectedModel,
   etapaAtual,
@@ -105,19 +211,54 @@ function AnalysisPage({
   setFile,
   tremer,
   setDocSelecionado,
+  documentos,
   setDocumentos,
   setTool,
-  handleScrollTo, // Recebendo a função do EditModels
-
-  // Props de controle de UI
+  handleScrollTo,
   erroArquivo,
   isEtapaDisabled,
-  onBlocked, // Renomeado para maior clareza, é o seu 'triggerShake'
+  onBlocked,
   showAlert,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Função para limpar o estado da análise ao fechar
+  const [favoriteModelIds, setFavoriteModelIds] = useState(() => {
+    const savedFavorites = localStorage.getItem("salvadocs_favorite_models");
+    // Se o backend ainda não estiver enviando, usa o localStorage ou um padrão
+    return savedFavorites ? JSON.parse(savedFavorites) : (user?.favoriteModelIds || [1, 2]);
+  });
+
+  useEffect(() => {
+    // Sincroniza com o 'user' prop se ele vier do backend
+    if (user?.favoriteModelIds) {
+      setFavoriteModelIds(user.favoriteModelIds);
+    }
+  }, [user]);
+
+  const handleToggleFavorite = async (modelId) => {
+    const isCurrentlyFavorite = favoriteModelIds.includes(modelId);
+    let newFavoriteIds;
+
+    if (isCurrentlyFavorite) {
+      newFavoriteIds = favoriteModelIds.filter(id => id !== modelId);
+    } else {
+      newFavoriteIds = [...favoriteModelIds, modelId];
+    }
+    setFavoriteModelIds(newFavoriteIds);
+
+    // Salva no localStorage como fallback
+    localStorage.setItem("salvadocs_favorite_models", JSON.stringify(newFavoriteIds));
+
+    try {
+      await axios.post(`/modelos/${modelId}/toggle-favorite`);
+    } catch (error) {
+      showAlert("error", "Erro ao atualizar favoritos.");
+      // Reverte a mudança otimista se a API falhar
+      setFavoriteModelIds(favoriteModelIds);
+      localStorage.setItem("salvadocs_favorite_models", JSON.stringify(favoriteModelIds));
+    }
+  };
+
   const handleCloseEditor = () => {
     setSelectedModel(null);
     setSelectedTags([]);
@@ -125,17 +266,16 @@ function AnalysisPage({
     setEtapaAtual(1);
   };
 
-  // Função para navegar entre as etapas com validação
   const goToEtapa = (targetId) => {
     if (targetId === 3 && !file) {
-      onBlocked(); // Chama a função triggerShake do pai
+      onBlocked();
       return;
     }
     setEtapaAtual(Math.max(1, Math.min(targetId, etapas.length)));
   };
 
-  // Função chamada ao clicar em um card de modelo.
   const handleModelSelection = async (model) => {
+    if (!model) return;
     try {
       const response = await axios.get(`/modelos/${model.id}`);
       const tagsDoModelo = response.data.tagsBase || [];
@@ -148,7 +288,6 @@ function AnalysisPage({
     }
   };
 
-  // Renderização condicional
   return (
     selectedModel ? (
       // --- TELA 2: Editor de Análise ---
@@ -184,18 +323,23 @@ function AnalysisPage({
             handleClick={goToEtapa}
             isEtapaDisabled={isEtapaDisabled}
             file={file}
+            showAlert={showAlert}
           />
         </div>
       </div>
     ) : (
-      // --- TELA 1: Seleção de Modelo ---
+      // --- TELA 1: Seleção de Modelo (Novo Design) ---
       <ModelSelectionScreen
+        tags={tags}
+        documentos={documentos}
         modelos={modelos}
         onModelSelect={handleModelSelection}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         setTool={setTool}
         handleScrollTo={handleScrollTo}
+        onToggleFavorite={handleToggleFavorite}
+        favoriteModelIds={favoriteModelIds}
       />
     )
   );
