@@ -89,19 +89,21 @@ export const me = async (req, res) => {
   try {
     const user = await models.User.findByPk(req.user.id, {
       attributes: [
-        "id",
-        "username",
-        "email",
-        "createdAt",
-        "empresa",
-        "welcomeDismissed",
+        "id", "username", "email", "createdAt", "empresa", "welcomeDismissed",
         [sequelize.literal("apiKey IS NOT NULL"), "hasApiKey"],
       ],
     });
-    if (!user) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
-    }
-    res.json(user); // O .json() do Express vai serializar o objeto corretamente
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
+    
+    // ✨ LÓGICA DE FAVORITOS ADICIONADA AQUI ✨
+    // 1. Busca os modelos favoritos deste usuário
+    const favoritos = await user.getFavoriteModels({ attributes: ['id'] });
+    // 2. Transforma o array de objetos em um array de IDs
+    const favoriteModelIds = favoritos.map(f => f.id);
+
+    // 3. Envia o usuário E a lista de favoritos
+    res.json({ ...user.toJSON(), favoriteModelIds });
+
   } catch (err) {
     console.error("Erro ao buscar dados do usuário:", err);
     res.status(500).json({ error: "Erro ao buscar usuário" });

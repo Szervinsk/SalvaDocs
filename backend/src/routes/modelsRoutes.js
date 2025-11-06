@@ -1,6 +1,13 @@
 import express from "express";
 import { authMiddleware } from "../middleware/auth.js";
-import { getAllModelos, getModelos, createModelo, updateModelo, deleteModelo } from "../controllers/modelosController.js";
+import {
+  getAllModelos,
+  getModelos,
+  createModelo,
+  updateModelo,
+  toggleFavorite,
+  deleteModelo,
+} from "../controllers/modelosController.js";
 
 const router = express.Router();
 
@@ -27,6 +34,11 @@ router.post("/", createModelo);
 // ROTA: /api/modelos/:id
 // DESCRIÇÃO: Atualiza um modelo existente (nome, descrição e tags).
 router.put("/:id", updateModelo);
+
+// MÉTODO: POST
+// ROTA: /api/modelos/:id/toggle-favorite
+// DESCRIÇÃO: Atualiza um modelo para favorito ou não.
+router.post("/:id/toggle-favorite", toggleFavorite);
 
 // MÉTODO: DELETE
 // ROTA: /api/modelos/:id
