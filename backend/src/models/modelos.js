@@ -18,6 +18,12 @@ export default (sequelize) => {
       onDelete: "CASCADE",
       hooks: true,
     });
+
+    Modelo.belongsToMany(models.User, {
+      through: "UserFavoriteModels", // Mesma tabela de junção
+      as: "favoritedBy", // Alias para ver quem favoritou
+      foreignKey: "modeloId",
+    });
   };
 
   return Modelo;
