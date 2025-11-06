@@ -1,20 +1,151 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TOOLS, MORE_TOOLS } from "../../../constants/constants";
+import { TOOLS, TOOLS_ACCOUNT } from "../../../constants/constants";
 import { Icons } from "../../../constants/icons";
 import Logo from "../../../assets/pen.svg";
 import SearchBar from "../searchBar/searchbar";
 import "./navbar.css";
 
-function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
+// ==========================================================================
+// COMPONENTE DO MODAL FLUTUANTE (Sem alterações)
+// ==========================================================================
+const AccountModal = ({ user, onLogout, darkMode, setDarkMode, setTool, setOpenModalAccount }) => {
+  const handleToolClick = (id) => {
+    setTool(id);
+    setOpenModalAccount(false);
+  };
+  return (
+    <motion.div
+      className="account-modal-popup"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="account-modal-popup__section">
+        {TOOLS_ACCOUNT.map((tool) => (
+          <button
+            key={tool.id}
+            className="account-modal-item"
+            onClick={() => handleToolClick(tool.id)}
+          >
+            {tool.icon} {tool.name}
+          </button>
+        ))}
+      </div>
+      <div className="account-modal-popup__section">
+        <div className="theme-toggle-control">
+          <button className={`theme-btn ${!darkMode ? "active" : ""}`} onClick={() => setDarkMode(false)}>
+            <Icons.Sun size={16} /> Claro
+          </button>
+          <button className={`theme-btn ${darkMode ? "active" : ""}`} onClick={() => setDarkMode(true)}>
+            <Icons.Moon size={16} /> Escuro
+          </button>
+        </div>
+      </div>
+      <div className="account-modal-popup__section">
+        <button className="account-modal-item logout" onClick={onLogout}>
+          <Icons.DoorOpen size={18} /> Sign out
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
+
+// ==========================================================================
+// SUB-COMPONENTE PARA CADA ITEM DA NAVEGAÇÃO (COM LÓGICA DE SUBMENU)
+// ==========================================================================
+const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmenu, setDataView, dataView , handleScrollTo }) => {
+  const hasSubtools = item.subtools && item.subtools.length > 0;
+  const isActive = tool === item.id || (item.subtools && item.subtools.map(s => s.id).includes(tool));
+  const isSubmenuOpen = openSubmenu === item.id;
+
+  const handleClick = () => {
+    if (hasSubtools) {
+      setOpenSubmenu(isSubmenuOpen ? null : item.id);
+    } else {
+      setTool(item.id);
+    }
+  };
+
+  const handleSubtoolClick = (e, subItem) => {
+    e.stopPropagation();
+
+    // 1. Define a ferramenta PAI (ex: tool 2 para "Relatório")
+    setTool(item.id); // Usa o 'item.id' que é o ID pai
+
+    // 2. Define a visão específica (ex: 1 para "Documentos", 2 para "Dashboard")
+    if (item.id === 2) {
+      setDataView(subItem.attribute); // Usa o 'attribute' do sub-item
+    }
+    if (item.id === 3) {
+      handleScrollTo(subItem.attribute);
+    }
+  };
+
+  return (
+    <div className="tool-item-container">
+      <button
+        className={`tool-item ${isActive ? "active" : ""}`}
+        onClick={handleClick}
+        title={item.name}
+      >
+        <div className="flex-row" style={{ gap: "10px" }}>
+          <div className="tool-item__icon">{item.icon}</div>
+          {!isCollapsed && (
+            <span className="tool-item__label">{item.name}</span>
+          )}
+        </div>
+        {hasSubtools && !isCollapsed && (
+          <Icons.ArrowDown size={16} className={`tool-item__chevron ${isSubmenuOpen ? 'open' : ''}`} />
+        )}
+      </button>
+
+      <AnimatePresence>
+        {hasSubtools && isSubmenuOpen && !isCollapsed && (
+          <motion.div
+            className="submenu-list"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            {item.subtools.map(subItem => (
+              <button
+                key={subItem.id}
+                // ✨ ATIVADO: O item fica ativo se o PAI estiver ativo E a visão for a correta
+                className={`submenu-item ${tool === item.id && dataView === subItem.haveData ? "active" : ""}`}
+                onClick={(e) => handleSubtoolClick(e, subItem)}
+              >
+                {subItem.name}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+
+// ==========================================================================
+// COMPONENTE PRINCIPAL DA NAVBAR
+// ==========================================================================
+function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataView, dataView, handleScrollTo}) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [openModalAccount, setOpenModalAccount] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
 
-  const toggleSidebar = () => setIsCollapsed((prev) => !prev);
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => !prev);
+    setOpenSubmenu(null);
+  };
 
   const navVariants = {
     expanded: { width: 280 },
-    collapsed: { width: 100 },
+    collapsed: { width: 80 },
   };
 
   const textVariants = {
@@ -22,10 +153,23 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
     visible: { opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } },
   };
 
-  // filtro da barra de pesquisa
-  const tools_filtradas = TOOLS.filter(tool => tool.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const getInitials = (name = "") => {
+    if (!name) return "";
+    const names = name.split(' ');
+    const initials = names.map(n => n[0]).join('');
+    return initials.slice(0, 2).toUpperCase();
+  };
 
-  const other_tools_filtradas = MORE_TOOLS.filter(tool => tool.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const tools_filtradas = TOOLS.filter(tool =>
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (!openModalAccount) return;
+    const handleClickOutside = () => setOpenModalAccount(false);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, [openModalAccount]);
 
 
   return (
@@ -43,121 +187,84 @@ function Navbar({ setTool, tool, user, onLogout, showAlternativeTools }) {
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.h2 variants={textVariants} initial="hidden" animate="visible" exit="hidden" className="app-title">
-                  <h2 className="app-title">SalvaDocs</h2>
+                  SalvaDocs
                 </motion.h2>
               )}
-
-
             </AnimatePresence>
           </div>
-          <button className="toggle-btn" onClick={toggleSidebar} title={isCollapsed ? "Expandir" : "Recolher"}>
-            <Icons.BackIn size={20} />
-          </button>
         </div>
 
         <div className="navbar-search">
           <AnimatePresence>
             {!isCollapsed ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <SearchBar
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  placeholder={"Buscar ferramentas..."}
-                />
+                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={"Buscar ferramentas..."} />
               </motion.div>
             ) : (
               <div className="search-icon-wrapper">
-                <Icons.Search size={20} onClick={()=> setIsCollapsed(!isCollapsed)}/>
+                <Icons.Search size={20} onClick={() => setIsCollapsed(false)} />
               </div>
             )}
           </AnimatePresence>
         </div>
 
         <div className="navbar__tools">
-          <>
-            <hr />
-            <div className="tools-Header">
-              <Icons.Tools size={15} className="icons-r" />
-              {!isCollapsed && <h5>Ferramentas</h5>}
-            </div>
-
-            {tools_filtradas.length > 0 ? (
-              tools_filtradas.map((item) => (
-                <button
-                  key={item.id}
-                  className={`tool-item ${tool === item.id ? "active" : ""}`}
-                  onClick={() => setTool(item.id)}
-                  title={`${item.name}${item.shortcut ? ` (Shift + ${item.shortcut})` : ""}`}
-                >
-                  <div className="flex-row" style={{ gap: "10px" }}>
-                    <div className="tool-item__icon">{item.icon}</div>
-                    {!isCollapsed && (
-                      <span className="tool-item__label">{item.name}</span>
-                    )}
-                  </div>
-
-                  {item.shortcut && !isCollapsed && (
-                    <kbd className="tool-item__shortcut">
-                      shift + {item.shortcut}
-                    </kbd>
-                  )}
-                </button>
-              ))
-            ) : (
-              <h5 className="thin" style={{ marginBottom: "10px" }}>Não foram encontradas ferramentas</h5>
-            )}
-          </>
-
-          {showAlternativeTools && (
-            <>
-              {other_tools_filtradas.length > 0 ? (
-                other_tools_filtradas.map((item) => (
-                  <button
-                    key={item.id}
-                    className={`tool-item ${tool === item.id ? "active" : ""}`}
-                    onClick={() => setTool(item.id)}
-                    title={`${item.name}${item.shortcut ? ` (Shift + ${item.shortcut})` : ""}`}
-                  >
-                    <div className="flex-row" style={{ gap: "10px" }}>
-                      <div className="tool-item__icon">{item.icon}</div>
-                      {!isCollapsed && (
-                        <span className="tool-item__label">{item.name}</span>
-                      )}
-                    </div>
-
-                    {item.shortcut && !isCollapsed && (
-                      <kbd className="tool-item__shortcut">
-                        shift + {item.shortcut}
-                      </kbd>
-                    )}
-                  </button>
-                ))
-              ) : (
-                <h5 className="thin">Não foram encontradas ferramentas</h5>
-              )}
-            </>
-          )}
+          {tools_filtradas.map((item) => (
+            (item.id !== 6 && item.id !== 8) && (
+              <ToolItem
+                key={item.id}
+                item={item}
+                tool={tool}
+                setTool={setTool}
+                isCollapsed={isCollapsed}
+                openSubmenu={openSubmenu}
+                setOpenSubmenu={setOpenSubmenu}
+                setDataView={setDataView}
+                handleScrollTo={handleScrollTo}
+              />
+            )
+          ))}
         </div>
       </div>
-      {/* --- SEÇÃO INFERIOR (CONTA) --- */}
+
       <div className="navbar-footer">
-        <div className="account-info">
-          <div className="account-img"></div>
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div variants={textVariants} initial="hidden" animate="visible" exit="hidden" className="user-details">
-                {user?.username ? (
-                  <span className="user-name">{user.username}</span>
-                ) : (
-                  <span className="user-name-placeholder">Recarregue</span>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <AnimatePresence>
+          {openModalAccount && !isCollapsed && (
+            <AccountModal
+              user={user}
+              onLogout={onLogout}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              setTool={setTool}
+              setOpenModalAccount={setOpenModalAccount}
+            />
+          )}
+        </AnimatePresence>
+
+        <div
+          className="account-info-trigger"
+          onClick={(e) => {
+            if (isCollapsed) return;
+            e.stopPropagation();
+            setOpenModalAccount(prev => !prev);
+          }}
+        >
+          <div className="account-info">
+            <div className="account-img">{getInitials(user?.username)}</div>
+            <AnimatePresence>
+              {!isCollapsed && (
+                <motion.div variants={textVariants} initial="hidden" animate="visible" exit="hidden" className="user-details">
+                  <span className="user-name">{user?.username || "Usuário"}</span>
+                  <span className="user-email">{user?.email || "email@app.com"}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <button className="toggle-btn" onClick={toggleSidebar} title={isCollapsed ? "Expandir" : "Recolher"}>
+            <Icons.BackIn size={20} />
+          </button>
         </div>
-        <button className="logout-btn" onClick={onLogout} title="Sair">
-          {user?.username ? <Icons.DoorOpen size={20} /> : <Icons.Retry size={20} />}
-        </button>
       </div>
     </motion.nav>
   );

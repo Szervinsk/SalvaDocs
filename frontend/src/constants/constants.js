@@ -21,63 +21,83 @@ export const ALERTS = [
 ];
 
 export const AREA_OPTIONS = [
-  {
-    label: "Dashboard",
-    value: "Dashboard",
-    icon: <Icons.Graphics size={16} />,
-  },
   { label: "Modelos", value: "Modelos", icon: <Icons.Model size={16} /> },
   { label: "Tags", value: "Tags", icon: <Icons.Tags size={16} /> },
   { label: "Pastas", value: "Pastas", icon: <Icons.Folder size={16} /> },
 ];
 
 export const TOOLS = [
-  { id: 1, name: "Home", icon: <Icons.Home size={22} />, shortcut: "H" },
   {
-    id: 2,
+    id: 1,
     name: "Analisar",
     icon: <Icons.ScannerDocument size={22} />,
     shortcut: "A",
   },
-  { id: 3, name: "Gerenciar", icon: <Icons.Model size={22} />, shortcut: "G" },
+  {
+    id: 2,
+    name: "Relatório", // ID PAI
+    icon: <Icons.Graphics size={22} />,
+    shortcut: "G",
+    subtools: [
+      { id: 2, name: "Documentos", attribute: false }, // ID 2 (pai) + atributo
+      { id: 20, name: "Dashboard", attribute: true }, // ID ÚNICO + atributo
+    ],
+  },
+  {
+    id: 3,
+    name: "Gerenciar", // ID PAI
+    icon: <Icons.Model size={22} />,
+    shortcut: "F",
+    subtools: [
+      { id: 3, name: "Modelos", attribute: "Modelos" }, // ID 3 (pai) + atributo
+      { id: 30, name: "Tags", attribute: "Tags" }, // ID ÚNICO + atributo
+      { id: 31, name: "Pastas", attribute: "Pastas" }, // ID ÚNICO + atributo
+    ],
+  },
   {
     id: 4,
+    name: "Rotas (Bot)",
+    icon: <Icons.Bot size={22} />,
+    shortcut: "B",
+    // Sub-itens com IDs únicos
+    subtools: [
+      { id: 41, name: "Criar rotas" , attribute: "1"},
+      { id: 42, name: "Gerenciar rotas" , attribute: "2"},
+    ],
+  },
+  {
+    id: 5,
+    name: "Monitoramento APIs",
+    icon: <Icons.Rocket size={20} />,
+    shortcut: "M",
+  },
+];
+
+export const TOOLS_ACCOUNT = [
+  {
+    id: 6,
     name: "Configurações",
     icon: <Icons.Adjustments size={22} />,
     shortcut: "D",
-  },
-  { id: 5, name: "Conta", icon: <Icons.User size={22} />, shortcut: "E" }, // Sem atalho
-];
-
-export const MORE_TOOLS = [
-  {
-    id: 6,
-    name: "Monitoramento APIs",
-    icon: <Icons.Model size={20} />, // Usando o componente de ícone diretamente
-    description: "Visualize as requisições do sistema.",
-    shortcut: "M",
   },
   {
     id: 7,
     name: "Sobre o Projeto",
     icon: <Icons.Question size={20} />,
-    description: "Conheça mais sobre a aplicação.",
     shortcut: "P",
+  },
+  {
+    id: 8,
+    name: "Conta",
+    icon: <Icons.User size={22} />,
+    shortcut: "C",
   },
 ];
 
 export const UTILS = [
-  {id: 1,
-    name: "Editar",
-    icon: <Icons.EditNote size={20} />,
-    tool: 6
-  },
-  {id: 2,
-    name: "Deletar",
-    icon: <Icons.Delete size={20} />,
-    tool: 6
-  },
-]
+  { id: 1, name: "Editar", icon: <Icons.EditNote size={20} />, tool: 6 },
+  { id: 2, name: "Deletar", icon: <Icons.Delete size={20} />, tool: 6 },
+];
 
 // Pastas iniciais
 export const PASTAS = [
