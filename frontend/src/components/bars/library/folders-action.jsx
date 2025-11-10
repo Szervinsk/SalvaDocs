@@ -305,8 +305,8 @@ function FoldersAction({ pastas, documentos, loading, docSelecionado, setDocSele
                 {recentDocuments.length > 0 ? (
                   recentDocuments.map((doc) => (
                     <div key={doc.id} className="recent-doc-item" onClick={() => handleDocumentClick(doc)}>
-                      <div className="recent-doc-info">
-                        <span className="recent-doc-name">{doc.templateName || doc.name}</span>
+                      <div className="recent-doc-info" title={`${doc.name}`}>
+                        <span className="recent-doc-name">{doc.name.slice(0,25) + "..."}</span>
                         <span className="recent-doc-date">{new Date(doc.createdAt).toLocaleDateString("pt-BR")}</span>
                       </div>
                       <Icons.ArrowRight size={14} />

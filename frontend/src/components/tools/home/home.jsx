@@ -126,7 +126,7 @@ const ListaDocumentos = ({ documentos, pastas, modelos, handleDocumentClick, sea
           <tbody>
             {sortedAndFilteredDocuments.map((doc) => (
               <tr key={doc.id} onClick={() => handleDocumentClick(doc)}>
-                <td className="doc-name">{doc.name}</td>
+                <td className="doc-name">{doc.name.slice(0,60) + "..."}</td>
                 <td>{doc.folder ? <span className="doc-folder">{doc.folder.name}</span> : "-"}</td>
                 <td><StatusBadge status={doc.status} /></td>
                 <td><TagProgress found={doc.tagsFound} total={doc.tagsTotal} /></td>

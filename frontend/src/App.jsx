@@ -157,15 +157,15 @@ function App() {
     if (event.shiftKey) {
       event.preventDefault();
       switch (event.key.toUpperCase()) {
-        case 'H': setTool(1); break; // Home (agora é Analisar)
-        case 'A': setTool(2); break; // Analisar (agora é Relatório)
-        case 'G': setTool(3); break; // Gerenciar (EditModels)
-        case 'B': setTool(5); break; // "B"ots (routes)
-        // Atalhos para o modal de conta
-        case 'D': setTool(4); break; // "D"efinições (Configurações)
-        case 'E': setTool(6); break; // "E"u (Conta)
-        case 'M': setTool(7); break; // Monitoramento
-        case 'P': setTool(8); break; // Sobre o "P"rojeto
+        case 'A': setTool(1); break;
+        case 'R': setTool(2); break;
+        case 'G': setTool(3); break;
+        case 'B': setTool(4); break; 
+        case 'M': setTool(5); break;
+        // Atalhos para o modal de c
+        case 'D': setTool(6); break;
+        case 'P': setTool(7); break;
+        case 'U': setTool(8); break;
         default: return;
       }
     }

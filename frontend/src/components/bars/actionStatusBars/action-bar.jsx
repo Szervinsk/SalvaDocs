@@ -91,10 +91,20 @@ function ActionBar({
           title="Iniciar nova análise"
           onClick={() => {
             setDocSelecionado(null);
-            setTool(2);
+            setTool(1);
           }}
         >
           <Icons.Add size={20} />
+        </button>
+
+        <button
+          className="btn-mini"
+          title="Iniciar bot"
+          onClick={() => {
+            setTool(4);
+          }}
+        >
+          <Icons.Bot size={20} />
         </button>
 
         <button

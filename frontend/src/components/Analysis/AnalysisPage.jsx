@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Icons } from "../../constants/icons";
 import SearchBar from "../bars/searchBar/searchbar";
 import axios from "axios";
@@ -9,7 +9,7 @@ import EditVariables from "./editContents/edit-variables";
 import EditEtapas from "./editContents/edit-etapas";
 
 // ==========================================================================
-// SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO
+// SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO (REFATORADO)
 // ==========================================================================
 const ModelSelectionScreen = ({
   tags,
@@ -20,11 +20,26 @@ const ModelSelectionScreen = ({
   setTool,
   handleScrollTo,
   documentos,
-  onToggleFavorite,
-  favoriteModelIds
+  onToggleFavorite, // Recebe a função
+  favoriteModelIds, // Recebe a lista de IDs
+  showAlert // Recebe a função showAlert
 }) => {
   const [seeModels, setSeeModels] = useState(false);
 
+  // Lógica de Autocomplete e Sugestão
+  const suggestion = useMemo(() => {
+    if (!searchQuery) return "";
+    const queryLower = searchQuery.toLowerCase();
+    const match = modelos.find(model =>
+      model.name.toLowerCase().startsWith(queryLower)
+    );
+    if (match && match.name.toLowerCase() !== queryLower) {
+      return match.name.substring(searchQuery.length);
+    }
+    return "";
+  }, [searchQuery, modelos]);
+
+  // Filtra os modelos para a lista
   const filteredModelos = useMemo(() =>
     modelos.filter(model =>
       model.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -36,8 +51,9 @@ const ModelSelectionScreen = ({
     handleScrollTo("Modelos");
   };
 
+  // Ações sugeridas (favoritos) são geradas dinamicamente
   const suggestedActions = useMemo(() =>
-    modelos // ✨ CORREÇÃO: Adicionado 'modelos' aqui
+    modelos
       .filter(m => favoriteModelIds.includes(m.id))
       .map(model => ({
         id: model.id,
@@ -45,7 +61,7 @@ const ModelSelectionScreen = ({
         icon: <Icons.Star size={14} />,
         action: () => onModelSelect(model)
       })),
-    [modelos, favoriteModelIds, onModelSelect] 
+    [modelos, favoriteModelIds, onModelSelect]
   );
 
   const createModelAction = {
@@ -54,9 +70,34 @@ const ModelSelectionScreen = ({
     action: () => { setTool(3); handleScrollTo("Modelos"); }
   };
 
+  // Lógica de clique no favorito (agora também mostra o alerta)
   const handleFavoriteClick = (e, modelId) => {
     e.stopPropagation();
+    const isCurrentlyFavorite = favoriteModelIds.includes(modelId);
+
+    // ✨ CORREÇÃO: Mostra o alerta correto ANTES de trocar o estado
+    if (!isCurrentlyFavorite) {
+      showAlert("success", `Modelo salvo em favoritos!`);
+    } else {
+      showAlert("info", `Modelo removido dos favoritos.`);
+    }
     onToggleFavorite(modelId);
+  };
+
+  // Lógica para lidar com Tab e Enter na barra de busca
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Tab' && suggestion) {
+      e.preventDefault();
+      setSearchQuery(searchQuery + suggestion);
+    }
+    if (e.key === 'Enter' && (searchQuery + suggestion)) {
+      e.preventDefault();
+      const fullMatch = searchQuery + suggestion;
+      const modelToSelect = modelos.find(m => m.name.toLowerCase() === fullMatch.toLowerCase());
+      if (modelToSelect) {
+        onModelSelect(modelToSelect);
+      }
+    }
   };
 
   const showModelList = searchQuery.length > 0 || seeModels;
@@ -78,8 +119,9 @@ const ModelSelectionScreen = ({
         <SearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Buscar modelo por nome (ex: Despacho)..."
-          showTabs={true}
+          placeholder="Buscar modelo (ex: Despacho) e pressionar Enter"
+          suggestion={suggestion} // ✨ Passa a sugestão para o SearchBar
+          onKeyDown={handleSearchKeyDown} // ✨ Passa a função de keydown
         />
       </div>
 
@@ -224,12 +266,10 @@ function AnalysisPage({
 
   const [favoriteModelIds, setFavoriteModelIds] = useState(() => {
     const savedFavorites = localStorage.getItem("salvadocs_favorite_models");
-    // Se o backend ainda não estiver enviando, usa o localStorage ou um padrão
     return savedFavorites ? JSON.parse(savedFavorites) : (user?.favoriteModelIds || [1, 2]);
   });
 
   useEffect(() => {
-    // Sincroniza com o 'user' prop se ele vier do backend
     if (user?.favoriteModelIds) {
       setFavoriteModelIds(user.favoriteModelIds);
     }
@@ -245,15 +285,12 @@ function AnalysisPage({
       newFavoriteIds = [...favoriteModelIds, modelId];
     }
     setFavoriteModelIds(newFavoriteIds);
-
-    // Salva no localStorage como fallback
     localStorage.setItem("salvadocs_favorite_models", JSON.stringify(newFavoriteIds));
 
     try {
       await axios.post(`/modelos/${modelId}/toggle-favorite`);
     } catch (error) {
       showAlert("error", "Erro ao atualizar favoritos.");
-      // Reverte a mudança otimista se a API falhar
       setFavoriteModelIds(favoriteModelIds);
       localStorage.setItem("salvadocs_favorite_models", JSON.stringify(favoriteModelIds));
     }
@@ -337,6 +374,7 @@ function AnalysisPage({
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         setTool={setTool}
+        showAlert={showAlert}
         handleScrollTo={handleScrollTo}
         onToggleFavorite={handleToggleFavorite}
         favoriteModelIds={favoriteModelIds}

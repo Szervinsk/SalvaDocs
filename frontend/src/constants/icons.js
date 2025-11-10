@@ -8,7 +8,7 @@ import { AiOutlineHome, AiOutlineReload, AiOutlineCloseCircle } from "react-icon
 // BoxIcons (bi)
 import { BiSolidBusiness } from "react-icons/bi";
 
-import { IoMdKey } from "react-icons/io";
+import { IoMdKey, IoMdLink} from "react-icons/io";
 
 // Phosphor Icons (pi)
 import { PiSpinnerGapBold } from "react-icons/pi";
@@ -87,6 +87,7 @@ export const Icons = {
   Eye: FiEye,
   EyeOff: FiEyeOff,
   Star: FaRegStar,
+  Link: IoMdLink,
 
 
   // ============================

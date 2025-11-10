@@ -56,7 +56,7 @@ const AccountModal = ({ user, onLogout, darkMode, setDarkMode, setTool, setOpenM
 // ==========================================================================
 // SUB-COMPONENTE PARA CADA ITEM DA NAVEGAÇÃO (COM LÓGICA DE SUBMENU)
 // ==========================================================================
-const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmenu, setDataView, dataView , handleScrollTo }) => {
+const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmenu, setDataView, dataView, handleScrollTo }) => {
   const hasSubtools = item.subtools && item.subtools.length > 0;
   const isActive = tool === item.id || (item.subtools && item.subtools.map(s => s.id).includes(tool));
   const isSubmenuOpen = openSubmenu === item.id;
@@ -85,45 +85,48 @@ const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmen
   };
 
   return (
-    <div className="tool-item-container">
-      <button
-        className={`tool-item ${isActive ? "active" : ""}`}
-        onClick={handleClick}
-        title={item.name}
-      >
-        <div className="flex-row" style={{ gap: "10px" }}>
-          <div className="tool-item__icon">{item.icon}</div>
-          {!isCollapsed && (
-            <span className="tool-item__label">{item.name}</span>
+    // algumas tools ainda estão em fase de desenvolvimento, depois deve-se retirar a tag de develop
+    <div className={`tool-item-container ${item.id === 4 || item.id === 9 ? "develop" : ""}`} >
+      <div>
+        <button
+          className={`tool-item ${isActive ? "active" : ""}`}
+          onClick={handleClick}
+          title={item.name}
+        >
+          <div className="flex-row" style={{ gap: "10px" }}>
+            <div className="tool-item__icon">{item.icon}</div>
+            {!isCollapsed && (
+              <span className="tool-item__label">{item.name}</span>
+            )}
+          </div>
+          {hasSubtools && !isCollapsed && (
+            <Icons.ArrowDown size={16} className={`tool-item__chevron ${isSubmenuOpen ? 'open' : ''}`} />
           )}
-        </div>
-        {hasSubtools && !isCollapsed && (
-          <Icons.ArrowDown size={16} className={`tool-item__chevron ${isSubmenuOpen ? 'open' : ''}`} />
-        )}
-      </button>
+        </button>
 
-      <AnimatePresence>
-        {hasSubtools && isSubmenuOpen && !isCollapsed && (
-          <motion.div
-            className="submenu-list"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-          >
-            {item.subtools.map(subItem => (
-              <button
-                key={subItem.id}
-                // ✨ ATIVADO: O item fica ativo se o PAI estiver ativo E a visão for a correta
-                className={`submenu-item ${tool === item.id && dataView === subItem.haveData ? "active" : ""}`}
-                onClick={(e) => handleSubtoolClick(e, subItem)}
-              >
-                {subItem.name}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {hasSubtools && isSubmenuOpen && !isCollapsed && (
+            <motion.div
+              className="submenu-list"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            >
+              {item.subtools.map(subItem => (
+                <button
+                  key={subItem.id}
+                  // ATIVADO: O item fica ativo se o PAI estiver ativo E a visão for a correta
+                  className={`submenu-item ${tool === item.id && dataView === subItem.haveData ? "active" : ""}`}
+                  onClick={(e) => handleSubtoolClick(e, subItem)}
+                >
+                  {subItem.name}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -132,7 +135,7 @@ const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmen
 // ==========================================================================
 // COMPONENTE PRINCIPAL DA NAVBAR
 // ==========================================================================
-function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataView, dataView, handleScrollTo}) {
+function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataView, dataView, handleScrollTo }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [openModalAccount, setOpenModalAccount] = useState(false);
