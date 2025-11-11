@@ -1,11 +1,6 @@
-***
-
 # SalvaDocs 📄✨
 
 Analisador de documentos com IA integrada, projetado para otimizar a extração de dados e o gerenciamento de informações. O SalvaDocs é uma aplicação web dinâmica que permite ao usuário customizar modelos de análise, tags de extração e a organização em pastas de acordo com suas necessidades.
-
-![License](https://img.shields.io/badgehttps://img.shields.io/badge/version
-
 
 
 
