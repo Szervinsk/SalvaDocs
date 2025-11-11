@@ -1,5 +1,3 @@
-Aqui está o seu README em Markdown, ajustado conforme o exemplo fornecido, e agora com a inclusão do Augusto Soares como desenvolvedor e linkado ao GitHub dele:
-
 ***
 
 # SalvaDocs 📄✨
