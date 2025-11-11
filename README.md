@@ -1,168 +1,151 @@
-📄✨ SalvaDocs
-Analisador de documentos com IA integrada, projetado para otimizar a extração de dados e o gerenciamento de informações.
-O SalvaDocs é uma aplicação web dinâmica que permite ao usuário customizar modelos de análise, tags de extração e a organização em pastas de acordo com suas necessidades.
+Aqui está o seu README em Markdown, ajustado conforme o exemplo fornecido, e agora com a inclusão do Augusto Soares como desenvolvedor e linkado ao GitHub dele:
 
-💡 Visão Geral
-O SalvaDocs automatiza o processo de leitura e extração de informações de documentos PDF.
-Utilizando expressões regulares e o poder da IA generativa (Google Gemini), a plataforma identifica e cataloga dados-chave, organizando-os de forma inteligente para fácil acesso e gerenciamento.
+***
 
-✨ Funcionalidades
-Análise Inteligente de Documentos: Extraia informações de arquivos PDF usando Regex ou IA.
+# SalvaDocs 📄✨
 
-Gerenciamento Completo: Crie, edite e exclua Modelos, Tags e Pastas personalizadas.
+Analisador de documentos com IA integrada, projetado para otimizar a extração de dados e o gerenciamento de informações. O SalvaDocs é uma aplicação web dinâmica que permite ao usuário customizar modelos de análise, tags de extração e a organização em pastas de acordo com suas necessidades.
 
-Visualizador de PDF Integrado: Compare o documento original com os dados extraídos, lado a lado.
+![License](https://img.shields.io/badgehttps://img.shields.io/badge/version
 
-Autenticação Segura: Registro, login e controle de sessão com JWT e cookies httpOnly.
 
-Interface Reativa e Moderna: Desenvolvido em React, com animações usando Framer Motion.
 
-Dashboard de Análise: Monitore estatísticas como documentos processados e modelos mais usados.
 
-Monitor de API: Ferramenta integrada para testar rotas da API e visualizar respostas em tempo real.
+***
 
-🚀 Tecnologias Utilizadas
-Frontend
-React
+## 💡 Visão Geral
 
-Axios
+O SalvaDocs automatiza o processo de leitura e extração de informações de documentos PDF. Utilizando expressões regulares e o poder da IA generativa (Google Gemini), a plataforma identifica e cataloga dados-chave, organizando-os de forma inteligente para fácil acesso e gerenciamento.
 
-Framer Motion
+***
 
-React Router DOM
+## ✨ Funcionalidades
 
-CSS moderno (Flexbox / Grid e theming Light/Dark)
+* **Análise Inteligente de Documentos:** Extraia informações de arquivos PDF usando Regex ou IA.
+* **Gerenciamento Completo:** Crie, edite e exclua seus próprios Modelos, Tags e Pastas.
+* **Visualizador de PDF Integrado:** Visualize o documento original lado a lado com os dados extraídos.
+* **Autenticação Segura:** Sistema completo de registro, login e gerenciamento de sessão com JWT e cookies `httpOnly`.
+* **Interface Reativa e Moderna:** Construído com React e animado com Framer Motion para uma experiência de usuário fluida.
+* **Dashboard de Análise:** Acompanhe estatísticas de uso, como documentos processados e modelos mais utilizados.
+* **Monitor de API:** Uma ferramenta de desenvolvimento para testar e visualizar as respostas das rotas da API em tempo real.
 
-Backend
-Node.js + Express.js
+***
 
-Sequelize (ORM)
+## 🚀 Tecnologias Utilizadas
 
-Google Gemini API (IA generativa)
+O projeto é um monorepo dividido em `frontend` e `backend`.
 
-JWT + bcryptjs (autenticação e segurança)
+### **Frontend**
+* **React:** Biblioteca principal para a construção da interface.
+* **Axios:** Para realizar as requisições HTTP para o backend.
+* **Framer Motion:** Para animações fluidas e transições de página.
+* **CSS Moderno:** Variáveis CSS para theming (light/dark) e layout com Flexbox/Grid.
 
-helmet + cors + express-rate-limit
+### **Backend**
+* **Node.js:** Ambiente de execução do servidor.
+* **Express.js:** Framework para a construção da API REST.
+* **Sequelize:** ORM para interação com o banco de dados.
+* **Google Gemini API:** Para as funcionalidades de extração de dados com Inteligência Artificial.
+* **Autenticação:** JWT (JSON Web Tokens) para controle de sessão.
+* **Segurança:** `helmet` para proteção contra vulnerabilidades comuns, `bcryptjs` para hashing de senhas.
+* **Upload de Arquivos:** `multer` para gerenciar o upload de PDFs.
 
-multer (upload de PDFs)
+### **Banco de Dados**
+* **SQLite:** Para o ambiente de desenvolvimento.
+* **PostgreSQL:** Recomendado para produção.
 
-Banco de Dados
-SQLite (desenvolvimento)
+***
 
-PostgreSQL (produção recomendada)
+## 🏁 Começando
 
-🏁 Começando
-🔧 Pré-requisitos
-Node.js v18.x ou superior
+Siga os passos abaixo para configurar e executar o projeto localmente.
 
-Git instalado
+### **Pré-requisitos**
+* Node.js (v18.x ou superior)
+* Git
 
-⚙️ Instalação
-Clone o repositório:
+### **Instalação**
 
-bash
-git clone https://github.com/Szervinsk/SalvaDocs.git
-cd SalvaDocs
-🔹 Backend
-bash
-cd backend
-npm install
-🔹 Frontend
-bash
-cd ../frontend
-npm install
-⚙️ Configuração de Ambiente
-Crie dois arquivos .env, um para o backend e outro para o frontend.
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/Szervinsk/SalvaDocs.git
+    cd SalvaDocs
+    ```
 
-📁 /backend/.env
-text
-# Porta do servidor
-PORT=5000
+2.  **Instale as dependências do Backend:**
+    ```bash
+    cd backend
+    npm install
+    ```
 
-# Segredos JWT (use valores longos e aleatórios)
-JWT_SECRET=seu_segredo_super_secreto_aqui
-JWT_REFRESH_SECRET=outro_segredo_ainda_mais_secreto
+3.  **Instale as dependências do Frontend:**
+    ```bash
+    cd ../frontend
+    npm install
+    ```
 
-# Chave da API do Google Gemini
-GEMINI_API_KEY=sua_chave_da_api_gemini
-📁 /frontend/.env
-text
-# URL base da API backend
-VITE_API_BASE_URL=http://localhost:5000
-🗃️ Banco de Dados
-Antes de iniciar o servidor, prepare o banco de dados:
+### **Configuração de Ambiente (`.env`)**
 
-bash
-cd backend
-# Recriar tabelas do zero
-npm run reset
-# Popular com dados iniciais (modelos, tags, pastas)
-npm run seed
-🖥️ Executando a Aplicação
-🟢 Opção 1 — Rodar manualmente (em dois terminais)
-Terminal 1 (backend):
+Você precisará de dois arquivos `.env`: um para o backend e um para o frontend.
 
-bash
-cd backend
-npm run dev
-Terminal 2 (frontend):
+1.  **Backend:** Na pasta `/backend`, crie um arquivo `.env` com as seguintes variáveis:
+    ```env
+    # Porta do servidor
+    PORT=5000
 
-bash
-cd frontend
-npm start
-⚡ Opção 2 — Rodar ambos com um comando (recomendado)
-Instale o concurrently (uma vez só):
+    # Segredos para os tokens JWT (use valores longos e aleatórios)
+    JWT_SECRET=seu_segredo_super_secreto_aqui
+    JWT_REFRESH_SECRET=outro_segredo_ainda_mais_secreto
 
-bash
-npm install concurrently --save-dev
-E depois execute da pasta raiz:
+    # Chave da API do Google Gemini
+    GEMINI_API_KEY=sua_chave_da_api_gemini
+    ```
 
-bash
-npx concurrently "cd backend && npm run dev" "cd frontend && npm start"
-💡 Isso sobe o backend na porta 5000 e o frontend na 3000 ao mesmo tempo.
+2.  **Frontend:** Na pasta `/frontend`, crie um arquivo `.env` para a URL da API:
+    ```env
+    # URL base da sua API backend
+    VITE_API_BASE_URL=http://localhost:5000
+    ```
 
-🧩 Estrutura do Projeto
-text
-SalvaDocs/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   └── server.js
-│   ├── scripts/
-│   │   ├── seed.js
-│   │   └── sync.js
-│   └── .env
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── .env
-└── README.md
-🤝 Contribuição
-Contribuições são bem-vindas!
+### **Executando a Aplicação**
 
-Para sugerir melhorias, relatar bugs ou enviar PRs:
+1.  **Prepare o Banco de Dados:** A partir da pasta `/backend`, execute os scripts para criar e popular o banco de dados.
+    ```bash
+    # (Opcional) Limpa e recria as tabelas do zero
+    npm run reset
 
-Faça um fork do repositório
+    # Adiciona os dados iniciais (modelos, tags, pastas)
+    npm run seed
+    ```
 
-Crie uma branch
-git checkout -b feature/nova-funcionalidade
+2.  **Inicie os Servidores:** A partir da pasta **raiz** do projeto, você pode iniciar ambos os servidores (frontend e backend) com um único comando (recomendado instalar `concurrently`):
+    ```bash
+    # Se tiver 'concurrently' instalado globalmente ou no projeto
+    npx concurrently "cd backend && npm run dev" "cd frontend && npm run dev"
+    ```
+    Alternativamente, abra dois terminais e execute os comandos separadamente.
 
-Faça commit das mudanças
+***
 
-Envie um PR para revisão 🚀
+## 🤝 Contribuição
 
-📝 Licença
-Este projeto está sob a licença MIT.
-Consulte o arquivo LICENSE para mais detalhes.
+Contribuições são bem-vindas! Se você tiver sugestões ou encontrar bugs, por favor, abra uma *issue* no repositório.
 
-👨‍💻 Desenvolvedores
-Matheus Szervinsk
-GitHub: @Szervinsk
+***
 
-Augusto Soares
-GitHub: @Augustossn
+## 📝 Licença
 
-Repositório
-SalvaDocs
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+***
+
+## 🧑‍💻 Desenvolvedores
+
+* **Matheus Szervinsk**  
+    [@Szervinsk](https://github.com/Szervinsk)
+
+* **Augusto Soares**  
+    [@Augustossn](https://github.com/Augustossn)
+
+* **Repositório do Projeto:**  
+    [SalvaDocs](https://github.com/Szervinsk/SalvaDocs)
