@@ -9,6 +9,7 @@ const router = express.Router();
 router.post("/register", ctrl.register);
 router.post("/login", ctrl.login);
 router.post("/refresh-token", ctrl.refreshToken);
+router.post("/reset-password", ctrl.resetPassword)
 
 // Aplica-se o middleware de segurança
 // Todas as rotas abaixo desta linha são protegidas e exigem um accessToken válido.

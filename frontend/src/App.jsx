@@ -112,7 +112,7 @@ function App() {
           }
 
           try {
-            const { data } = await axios.post("/auth/refresh-token");
+            const { data } = await axios.post("/auth/refresh-token", null, { withCredentials: true });
             localStorage.setItem("accessToken", data.accessToken);
             return axios(originalRequest);
           } catch (refreshError) {
@@ -245,7 +245,7 @@ function App() {
 
   // Funções de Login e Cadastro que serão passadas para o AuthForm
   const handleLogin = async (credentials) => {
-    const { data } = await axios.post(`/auth/login`, credentials);
+    const { data } = await axios.post(`/auth/login`, credentials, { withCredentials: true });
     localStorage.setItem("accessToken", data.accessToken);
     setUser(data.user);
     setIsLogged(true);
