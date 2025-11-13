@@ -27,7 +27,7 @@ const AuthInput = ({ id, label, type, value, onChange, placeholder, children }) 
   </div>
 );
 
-function Login({ onSubmit, err, loading, switchToSignup }) {
+function Login({ onSubmit, err, loading, switchToSignup, switchToReset }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -35,9 +35,11 @@ function Login({ onSubmit, err, loading, switchToSignup }) {
   const isValidEmail = (v) => /\S+@\S+\.\S+/.test(v);
   const canSubmit = isValidEmail(email) && password.length >= 6 && !loading;
 
+  const [rememberMe, setRememberMe] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (canSubmit) onSubmit({ email, password });
+    if (canSubmit) onSubmit({ email, password, rememberMe });
   };
 
   return (
@@ -68,8 +70,25 @@ function Login({ onSubmit, err, loading, switchToSignup }) {
         </button>
       </AuthInput>
 
+      <div className="remember-me">
+        <label className="remember-me__label">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          Manter conectado
+        </label>
+      </div>
+
       <div className="auth-actions">
-        <button type="button" className="link-btn">Esqueceu a senha?</button>
+        <button
+          type="button"
+          className="link-btn"
+          onClick={switchToReset}   // <-- Troca para a tela de redefinição
+        >
+          Esqueceu a senha?
+        </button>
         <button type="submit" className="auth-btn" disabled={!canSubmit}>
           {loading ? "Entrando..." : "Entrar"}
         </button>

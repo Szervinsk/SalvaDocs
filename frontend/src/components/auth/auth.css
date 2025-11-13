@@ -171,6 +171,7 @@ CAMPOS DE ENTRADA
   align-items: center;
   justify-content: space-between;
   margin-top: var(--spacing-sm);
+  gap: 50px;
 }
 
 .auth-btn {
@@ -291,4 +292,18 @@ CAMPOS DE ENTRADA
 .dark .auth-error {
   background-color: rgba(255, 0, 0, 0.1);
   color: var(--color-error-text);
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  margin: 8px 0 16px;
+}
+
+.remember-me__label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
