@@ -86,7 +86,7 @@ const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmen
 
   return (
     // algumas tools ainda estão em fase de desenvolvimento, depois deve-se retirar a tag de develop
-    <div className={`tool-item-container ${item.id === 4 || item.id === 9 ? "develop" : ""}`} >
+    <div className="tool-item-container" >
       <div>
         <button
           className={`tool-item ${isActive ? "active" : ""}`}

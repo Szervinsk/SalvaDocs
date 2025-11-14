@@ -1,0 +1,437 @@
+/* ==========================================================================
+   1. LAYOUT GERAL DA PÁGINA (EditManager.jsx)
+   ========================================================================== */
+.manager-page {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background);
+  overflow: hidden;
+}
+
+/* --- Coluna da Esquerda (Listas/Tabelas) --- */
+.manager-sidebar {
+  flex: 1; /* Ocupa todo o espaço por padrão */
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-lg);
+  transition: flex 0.3s ease-in-out;
+  min-width: 0; /* Evita que o flexbox transborde */
+}
+
+/* Quando o editor está aberto, a sidebar encolhe */
+.manager-sidebar.shrunk {
+  flex: 0 0 60%; /* Ocupa 60% da tela */
+  padding-right: var(--spacing-lg);
+}
+
+.manager-header {
+  flex-shrink: 0;
+}
+.manager-header h1 {
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--spacing-xs);
+}
+.manager-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.manager-tabs {
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
+/* Container branco para as tabelas */
+.manager-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border);
+  min-height: 0; /* Correção de bug do Flexbox */
+}
+/* Esconde a barra de rolagem */
+.manager-content::-webkit-scrollbar {
+  display: none;
+}
+.manager-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   2. COLUNA DA DIREITA (PAINEL DE EDIÇÃO)
+   ========================================================================== */
+.manager-editor-panel {
+  flex: 0 0 40%; /* Ocupa 40% da tela */
+  max-width: 500px; /* Largura máxima */
+  background-color: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s ease;
+  z-index: 10;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.object-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.editor-header h3 {
+  margin: 0;
+  font-size: var(--font-size-h4);
+}
+
+.editor-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+/* Formulário dentro do painel */
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  height: 100%;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-lg);
+  margin-top: auto; /* Empurra para o final */
+}
+
+/* ==========================================================================
+   3. COMPONENTES DE GERENCIAMENTO (Tabelas, Abas)
+   ========================================================================== */
+
+/* --- Abas de Navegação (SegmentedControl) --- */
+.segmented-control {
+  display: inline-flex;
+  padding: 4px;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-sm);
+  border: var(--border-width-sm) solid var(--color-border);
+}
+.segmented-control__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background-color: transparent;
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.segmented-control__button:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+.segmented-control__button.active {
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Cabeçalho da Tabela (dentro do .manager-content) --- */
+.table-container {
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+.table-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-background);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.table-header-actions h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* --- Tabela de Dados (data-table) --- */
+.table-wrapper {
+  overflow-x: auto;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.data-table th,
+.data-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+.data-table thead {
+  background: var(--color-background);
+}
+.data-table th {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+.data-table tbody tr.clickable-row {
+  cursor: pointer;
+}
+.data-table tbody tr.clickable-row:hover {
+  background-color: var(--color-background);
+}
+.data-table .actions-cell {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  text-align: right;
+}
+.tag-count {
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+.tag-type-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+}
+.tag-type-badge.type--manual {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+.tag-type-badge.type--regex {
+  background-color: rgba(25, 135, 84, 0.1);
+  color: #198754;
+}
+.tag-type-badge.type--ia {
+  background-color: rgba(89, 125, 255, 0.1);
+  color: var(--color-accent);
+}
+
+/* ==========================================================================
+   4. ESTILOS DOS FORMULÁRIOS (Dentro do Painel)
+   ========================================================================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+.form-field label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+.form-field input[type="text"],
+.form-field .form-select,
+.form-field textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-background);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-field input[type="text"]:focus,
+.form-field .form-select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
+}
+.form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Wrapper para o <select> customizado */
+.custom-select-wrapper {
+  position: relative;
+}
+.custom-select-wrapper::after {
+  content: "▼";
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-md);
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+.form-field .form-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: var(--spacing-xl);
+}
+
+.tag-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.empty-text {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+.tag-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background-color: rgba(var(--color-accent-rgb), 0.1);
+}
+.tag-pill.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-surface);
+}
+
+/* ==========================================================================
+   5. COMPONENTE: MODAL DE CONFIRMAÇÃO (Para Excluir)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+.modal-content {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 0.3s ease;
+  max-height: 90vh;
+}
+.modal-content--small {
+  max-width: 400px;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: var(--border-width-sm) solid var(--color-border);
+  flex-shrink: 0;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: var(--font-size-h4);
+}
+.modal-body {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  line-height: 1.6;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width-sm) solid var(--color-border);
+  background-color: var(--color-background);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   6. ANIMAÇÕES
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

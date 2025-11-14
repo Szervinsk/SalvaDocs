@@ -36,7 +36,7 @@ import { IoAdd, IoClose, IoRocketOutline } from "react-icons/io5";
 import { LuCalendarDays, LuCircleDashed, LuDoorOpen, LuFileSearch, LuLayoutDashboard, LuTextSearch , LuClipboard} from "react-icons/lu";
 
 // Material Design (md)
-import { MdFileUpload, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt , MdAlternateEmail, MdFilterAlt ,MdOutlineDataUsage} from "react-icons/md";
+import { MdFileUpload, MdFolderOpen, MdOutlineDocumentScanner, MdOutlineEditNote, MdOutlineMoreHoriz, MdOutlineSearch, MdOutlineSettings, MdOutlineSubtitles, MdPeopleAlt , MdAlternateEmail, MdFilterAlt ,MdOutlineDataUsage} from "react-icons/md";
 
 // Phosphor Icons (pi)
 import { PiArchive, PiChartPie, PiFilePdf, PiListChecks } from "react-icons/pi";
@@ -121,7 +121,7 @@ export const Icons = {
   FileList: PiListChecks,
   ScannerDocument: MdOutlineDocumentScanner,
   Pdf_file: PiFilePdf,
-  Folder: FaRegFolder,
+  Folder: MdFolderOpen,
   Archive: PiArchive,
   Model: LuLayoutDashboard,
   Code: FiCode,
