@@ -5,8 +5,9 @@
   display: flex;
   width: 100%;
   height: 100%;
+  justify-content: space-between;
   background-color: var(--color-background);
-  overflow: hidden;
+  overflow: hidden; /* Impede a rolagem no nível da página */
 }
 
 /* --- Coluna da Esquerda (Listas/Tabelas) --- */
@@ -16,118 +17,150 @@
   flex-direction: column;
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
-  transition: flex 0.3s ease-in-out;
+  transition: flex 0.35s ease-in-out;
   min-width: 0; /* Evita que o flexbox transborde */
 }
 
 /* Quando o editor está aberto, a sidebar encolhe */
 .manager-sidebar.shrunk {
-  flex: 0 0 60%; /* Ocupa 60% da tela */
-  padding-right: var(--spacing-lg);
+  flex: 0 0 50%;
 }
 
-.manager-header {
+/* Cabeçalho Fixo da Sidebar */
+.manager-sidebar-header {
   flex-shrink: 0;
+  padding: var(--spacing-md);
+  position: sticky;
+  top: 0;
+  background-color: var(--color-background);
 }
-.manager-header h1 {
-  font-size: var(--font-size-h2);
-  margin-bottom: var(--spacing-xs);
+.manager-sidebar-header h1 {
+  font-size: 1.75rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
 }
-.manager-header p {
-  font-size: var(--font-size-base);
+.manager-subtitle {
   color: var(--color-text-secondary);
-  margin: 0;
+  font-size: 0.9rem;
 }
 
 .manager-tabs {
   align-self: flex-start;
   flex-shrink: 0;
+  padding: var(--spacing-sm) 0;
+  z-index: 20;
+  width: 100%;
 }
 
-/* Container branco para as tabelas */
-.manager-content {
-  flex: 1;
-  overflow-y: auto;
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--color-border);
+.manager-scroll-container {
+  flex: 1; /* Ocupa todo o espaço restante */
+  overflow-y: auto; /* A rolagem acontece aqui */
+  scroll-behavior: smooth;
   min-height: 0; /* Correção de bug do Flexbox */
 }
 /* Esconde a barra de rolagem */
-.manager-content::-webkit-scrollbar {
+.manager-scroll-container::-webkit-scrollbar {
   display: none;
 }
-.manager-content {
+.manager-scroll-container {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Estilo para cada seção (Modelos, Tags, Pastas) */
+.models-section {
+  padding-top: var(--spacing-xl);
+  scroll-margin-top: 100px;
+}
+.models-section__title {
+  font-size: var(--font-size-h3);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 
 /* ==========================================================================
    2. COLUNA DA DIREITA (PAINEL DE EDIÇÃO)
    ========================================================================== */
 .manager-editor-panel {
-  flex: 0 0 40%; /* Ocupa 40% da tela */
-  max-width: 500px; /* Largura máxima */
+  width: 450px;
   background-color: var(--color-surface);
   border-left: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  animation: slideInRight 0.3s ease;
   z-index: 10;
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  height: 100vh; /* Ocupa a altura total */
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.08);
+  /* A animação CSS é controlada pelo Framer Motion (no JSX) */
 }
 
 .object-editor {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 
 .editor-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  justify-content: space-between;
+  padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 .editor-header h3 {
-  margin: 0;
-  font-size: var(--font-size-h4);
+  color: var(--color-text-primary);
+}
+
+.editor-back-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.editor-back-btn:hover {
+  color: var(--color-accent);
+}
+.back-arrow {
+  transform: rotate(180deg);
+  font-size: 1.25rem;
 }
 
 .editor-body {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: none;
   padding: var(--spacing-lg);
 }
+.editor-body::-webkit-scrollbar {
+  display: none;
+}
+.editor-body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-/* Formulário dentro do painel */
 .editor-form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
   height: 100%;
 }
-
 .editor-footer {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-sm);
   padding-top: var(--spacing-lg);
-  margin-top: auto; /* Empurra para o final */
+  margin-top: auto;
 }
 
 /* ==========================================================================
-   3. COMPONENTES DE GERENCIAMENTO (Tabelas, Abas)
+   3. COMPONENTES DE GERENCIAMENTO (Abas, Tabelas)
    ========================================================================== */
 
 /* --- Abas de Navegação (SegmentedControl) --- */
@@ -166,7 +199,9 @@
 /* --- Cabeçalho da Tabela (dentro do .manager-content) --- */
 .table-container {
   border-radius: 10px;
+  background: var(--color-surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
   overflow: hidden;
 }
 .table-header-actions {
@@ -224,19 +259,20 @@
   justify-content: flex-end;
   text-align: right;
 }
+
 .tag-count {
-  background-color: var(--color-background);
-  color: var(--color-text-secondary);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  background: rgba(var(--color-accent-rgb), 0.1);
+  color: var(--color-accent);
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 .tag-type-badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: capitalize;
 }
 .tag-type-badge.type--manual {
@@ -258,46 +294,44 @@
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
+  gap: 1rem;
 }
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 0.35rem;
 }
 .form-field.full-width {
   grid-column: 1 / -1;
 }
 .form-field label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: 0.85rem;
+  font-weight: 500;
   color: var(--color-text-primary);
 }
 .form-field input[type="text"],
-.form-field .form-select,
+.form-field select,
 .form-field textarea {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--color-background);
-  border: var(--border-width-sm) solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.9rem;
   color: var(--color-text-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--color-background);
+  transition: border 0.2s, box-shadow 0.2s;
 }
 .form-field input[type="text"]:focus,
-.form-field .form-select:focus,
+.form-field select:focus,
 .form-field textarea:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(89, 125, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.15);
 }
 .form-field textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-/* Wrapper para o <select> customizado */
 .custom-select-wrapper {
   position: relative;
 }
@@ -321,43 +355,39 @@
 .tag-selection-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
   background-color: var(--color-background);
-  border-radius: var(--border-radius-sm);
+  border-radius: 10px;
+  padding: var(--spacing-md);
   border: 1px solid var(--color-border);
-  max-height: 200px;
+  gap: 0.5rem;
+  max-height: 250px;
   overflow-y: auto;
+  padding: 0.3rem 0;
 }
 .empty-text {
   font-style: italic;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.85rem;
 }
 .tag-pill {
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  background-color: transparent;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
+  gap: 0.35rem;
+  transition: background 0.2s, border 0.2s, color 0.2s;
 }
 .tag-pill:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  background-color: rgba(var(--color-accent-rgb), 0.1);
 }
 .tag-pill.active {
-  background-color: var(--color-accent);
+  background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-surface);
+  color: white;
 }
 
 /* ==========================================================================
@@ -415,7 +445,7 @@
 }
 
 /* ==========================================================================
-   6. ANIMAÇÕES
+   6. ANIMAÇÕES (Apenas para o Modal)
    ========================================================================== */
 @keyframes fadeIn {
   from {

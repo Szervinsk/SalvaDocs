@@ -44,7 +44,7 @@ import { PiArchive, PiChartPie, PiFilePdf, PiListChecks } from "react-icons/pi";
 import { RiRobot2Line } from "react-icons/ri";
 
 // Tabler Icons (tb)
-import { TbLayoutSidebarRight, TbNumber123, TbPigMoney } from "react-icons/tb";
+import { TbLayoutSidebarRight, TbNumber123, TbPigMoney, TbAdjustmentsSpark } from "react-icons/tb";
 
 // VS Code Icons (vsc)
 import { VscLaw } from "react-icons/vsc";
@@ -88,6 +88,7 @@ export const Icons = {
   EyeOff: FiEyeOff,
   Star: FaRegStar,
   Link: IoMdLink,
+  Manage: TbAdjustmentsSpark,
 
 
   // ============================

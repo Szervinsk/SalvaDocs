@@ -3,20 +3,37 @@ import { Icons } from "../../../constants/icons";
 import axios from "axios";
 import "./managements.css";
 
-// --- FORMULÁRIO DE TAGS ---
+// ==========================================================================
+// FORMULÁRIO DE TAGS
+// ==========================================================================
 const TagForm = ({ data, onSave, onClose, showAlert }) => {
   const [formData, setFormData] = useState({
     name: data?.name || "",
     category: data?.category || "",
-    type: data?.type || "Manual",
     icon: data?.icon || "",
     regex: data?.regex || "",
     prompt: data?.prompt || "",
     displayCategory: data?.displayCategory || "data",
   });
   const [extractionType, setExtractionType] = useState(data?.type || "Manual");
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Efeito para ATUALIZAR o formulário se a prop 'data' mudar
   useEffect(() => {
+    setFormData({
+      name: data?.name || "",
+      category: data?.category || "",
+      icon: data?.icon || "",
+      regex: data?.regex || "",
+      prompt: data?.prompt || "",
+      displayCategory: data?.displayCategory || "data",
+    });
+    setExtractionType(data?.type || "Manual");
+  }, [data]);
+
+  // Efeito para determinar o tipo de extração automaticamente
+  useEffect(() => {
+    // Só muda automaticamente se for uma NOVA tag
     if (!data) {
       if (formData.prompt) setExtractionType("IA");
       else if (formData.regex) setExtractionType("Regex");
@@ -31,14 +48,42 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const payload = { ...formData, type: extractionType };
+
     try {
-      if (data) await axios.put(`/tags/${data.id}`, payload);
-      else await axios.post("/tags", payload);
-      showAlert("success", "Tag salva com sucesso!");
-      onSave();
+      if (data) {
+        await axios.put(`/tags/${data.id}`, payload);
+        showAlert("success", "Tag atualizada com sucesso!");
+      } else {
+        await axios.post("/tags/create", payload);
+        showAlert("success", "Tag criada com sucesso!");
+      }
+      onSave(); // Atualiza os dados no pai
     } catch (err) {
       showAlert("error", "Erro ao salvar tag.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      !data ||
+      !window.confirm(`Tem certeza que deseja excluir a tag "${data.name}"?`)
+    )
+      return;
+
+    setIsLoading(true);
+    try {
+      await axios.delete(`/tags/${data.id}`);
+      showAlert("success", "Tag excluída com sucesso!");
+      onSave(); // Atualiza os dados
+      onClose(); // Fecha o painel
+    } catch (err) {
+      showAlert("error", "Erro ao excluir tag.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,7 +95,7 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
           <input
             type="text"
             name="name"
-            value={formData.name}
+            value={formData.name || ""}
             onChange={handleInputChange}
             required
           />
@@ -60,7 +105,7 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
           <input
             type="text"
             name="category"
-            value={formData.category}
+            value={formData.category || ""}
             onChange={handleInputChange}
           />
         </div>
@@ -104,7 +149,7 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
             <input
               type="text"
               name="regex"
-              value={formData.regex}
+              value={formData.regex || ""}
               onChange={handleInputChange}
               placeholder="/.../"
             />
@@ -115,18 +160,18 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
             <label>Prompt IA</label>
             <textarea
               name="prompt"
-              value={formData.prompt}
+              value={formData.prompt || ""}
               onChange={handleInputChange}
               rows="4"
             />
           </div>
         )}
 
-        <div className="form-field full-width">
+        <div className="form-field">
           <label>Ícone</label>
           <select
             name="icon"
-            value={formData.icon}
+            value={formData.icon || ""}
             onChange={handleInputChange}
             className="form-select"
           >
@@ -138,31 +183,67 @@ const TagForm = ({ data, onSave, onClose, showAlert }) => {
             ))}
           </select>
         </div>
+        <div className="form-field">
+          <label>Categoria de Exibição</label>
+          <select
+            name="displayCategory"
+            value={formData.displayCategory || "data"}
+            onChange={handleInputChange}
+            className="form-select"
+          >
+            <option value="data">Dado (Caixinha)</option>
+            <option value="title">Título Principal</option>
+            <option value="summary">Bloco de Resumo</option>
+            <option value="signatory">Signatário</option>
+            <option value="list">Lista</option>
+          </select>
+        </div>
       </div>
       <div className="editor-footer">
-        <button type="button" className="btn-secondary" onClick={onClose}>
+        {data && (
+          <button
+            type="button"
+            className="btn-danger"
+            onClick={handleDelete}
+            disabled={isLoading}
+            style={{ marginRight: "auto" }}
+          >
+            {isLoading ? "Excluindo..." : "Excluir"}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={onClose}
+          disabled={isLoading}
+        >
           Cancelar
         </button>
-        <button type="submit" className="btn-primary">
-          Salvar
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? "Salvando..." : "Salvar"}
         </button>
       </div>
     </form>
   );
 };
 
-// --- FORMULÁRIO DE MODELOS (O que você mandou) ---
-const ModelForm = ({ data, onSave, onClose, showAlert }) => {
+// ==========================================================================
+// FORMULÁRIO DE MODELOS
+// ==========================================================================
+const ModelForm = ({ data, onSave, onClose, showAlert, allTags }) => {
   const [name, setName] = useState(data?.name || "");
   const [description, setDescription] = useState(data?.description || "");
-  const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState(
     data?.tagsBase?.map((t) => t.id) || []
   );
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Atualiza o formulário se a prop 'data' mudar
   useEffect(() => {
-    axios.get("/tags").then((res) => setAvailableTags(res.data));
-  }, []);
+    setName(data?.name || "");
+    setDescription(data?.description || "");
+    setSelectedTagIds(data?.tagsBase?.map((t) => t.id) || []);
+  }, [data]);
 
   const handleTagChange = (tagId) => {
     setSelectedTagIds((prev) =>
@@ -174,6 +255,7 @@ const ModelForm = ({ data, onSave, onClose, showAlert }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const payload = { name, description, tagIds: selectedTagIds };
     try {
       if (data) await axios.put(`/modelos/${data.id}`, payload);
@@ -182,6 +264,28 @@ const ModelForm = ({ data, onSave, onClose, showAlert }) => {
       onSave();
     } catch (err) {
       showAlert("error", "Erro ao salvar modelo.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      !data ||
+      !window.confirm(`Tem certeza que deseja excluir o modelo "${data.name}"?`)
+    )
+      return;
+
+    setIsLoading(true);
+    try {
+      await axios.delete(`/modelos/${data.id}`);
+      showAlert("success", "Modelo excluído com sucesso!");
+      onSave();
+      onClose();
+    } catch (err) {
+      showAlert("error", "Erro ao excluir modelo.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -207,7 +311,7 @@ const ModelForm = ({ data, onSave, onClose, showAlert }) => {
       <div className="form-field">
         <label>Tags Associadas</label>
         <div className="tag-selection-grid">
-          {availableTags.map((tag) => (
+          {allTags.map((tag) => (
             <label
               key={tag.id}
               className={`tag-pill ${
@@ -227,23 +331,48 @@ const ModelForm = ({ data, onSave, onClose, showAlert }) => {
         </div>
       </div>
       <div className="editor-footer">
-        <button type="button" className="btn-secondary" onClick={onClose}>
+        {data && (
+          <button
+            type="button"
+            className="btn-danger"
+            onClick={handleDelete}
+            disabled={isLoading}
+            style={{ marginRight: "auto" }}
+          >
+            {isLoading ? "Excluindo..." : "Excluir"}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={onClose}
+          disabled={isLoading}
+        >
           Cancelar
         </button>
-        <button type="submit" className="btn-primary">
-          Salvar
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? "Salvando..." : "Salvar"}
         </button>
       </div>
     </form>
   );
 };
 
-// --- FORMULÁRIO DE PASTAS ---
+// ==========================================================================
+// FORMULÁRIO DE PASTAS
+// ==========================================================================
 const PastaForm = ({ data, onSave, onClose, showAlert }) => {
   const [name, setName] = useState(data?.name || "");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Atualiza o formulário se a prop 'data' mudar
+  useEffect(() => {
+    setName(data?.name || "");
+  }, [data]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (data) await axios.put(`/folders/${data.id}`, { name });
       else await axios.post("/folders", { name });
@@ -251,6 +380,31 @@ const PastaForm = ({ data, onSave, onClose, showAlert }) => {
       onSave();
     } catch (err) {
       showAlert("error", "Erro ao salvar pasta.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      !data ||
+      !window.confirm(`Tem certeza que deseja excluir a pasta "${data.name}"?`)
+    )
+      return;
+
+    setIsLoading(true);
+    try {
+      await axios.delete(`/folders/${data.id}`);
+      showAlert("success", "Pasta excluída com sucesso!");
+      onSave();
+      onClose();
+    } catch (err) {
+      showAlert(
+        "error",
+        "Erro ao excluir pasta. Verifique se ela não contém documentos."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -266,29 +420,48 @@ const PastaForm = ({ data, onSave, onClose, showAlert }) => {
         />
       </div>
       <div className="editor-footer">
-        <button type="button" className="btn-secondary" onClick={onClose}>
+        {data && (
+          <button
+            type="button"
+            className="btn-danger"
+            onClick={handleDelete}
+            disabled={isLoading}
+            style={{ marginRight: "auto" }}
+          >
+            {isLoading ? "Excluindo..." : "Excluir"}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={onClose}
+          disabled={isLoading}
+        >
           Cancelar
         </button>
-        <button type="submit" className="btn-primary">
-          Salvar
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? "Salvando..." : "Salvar"}
         </button>
       </div>
     </form>
   );
 };
 
-// --- COMPONENTE PRINCIPAL DO EDITOR (SELETOR) ---
-const ObjectEditor = ({ editorState, onClose, onSave, showAlert }) => {
+// ==========================================================================
+// COMPONENTE PRINCIPAL DO EDITOR (SELETOR)
+// ==========================================================================
+const ObjectEditor = ({ editorState, onClose, onSave, showAlert, tags }) => {
   const { type, data, mode } = editorState;
   const title = mode === "create" ? `Criar ${type}` : `Editar ${type}`;
 
   return (
     <div className="object-editor">
       <header className="editor-header">
-        <h3>{title}</h3>
-        <button className="icon-btn" onClick={onClose}>
-          <Icons.Close size={20} />
+        <button onClick={onClose} className="editor-back-btn">
+          <Icons.ArrowRight size={20} className="back-arrow" />
+          Voltar
         </button>
+        <h3>{title}</h3>
       </header>
       <div className="editor-body">
         {type === "tag" && (
@@ -305,6 +478,7 @@ const ObjectEditor = ({ editorState, onClose, onSave, showAlert }) => {
             onSave={onSave}
             onClose={onClose}
             showAlert={showAlert}
+            allTags={tags} // Passa a lista completa de tags
           />
         )}
         {type === "pasta" && (
