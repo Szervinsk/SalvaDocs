@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Login from "./login";
 import Cadastro from "./sign";
+import ResetPassword from "./reset"; // <---- adicione seu componente aqui!
 import "./auth.css";
 import { Icons } from "../../constants/icons";
 import Logo from "../../../src/assets/pen.svg";
@@ -29,15 +30,12 @@ function AuthForm({ onLoginSubmit, onSignupSubmit }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // NENHUMA LÓGICA DE API AQUI!
-
-  // Funções "wrapper" que adicionam estado de loading e erro antes de chamar a prop
+  // Funções "wrapper" que adicionam estado de loading e erro ao chamar as props
   const handleLogin = async (credentials) => {
     setLoading(true);
     setError("");
     try {
       await onLoginSubmit(credentials);
-      // O App.jsx vai cuidar de mudar o estado isLogged
     } catch (err) {
       setError(err.message);
     } finally {
@@ -58,16 +56,22 @@ function AuthForm({ onLoginSubmit, onSignupSubmit }) {
   };
 
   const formVariants = {
-    hidden: { opacity: 0, x: mode === 'login' ? -50 : 50 },
+    hidden: { opacity: 0, x: mode === "login" ? -50 : 50 },
     visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: mode === 'login' ? 50 : -50 },
+    exit: { opacity: 0, x: mode === "login" ? 50 : -50 },
   };
 
   return (
     <main className="auth-container">
       <div className="auth-card">
         <motion.div
-          style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
         >
           <div className="logo-wrapper">
             <img src={Logo} alt="SalvaDocs Logo" className="logo-icon" />
@@ -81,7 +85,7 @@ function AuthForm({ onLoginSubmit, onSignupSubmit }) {
               animate="visible"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{ width: "100%" , display: "flex",  justifyContent: "center" }}
+              style={{ width: "100%", display: "flex", justifyContent: "center" }}
             >
               {mode === "login" ? (
                 <Login
@@ -89,13 +93,19 @@ function AuthForm({ onLoginSubmit, onSignupSubmit }) {
                   loading={loading}
                   err={error}
                   switchToSignup={() => setMode("signup")}
+                  switchToReset={() => setMode("reset")} // <---- callback para reset
                 />
-              ) : (
+              ) : mode === "signup" ? (
                 <Cadastro
                   onSubmit={handleSignup}
                   loading={loading}
                   err={error}
                   switchToLogin={() => setMode("login")}
+                />
+              ) : (
+                <ResetPassword
+                  loading={loading}
+                  switchToLogin={() => setMode("login")} // <--- retorna para login
                 />
               )}
             </motion.div>

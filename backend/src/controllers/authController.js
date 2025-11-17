@@ -32,7 +32,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
     const user = await models.User.findOne({ where: { email } });
 
     if (!user) return res.status(400).json({ error: "Credenciais inválidas" });
@@ -42,10 +42,10 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Credenciais inválidas" });
 
     const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, {
-      expiresIn: "30m",
+      expiresIn: "1m",
     });
     const refreshToken = jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
-      expiresIn: "7d",
+      expiresIn: rememberMe ? "7d" : "1h",
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -53,6 +53,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/api/auth",
+      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
     });
 
     const userResponse = user.toJSON();
@@ -80,7 +81,7 @@ export const refreshToken = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("refreshToken", { path: "/api/auth" });
+  res.clearCookie("refresh-Token", { path: "/api/auth" });
   res.status(200).json({ message: "Logout realizado com sucesso" });
 };
 
@@ -108,4 +109,19 @@ export const me = async (req, res) => {
     console.error("Erro ao buscar dados do usuário:", err);
     res.status(500).json({ error: "Erro ao buscar usuário" });
   }
-};
+}
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const user = await models.User.findOne({ where: { email }});
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Senha redefinida com sucesso!" })
+  } catch (err) {
+      res.status(500).json({ error: "Erro ao definir senha."})
+  }
+}

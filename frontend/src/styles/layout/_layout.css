@@ -26,7 +26,6 @@ body {
   display: flex;
   flex-direction: row; /* se tu mudar de novo essa porra eu te mato */
   flex: 1;
-  overflow: hidden;
   align-items: center;
 }
 
@@ -63,7 +62,6 @@ body {
   flex: 1;
   display: flex; /* Mantenha isso para o .main-content se expandir */
   position: relative; /* ESSENCIAL para que o OpenDocs (com position: absolute) se posicione corretamente */
-  overflow-y: auto;
   min-height: 0;
 }
 

@@ -1,38 +1,12 @@
-/* Estado colapsado (ícone apenas) */
-.search-collapsed {
+/* ==========================================================================
+   COMPONENTE: SEARCHBAR
+   ========================================================================== */
+
+.search-bar-wrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--color-surface);
-  border: 1.8px solid var(--color-border);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.search-collapsed:hover {
-  background: var(--color-hover);
-  border-color: var(--color-accent);
-  transform: scale(1.05);
-}
-
-.search-collapsed svg {
-  color: var(--color-text-secondary);
-  font-size: 18px;
-  transition: color 0.2s ease;
-}
-
-.search-collapsed:hover svg {
-  color: var(--color-accent);
-}
-
-/* Estado expandido */
-.search-container {
-  display: flex;
-  align-items: center;
+  position: relative;
+  /* Necessário para a sugestão de autocomplete */
   background: var(--color-surface);
   border: 1.8px solid var(--color-border);
   border-radius: 10px;
@@ -43,25 +17,26 @@
   transition: all 0.3s ease;
 }
 
-.search-container:hover,
-.search-container:focus-within {
+.search-bar-wrapper:hover,
+.search-bar-wrapper:focus-within {
   border-color: var(--color-accent);
   box-shadow: 0 0 5px rgba(89, 125, 255, 0.2);
 }
 
-.search-icon {
+.search-bar-icon {
   color: var(--color-text-secondary);
   font-size: 16px;
   margin-right: 10px;
-  cursor: pointer;
   transition: color 0.2s ease;
+  flex-shrink: 0;
+  /* Impede que o ícone seja espremido */
 }
 
-.search-container:hover .search-icon {
+.search-bar-wrapper:hover .search-bar-icon {
   color: var(--color-accent);
 }
 
-.search-input {
+.search-bar-input {
   flex: 1;
   border: none;
   outline: none;
@@ -69,29 +44,55 @@
   font-size: 14px;
   color: var(--color-text-primary);
   letter-spacing: 0.2px;
+  /* Garante que o input fique por cima da sugestão */
+  position: relative;
+  z-index: 2;
 }
 
-.search-input::placeholder {
+.search-bar-input::placeholder {
   color: var(--color-text-secondary);
   opacity: 0.8;
 }
 
-/* --- Dark mode --- */
-[data-theme="dark"] .search-container,
-[data-theme="dark"] .search-collapsed {
-  background: var(--color-dark-surface);
-  border-color: var(--color-dark-border);
+/* ==========================================================================
+   NOVOS ESTILOS: Autocomplete e Botão Limpar
+   ========================================================================== */
+
+/* --- Texto "Fantasma" do Autocomplete --- */
+.search-bar-suggestion {
+  position: absolute;
+  left: calc(14px + 16px + 10px);
+  /* Alinha com o texto do input */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  pointer-events: none;
+  /* Permite clicar através dele */
+  z-index: 1;
+  letter-spacing: 0.2px;
 }
 
-[data-theme="dark"] .search-input {
-  color: var(--color-dark-text-primary);
+/* --- Botão 'X' para Limpar a Busca --- */
+.search-bar-clear {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+  z-index: 2;
+  /* Garante que fique clicável */
 }
 
-[data-theme="dark"] .search-icon {
-  color: var(--color-dark-text-secondary);
-}
-
-[data-theme="dark"] .search-container:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 6px rgba(125, 162, 255, 0.2);
+.search-bar-clear:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
 }

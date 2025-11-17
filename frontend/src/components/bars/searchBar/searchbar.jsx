@@ -1,21 +1,37 @@
 import { Icons } from "../../../constants/icons";
+import "./searchbar.css"; // Certifique-se que o CSS está sendo importado
 
-function SearchBar({ searchQuery, setSearchQuery, placeholder }) {
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
-
+function SearchBar({ searchQuery, setSearchQuery, placeholder, suggestion, onKeyDown }) {
   return (
-    <form className="search-container" onSubmit={handleSearch}>
-      <Icons.Search size={20} className="search-icon" />
+    <div className="search-bar-wrapper">
+      <div className="search-bar-icon">
+        <Icons.Search size={16} />
+      </div>
+
+      {suggestion && (
+        <div className="search-bar-suggestion">
+          {/* Renderiza a parte já digitada com 'visibility: hidden' para alinhar a sugestão */}
+          <span style={{ visibility: 'hidden' }}>{searchQuery}</span>
+          <span>{suggestion}</span>
+        </div>
+      )}
+
       <input
         type="text"
-        placeholder={placeholder} // colocar if para se for das pastas ou se for dos tools
+        className="search-bar-input"
+        placeholder={placeholder || "Buscar..."}
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
-        className="search-input"
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={onKeyDown} // Adiciona o listener de keydown
       />
-    </form>
+
+      {/* Botão de limpar (opcional) */}
+      {searchQuery && (
+        <button className="search-bar-clear" onClick={() => setSearchQuery("")}>
+          <Icons.Close size={14} />
+        </button>
+      )}
+    </div>
   );
 }
 

@@ -37,7 +37,7 @@ export const TOOLS = [
     id: 2,
     name: "Relatório", // ID PAI
     icon: <Icons.Graphics size={22} />,
-    shortcut: "G",
+    shortcut: "R",
     subtools: [
       { id: 2, name: "Documentos", attribute: false }, // ID 2 (pai) + atributo
       { id: 20, name: "Dashboard", attribute: true }, // ID ÚNICO + atributo
@@ -46,8 +46,8 @@ export const TOOLS = [
   {
     id: 3,
     name: "Gerenciar", // ID PAI
-    icon: <Icons.Model size={22} />,
-    shortcut: "F",
+    icon: <Icons.Manage size={22} />,
+    shortcut: "G",
     subtools: [
       { id: 3, name: "Modelos", attribute: "Modelos" }, // ID 3 (pai) + atributo
       { id: 30, name: "Tags", attribute: "Tags" }, // ID ÚNICO + atributo
@@ -71,6 +71,12 @@ export const TOOLS = [
     icon: <Icons.Rocket size={20} />,
     shortcut: "M",
   },
+  {
+    id: 9,
+    name: "Links",
+    icon: <Icons.Link size={20} />,
+    shortcut: "L",
+  },
 ];
 
 export const TOOLS_ACCOUNT = [
@@ -90,7 +96,7 @@ export const TOOLS_ACCOUNT = [
     id: 8,
     name: "Conta",
     icon: <Icons.User size={22} />,
-    shortcut: "C",
+    shortcut: "U",
   },
 ];
 
