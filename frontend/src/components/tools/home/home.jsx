@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Icons } from "../../../constants/icons";
 import "./home.css";
 import SearchBar from "../../bars/searchBar/searchbar";
-import Dashboard from "../../tools/models/dashboard"
+import Dashboard from "./dashboard"
 
 // ==========================================================================
 // SUB-COMPONENTE: TABELA DE DOCUMENTOS (AGORA COM STATUS E PROGRESSO)

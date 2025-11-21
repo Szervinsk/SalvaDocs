@@ -7,7 +7,7 @@ import axios from "axios";
 // Importação das Ferramentas (Componentes Filhos)
 import AnalyseDoc from "./tools/analyse/analyse";
 import Home from "./tools/home/home";
-import EditModels from "./tools/models/edit-models";
+import EditManager from "./tools/models/edit-manager";
 import Configurations from "./tools/configurations/configurations";
 import Account from "./tools/account/account";
 import Routes from "./tools/routes/routes";
@@ -150,7 +150,7 @@ function Block({
       case 31:
       case 32:
         return (
-          <EditModels
+          <EditManager
             modelos={modelos}
             tags={tags}
             pastas={pastas}

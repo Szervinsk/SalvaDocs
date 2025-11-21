@@ -46,7 +46,7 @@ export const TOOLS = [
   {
     id: 3,
     name: "Gerenciar", // ID PAI
-    icon: <Icons.Model size={22} />,
+    icon: <Icons.Manage size={22} />,
     shortcut: "G",
     subtools: [
       { id: 3, name: "Modelos", attribute: "Modelos" }, // ID 3 (pai) + atributo
