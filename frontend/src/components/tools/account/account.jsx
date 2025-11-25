@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Icons } from "../../../constants/icons"; // Ajuste o caminho se necessário
 import "./account.css";
 import axios from "axios";
+import logoImage from '../../../assets/Photo.png';
 
 function Account({ user, onUserUpdate, onLogout, showAlert, onDataChange }) {
   // --- Estados do Formulário Principal ---
@@ -255,10 +256,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, onDataChange }) {
 
             {/* Logo e Cabeçalho */}
             <div className="auth-header-logo">
-              {/* !! ADICIONE A URL DO SEU LOGO AQUI !! 
-                (Ex: /logo-salvadocs.png)
-              */}
-              <img src="/logo.png" alt="SalvaDocs" className="auth-logo" />
+              <img src={logoImage} alt="SalvaDocs" className="auth-logo" /> 
               <h2>Alterar Senha</h2>
               <p>Para sua segurança, informe sua senha atual e a nova.</p>
             </div>
@@ -310,7 +308,7 @@ function Account({ user, onUserUpdate, onLogout, showAlert, onDataChange }) {
               </div>
 
               <div className="auth-modal-actions">
-                <button type="submit" className="auth-btn-submit">Salvar Nova Senha</button>
+                <button type="submit" className="auth-btn-submit">Salvar</button>
                 <button type="button" className="auth-btn-cancel" onClick={() => setShowPasswordModal(false)}>
                   Cancelar
                 </button>
