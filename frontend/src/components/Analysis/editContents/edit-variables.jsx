@@ -11,9 +11,9 @@ function EditVariables({
   onClose,
   selectedTags,
   setSelectedTags,
-  file,
+  files,       // <--- ALTERADO (antes era 'file')
   modelos,
-  setFile,
+  setFiles,    // <--- ALTERADO (antes era 'setFile')
   erroArquivo,
   setDocSelecionado,
   setEtapaAtual,
@@ -62,8 +62,8 @@ function EditVariables({
         etapaAtual={etapaAtual}
         selectedModel={selectedModel}
         onClose={onClose}
-        file={file}
-        setFile={setFile}
+        files={files}          // <--- ALTERADO: Passando o array
+        setFiles={setFiles}    // <--- ALTERADO: Passando a função
         pastas={pastas}
         tags={tags}
         selectedTags={selectedTags}
@@ -89,7 +89,7 @@ function EditVariables({
         etapas={etapas}
         etapaAtual={etapaAtual}
         selectedTags={selectedTags}
-        file={file}
+        files={files}          // <--- ALTERADO: Agora EditAnalise recebe a lista
         tags={tags}
         onClose={() => {
           setDocSelecionado(null);

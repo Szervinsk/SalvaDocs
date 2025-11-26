@@ -13,8 +13,8 @@ export function AnalyseDoc({
   setEtapaAtual,
   selectedTags,
   setSelectedTags,
-  file,
-  setFile,
+  files,       // <--- ALTERADO DE 'file' PARA 'files'
+  setFiles,    // <--- ALTERADO DE 'setFile' PARA 'setFiles'
   erroArquivo,
   isEtapaDisabled,
   tremer,
@@ -40,7 +40,8 @@ export function AnalyseDoc({
 }) {
 
   const goToEtapa = (targetId) => {
-    if (targetId === 3 && !file) {
+    // <--- ALTERADO: Verifica se o array existe e se tem itens
+    if (targetId === 3 && (!files || files.length === 0)) {
       triggerShake();
       return;
     }
@@ -64,8 +65,8 @@ export function AnalyseDoc({
         setEtapaAtual={goToEtapa}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        file={file}
-        setFile={setFile}
+        files={files}       // <--- ALTERADO: Passando o array para AnalysisPage
+        setFiles={setFiles} // <--- ALTERADO: Passando a função para AnalysisPage
         erroArquivo={erroArquivo}
         onBlocked={triggerShake}
         tremer={tremer}

@@ -1,6 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import { Icons } from "../constants/icons";
-import { ETAPAS } from "../constants/constants";
+import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import axios from "axios";
 
@@ -17,6 +15,7 @@ import StatusBar from "./bars/actionStatusBars/status-bar";
 import ApiMonitoration from "./tools/dev/ApiMonitoration";
 import MoreContent from "./more/moreContent";
 import AboutPage from "./tools/aboutPage/AboutPage";
+import { ETAPAS } from "../constants/constants"; // Certifique-se que o caminho está certo
 
 function Block({
   // Props de Dados e Estado do App.jsx
@@ -25,8 +24,8 @@ function Block({
   documentos,
   setDocumentos,
   onDataChange,
-  dataView, // Recebe o estado da visão (false=Docs, true=Dashboard)
-  setDataView, // Recebe o setter
+  dataView,
+  setDataView,
   user,
   tool,
   setTool,
@@ -55,7 +54,11 @@ function Block({
   // Estados locais do Block (para o fluxo de Análise)
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [file, setFile] = useState(null);
+  
+  // --- MUDANÇA PRINCIPAL AQUI ---
+  const [files, setFiles] = useState([]); // Agora é um array vazio, não null
+  // ------------------------------
+
   const [tags, setTags] = useState([]);
   const [tremer, setTremer] = useState(false);
   const [more, setMore] = useState(false);
@@ -66,7 +69,7 @@ function Block({
     if (tool !== 1) { // Tool 1 agora é "Analisar"
       setSelectedModel(null);
       setSelectedTags([]);
-      setFile(null);
+      setFiles([]); // Reseta para array vazio
       setEtapaAtual(1);
     }
   }, [tool, setSelectedModel]);
@@ -87,12 +90,13 @@ function Block({
   const triggerShake = () => {
     setTremer(true);
     setTimeout(() => setTremer(false), 500);
-    showAlert("warning", "Ação bloqueada: anexe um arquivo para prosseguir.");
+    showAlert("warning", "Ação bloqueada: anexe pelo menos um arquivo para prosseguir.");
   };
 
   const isEtapaDisabled = (id) => {
     if (id <= etapaAtual) return false;
-    if (id === 3 && !file) return true;
+    // Verifica se o array está vazio para bloquear a etapa 3
+    if (id === 3 && files.length === 0) return true; 
     return false;
   };
 
@@ -113,15 +117,17 @@ function Block({
             setEtapaAtual={setEtapaAtual}
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
-            file={file}
-            setFile={setFile}
+            
+            files={files}       // Passa o array
+            setFiles={setFiles} // Passa a função
+            
             tremer={tremer}
             setDocSelecionado={setDocSelecionado}
             documentos={documentos}
             setDocumentos={setDocumentos}
             setTool={setTool}
             handleScrollTo={handleScrollTo}
-            erroArquivo={false} // Resetar erro?
+            erroArquivo={false}
             isEtapaDisabled={isEtapaDisabled}
             onBlocked={triggerShake}
             showAlert={showAlert}
@@ -136,7 +142,7 @@ function Block({
             documentos={documentos}
             pastas={pastas}
             tags={tags}
-            setArea={handleScrollTo} // Para os StatCards
+            setArea={handleScrollTo}
             modelos={modelos}
             loading={loading}
             setDocSelecionado={setDocSelecionado}
@@ -161,11 +167,11 @@ function Block({
             modelosRef={modelosRef}
             tagsRef={tagsRef}
             pastasRef={pastasRef}
-            dashboardRef={dashboardRef} // Passa a ref do dashboard
-            initialSection={id} // Passa o ID para a rolagem inicial
+            dashboardRef={dashboardRef}
+            initialSection={id}
           />
         );
-      case 4: // Rotas (Bot)
+      case 4: // Rotas
       case 41:
       case 42:
         return <Routes user={user} showAlert={showAlert} onDataChange={onDataChange} />;
@@ -183,7 +189,7 @@ function Block({
             showAlert={showAlert}
           />
         );
-      case 7: // Sobre o projeto
+      case 7: // Sobre
         return <AboutPage />;
       case 8: // Conta
         return (
@@ -195,7 +201,6 @@ function Block({
           />
         );
       default:
-        // Se 'tool' for null ou inválido, volta para Analisar (Tool 1)
         setTool(1);
         return null;
     }
@@ -211,7 +216,7 @@ function Block({
         setDocSelecionado={setDocSelecionado}
         selectedTags={selectedTags}
         etapaAtual={etapaAtual}
-        file={file}
+        files={files} // Atualizado para files
         setMore={setMore}
         more={more}
         tool={tool}
@@ -243,7 +248,7 @@ function Block({
           setSelectedModel={setSelectedModel}
           etapaAtual={etapaAtual}
           setEtapaAtual={setEtapaAtual}
-          file={file}
+          files={files} // Atualizado para files
           triggerShake={triggerShake}
           setSelectedTags={setSelectedTags}
         />

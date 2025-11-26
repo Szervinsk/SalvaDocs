@@ -9,7 +9,7 @@ import EditVariables from "./editContents/edit-variables";
 import EditEtapas from "./editContents/edit-etapas";
 
 // ==========================================================================
-// SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO (REFATORADO)
+// SUB-COMPONENTE PARA A TELA DE SELEÇÃO DE MODELO (MANTIDO IGUAL)
 // ==========================================================================
 const ModelSelectionScreen = ({
   tags,
@@ -20,9 +20,9 @@ const ModelSelectionScreen = ({
   setTool,
   handleScrollTo,
   documentos,
-  onToggleFavorite, // Recebe a função
-  favoriteModelIds, // Recebe a lista de IDs
-  showAlert // Recebe a função showAlert
+  onToggleFavorite,
+  favoriteModelIds,
+  showAlert
 }) => {
   const [seeModels, setSeeModels] = useState(false);
 
@@ -70,12 +70,11 @@ const ModelSelectionScreen = ({
     action: () => { setTool(3); handleScrollTo("Modelos"); }
   };
 
-  // Lógica de clique no favorito (agora também mostra o alerta)
+  // Lógica de clique no favorito
   const handleFavoriteClick = (e, modelId) => {
     e.stopPropagation();
     const isCurrentlyFavorite = favoriteModelIds.includes(modelId);
 
-    // ✨ CORREÇÃO: Mostra o alerta correto ANTES de trocar o estado
     if (!isCurrentlyFavorite) {
       showAlert("success", `Modelo salvo em favoritos!`);
     } else {
@@ -120,8 +119,8 @@ const ModelSelectionScreen = ({
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           placeholder="Buscar modelo (ex: Despacho) e pressionar Enter"
-          suggestion={suggestion} // ✨ Passa a sugestão para o SearchBar
-          onKeyDown={handleSearchKeyDown} // ✨ Passa a função de keydown
+          suggestion={suggestion}
+          onKeyDown={handleSearchKeyDown}
         />
       </div>
 
@@ -235,7 +234,7 @@ const ModelSelectionScreen = ({
 
 
 // ==========================================================================
-// COMPONENTE PRINCIPAL (AnalysisPage)
+// COMPONENTE PRINCIPAL (AnalysisPage) - ATUALIZADO
 // ==========================================================================
 function AnalysisPage({
   modelos,
@@ -249,8 +248,8 @@ function AnalysisPage({
   setEtapaAtual,
   selectedTags,
   setSelectedTags,
-  file,
-  setFile,
+  files,       // <--- ATUALIZADO (plural)
+  setFiles,    // <--- ATUALIZADO (plural)
   tremer,
   setDocSelecionado,
   documentos,
@@ -299,12 +298,13 @@ function AnalysisPage({
   const handleCloseEditor = () => {
     setSelectedModel(null);
     setSelectedTags([]);
-    setFile(null);
+    setFiles([]); // <--- ATUALIZADO: Reseta para array vazio
     setEtapaAtual(1);
   };
 
   const goToEtapa = (targetId) => {
-    if (targetId === 3 && !file) {
+    // <--- ATUALIZADO: Verifica se o array de arquivos está vazio
+    if (targetId === 3 && (!files || files.length === 0)) {
       onBlocked();
       return;
     }
@@ -338,8 +338,8 @@ function AnalysisPage({
             onClose={handleCloseEditor}
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
-            file={file}
-            setFile={setFile}
+            files={files}       // <--- ATUALIZADO
+            setFiles={setFiles} // <--- ATUALIZADO
             erroArquivo={erroArquivo}
             showAlert={showAlert}
             setDocSelecionado={setDocSelecionado}
@@ -359,13 +359,13 @@ function AnalysisPage({
             tremer={tremer}
             handleClick={goToEtapa}
             isEtapaDisabled={isEtapaDisabled}
-            file={file}
+            files={files} // <--- ATUALIZADO: O EditEtapas precisa saber que agora são 'files'
             showAlert={showAlert}
           />
         </div>
       </div>
     ) : (
-      // --- TELA 1: Seleção de Modelo (Novo Design) ---
+      // --- TELA 1: Seleção de Modelo ---
       <ModelSelectionScreen
         tags={tags}
         documentos={documentos}
