@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
 
 // Importação das Ferramentas (Componentes Filhos)
@@ -49,12 +49,12 @@ function Block({
   modelosRef,
   pastasRef,
   dashboardRef,
-  handleScrollTo
+  handleScrollTo,
 }) {
   // Estados locais do Block (para o fluxo de Análise)
   const [etapaAtual, setEtapaAtual] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
-  
+
   // --- MUDANÇA PRINCIPAL AQUI ---
   const [files, setFiles] = useState([]); // Agora é um array vazio, não null
   // ------------------------------
@@ -66,7 +66,8 @@ function Block({
 
   // Limpa estados específicos da análise
   useEffect(() => {
-    if (tool !== 1) { // Tool 1 agora é "Analisar"
+    if (tool !== 1) {
+      // Tool 1 agora é "Analisar"
       setSelectedModel(null);
       setSelectedTags([]);
       setFiles([]); // Reseta para array vazio
@@ -76,11 +77,12 @@ function Block({
 
   // Busca todas as tags
   useEffect(() => {
-    axios.get(`/tags`)
+    axios
+      .get(`/tags`)
       .then((res) => {
-        setTags(res.data || [])
+        setTags(res.data || []);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Erro ao buscar todas as tags:", err);
         showAlert("error", "Não foi possível carregar as tags.");
       });
@@ -90,13 +92,16 @@ function Block({
   const triggerShake = () => {
     setTremer(true);
     setTimeout(() => setTremer(false), 500);
-    showAlert("warning", "Ação bloqueada: anexe pelo menos um arquivo para prosseguir.");
+    showAlert(
+      "warning",
+      "Ação bloqueada: anexe pelo menos um arquivo para prosseguir."
+    );
   };
 
   const isEtapaDisabled = (id) => {
     if (id <= etapaAtual) return false;
     // Verifica se o array está vazio para bloquear a etapa 3
-    if (id === 3 && files.length === 0) return true; 
+    if (id === 3 && files.length === 0) return true;
     return false;
   };
 
@@ -111,16 +116,15 @@ function Block({
             tags={tags}
             pastas={pastas}
             user={user}
+            tool={tool}
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
             etapaAtual={etapaAtual}
             setEtapaAtual={setEtapaAtual}
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
-            
-            files={files}       // Passa o array
+            files={files} // Passa o array
             setFiles={setFiles} // Passa a função
-            
             tremer={tremer}
             setDocSelecionado={setDocSelecionado}
             documentos={documentos}
@@ -174,7 +178,13 @@ function Block({
       case 4: // Rotas
       case 41:
       case 42:
-        return <Routes user={user} showAlert={showAlert} onDataChange={onDataChange} />;
+        return (
+          <Routes
+            user={user}
+            showAlert={showAlert}
+            onDataChange={onDataChange}
+          />
+        );
       case 5: // Monitoramento APIs
         return <ApiMonitoration />;
       case 6: // Configurações
@@ -207,7 +217,13 @@ function Block({
   };
 
   return (
-    <main className="switch-area" style={{ borderTopLeftRadius: pastasAbertas ? "0px" : "10px", borderBottomLeftRadius: pastasAbertas ? "0px" : "10px" }}>
+    <main
+      className="switch-area"
+      style={{
+        borderTopLeftRadius: pastasAbertas ? "0px" : "10px",
+        borderBottomLeftRadius: pastasAbertas ? "0px" : "10px",
+      }}
+    >
       {more && <MoreContent tool={tool} setTool={setTool} setMore={setMore} />}
 
       <ActionBar
@@ -224,9 +240,7 @@ function Block({
       />
 
       <div className="middle-area">
-        <div className="main-content">
-          {handleSelectTool(tool)}
-        </div>
+        <div className="main-content">{handleSelectTool(tool)}</div>
 
         <AnimatePresence>
           {docSelecionado && (
@@ -242,17 +256,15 @@ function Block({
         </AnimatePresence>
       </div>
 
-      {(tool === 1 && selectedModel) && (
-        <StatusBar
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          etapaAtual={etapaAtual}
-          setEtapaAtual={setEtapaAtual}
-          files={files} // Atualizado para files
-          triggerShake={triggerShake}
-          setSelectedTags={setSelectedTags}
-        />
-      )}
+      <StatusBar
+        selectedModel={selectedModel}
+        setSelectedModel={setSelectedModel}
+        etapaAtual={etapaAtual}
+        setEtapaAtual={setEtapaAtual}
+        files={files}
+        triggerShake={triggerShake}
+        setSelectedTags={setSelectedTags}
+      />
     </main>
   );
 }

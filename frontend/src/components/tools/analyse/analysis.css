@@ -407,7 +407,6 @@
    ========================================================================== */
 .analysis-step-page {
   width: 100%;
-  min-height: 80vh;
   height: 100%;
   padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;

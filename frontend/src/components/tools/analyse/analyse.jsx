@@ -1,9 +1,12 @@
 import AnalisarArquivos from "../../Analysis/AnalysisPage";
 import { ETAPAS } from "../../../constants/constants";
+import { motion } from "framer-motion";
+import StatusBar from "../../bars/actionStatusBars/status-bar";
 
 export function AnalyseDoc({
   openDocsVisible,
   setModelos,
+  tool,
   modelos,
   selectedModel,
   setSelectedModel,
@@ -12,8 +15,8 @@ export function AnalyseDoc({
   setEtapaAtual,
   selectedTags,
   setSelectedTags,
-  files,       // <--- ALTERADO DE 'file' PARA 'files'
-  setFiles,    // <--- ALTERADO DE 'setFile' PARA 'setFiles'
+  files,
+  setFiles,
   erroArquivo,
   isEtapaDisabled,
   tremer,
@@ -35,10 +38,9 @@ export function AnalyseDoc({
   pastas,
   handleScrollTo,
 }) {
-
   const goToEtapa = (targetId) => {
     // <--- ALTERADO: Verifica se o array existe e se tem itens
-    if (targetId === 3 && (!files || files.length === 0)) {
+    if (targetId === 3 && files.length < 1) {
       triggerShake();
       return;
     }
@@ -58,7 +60,7 @@ export function AnalyseDoc({
         setEtapaAtual={goToEtapa}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        files={files}       // <--- ALTERADO: Passando o array para AnalysisPage
+        files={files} // <--- ALTERADO: Passando o array para AnalysisPage
         setFiles={setFiles} // <--- ALTERADO: Passando a função para AnalysisPage
         erroArquivo={erroArquivo}
         onBlocked={triggerShake}
