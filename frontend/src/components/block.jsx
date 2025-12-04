@@ -129,7 +129,7 @@ function Block({
             handleScrollTo={handleScrollTo}
             erroArquivo={false}
             isEtapaDisabled={isEtapaDisabled}
-            onBlocked={triggerShake}
+            triggerShake={triggerShake}
             showAlert={showAlert}
             onToggleFavorite={onToggleFavorite}
             favoriteModelIds={favoriteModelIds}

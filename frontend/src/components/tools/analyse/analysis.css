@@ -284,11 +284,17 @@
   width: 100%;
   height: 100%;
 }
+
 .analysis-editor__main-content {
   flex: 1;
   min-width: 0;
   height: 100%;
   border-right: 1px solid var(--color-border);
+}
+
+.analysis-editor__main-content.shake {
+  border: 2px solid var(--color-danger);
+  animation: shake 0.6s ease;
 }
 .analysis-editor__sidebar {
   width: 320px;
@@ -401,6 +407,7 @@
    ========================================================================== */
 .analysis-step-page {
   width: 100%;
+  min-height: 80vh;
   height: 100%;
   padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;
@@ -424,6 +431,7 @@
   font-size: 1.25rem;
   margin: 0;
 }
+
 .page-description {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
@@ -578,6 +586,13 @@
 .setting-row:not(:last-child) {
   border-bottom: 1px solid var(--color-border);
 }
+.setting-row__header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+}
+
 .setting-row__info {
   display: flex;
   align-items: center;
@@ -593,7 +608,7 @@
   color: var(--color-text-secondary);
 }
 .alter-name-wrapper {
-  padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-md);
   background-color: var(--color-surface);
 }
 
@@ -704,20 +719,20 @@
 @keyframes shake {
   10%,
   90% {
-    transform: translateX(-2px);
+    transform: translateX(-1px);
   }
   20%,
   80% {
-    transform: translateX(2px);
+    transform: translateX(1px);
   }
   30%,
   50%,
   70% {
-    transform: translateX(-4px);
+    transform: translateX(-2px);
   }
   40%,
   60% {
-    transform: translateX(4px);
+    transform: translateX(2px);
   }
 }
 @keyframes rotation {

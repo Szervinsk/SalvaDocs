@@ -258,7 +258,7 @@ function AnalysisPage({
   handleScrollTo,
   erroArquivo,
   isEtapaDisabled,
-  onBlocked,
+  goToEtapa,
   showAlert,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -302,14 +302,14 @@ function AnalysisPage({
     setEtapaAtual(1);
   };
 
-  const goToEtapa = (targetId) => {
-    // <--- ATUALIZADO: Verifica se o array de arquivos está vazio
-    if (targetId === 3 && (!files || files.length === 0)) {
-      onBlocked();
-      return;
-    }
-    setEtapaAtual(Math.max(1, Math.min(targetId, etapas.length)));
-  };
+  // const goToEtapa = (targetId) => {
+  //   // <--- ATUALIZADO: Verifica se o array de arquivos está vazio
+  //   if (targetId === 3 && (!files || files.length === 0)) {
+  //     onBlocked();
+  //     return;
+  //   }
+  //   setEtapaAtual(Math.max(1, Math.min(targetId, etapas.length)));
+  // };
 
   const handleModelSelection = async (model) => {
     if (!model) return;
@@ -329,7 +329,7 @@ function AnalysisPage({
     selectedModel ? (
       // --- TELA 2: Editor de Análise ---
       <div className="analysis-editor-screen">
-        <div className="analysis-editor__main-content">
+        <div className={`analysis-editor__main-content ${tremer ? 'shake' : ''}`}>
           <EditVariables
             etapas={etapas}
             etapaAtual={etapaAtual}
@@ -356,7 +356,6 @@ function AnalysisPage({
             etapas={etapas}
             etapaAtual={etapaAtual}
             setEtapaAtual={goToEtapa}
-            tremer={tremer}
             handleClick={goToEtapa}
             isEtapaDisabled={isEtapaDisabled}
             files={files} // <--- ATUALIZADO: O EditEtapas precisa saber que agora são 'files'

@@ -1,6 +1,5 @@
 import AnalisarArquivos from "../../Analysis/AnalysisPage";
 import { ETAPAS } from "../../../constants/constants";
-import Alerts from "../../alerts/alerts";
 
 export function AnalyseDoc({
   openDocsVisible,
@@ -22,8 +21,6 @@ export function AnalyseDoc({
   closeAlert,
   setCloseAlert,
   user,
-  alertSuccess,
-  alertError,
   showAlert,
   docSelecionado,
   setDocSelecionado,
@@ -50,10 +47,6 @@ export function AnalyseDoc({
 
   return (
     <>
-      {/* Alertas globais */}
-      {alertSuccess && <Alerts type={3} />}
-      {alertError && <Alerts type={4} />}
-
       <AnalisarArquivos
         openDocsVisible={openDocsVisible}
         setModelos={setModelos}
@@ -80,7 +73,7 @@ export function AnalyseDoc({
         setDocSelecionado={setDocSelecionado}
         onVoltar={onVoltar}
         isEtapaDisabled={isEtapaDisabled}
-        handleClick={goToEtapa}
+        goToEtapa={goToEtapa}
         showAlert={showAlert}
         setTool={setTool}
         setTags={setTags}
