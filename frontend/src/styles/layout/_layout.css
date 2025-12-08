@@ -63,6 +63,7 @@ body {
   display: flex; /* Mantenha isso para o .main-content se expandir */
   position: relative; /* ESSENCIAL para que o OpenDocs (com position: absolute) se posicione corretamente */
   min-height: 0;
+  height: 400px;
 }
 
 .main-content {
@@ -79,7 +80,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: var(--border-width-md) solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-right: none;
   border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
   padding: var(--spacing-sm) var(--spacing-md);

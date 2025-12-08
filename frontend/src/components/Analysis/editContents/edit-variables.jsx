@@ -11,9 +11,9 @@ function EditVariables({
   onClose,
   selectedTags,
   setSelectedTags,
-  file,
+  files,       
   modelos,
-  setFile,
+  setFiles,    
   erroArquivo,
   setDocSelecionado,
   setEtapaAtual,
@@ -25,11 +25,8 @@ function EditVariables({
   setTool,
   pastas,
 }) {
-  const [sendFiles, setSendFiles] = useState(false);
-  const [alterName, setAlterName] = useState(false);
   const [limitador, setLimitador] = useState(false);
-  const [fileName, setFileName] = useState("");
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [filesConfig, setFilesConfig] = useState([]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -51,9 +48,11 @@ function EditVariables({
         setSelectedTags={setSelectedTags}
         setTags={setTags}
         tags={tags}
+        showAlert={showAlert}
       />
     );
   }
+  
   // --- ETAPA 2: EditExit ---
   else if (etapaAtual === 2) {
     return (
@@ -62,26 +61,23 @@ function EditVariables({
         etapaAtual={etapaAtual}
         selectedModel={selectedModel}
         onClose={onClose}
-        file={file}
-        setFile={setFile}
+        files={files}
+        setFiles={setFiles}
         pastas={pastas}
         tags={tags}
-        selectedTags={selectedTags}
-        setSelectedTags={setSelectedTags}
-        sendFiles={sendFiles}
-        setSendFiles={setSendFiles}
-        erroArquivo={erroArquivo}
-        setAlterName={setAlterName}
-        alterName={alterName}
-        setFileName={setFileName}
-        limitador={limitador}
         modelos={modelos}
+        selectedTags={selectedTags}
+        erroArquivo={erroArquivo}
+        showAlert={showAlert}
+        limitador={limitador}
         setLimitador={setLimitador}
-        selectedFolder={selectedFolder}
-        setSelectedFolder={setSelectedFolder}
+        
+        // NOVA PROP: Recebe as configurações dos arquivos do filho
+        onConfigsChange={setFilesConfig}
       />
     );
   }
+  
   // --- ETAPA 3: EditAnalise ---
   else if (etapaAtual === 3) {
     return (
@@ -89,7 +85,7 @@ function EditVariables({
         etapas={etapas}
         etapaAtual={etapaAtual}
         selectedTags={selectedTags}
-        file={file}
+        files={files} 
         tags={tags}
         onClose={() => {
           setDocSelecionado(null);
@@ -101,9 +97,9 @@ function EditVariables({
         showAlert={showAlert}
         selectedModel={selectedModel}
         setEtapaAtual={setEtapaAtual}
-        fileName={fileName}
         setTool={setTool}
-        selectedFolder={selectedFolder}
+        
+        filesConfig={filesConfig}
       />
     );
   }

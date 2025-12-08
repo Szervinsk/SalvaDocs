@@ -21,11 +21,10 @@ class Bot:
     def openChrome(self):
         """ Inicia uma instância do Google Chrome com argumentos de performance. """
         options = webdriver.ChromeOptions()
-        options.add_argument("--disable-gpu") # Desabilita GPU para evitar problemas em ambientes virtuais
-        options.add_argument("--no-sandbox") # Essencial para ambientes Linux/servidor
-        options.add_argument("--disable-dev-shm-usage") # Melhora a performance em ambientes com pouca memória
-        options.add_argument("--disable-logging") # Desabilita logs desnecessários
-        options.add_argument("--log-level=3") # Reduz a verbosidade do console
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
         
         if self.headless:
             options.add_argument("--headless=new")

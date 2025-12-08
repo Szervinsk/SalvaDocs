@@ -1,10 +1,12 @@
 import AnalisarArquivos from "../../Analysis/AnalysisPage";
 import { ETAPAS } from "../../../constants/constants";
-import Alerts from "../../alerts/alerts";
+import { motion } from "framer-motion";
+import StatusBar from "../../bars/actionStatusBars/status-bar";
 
 export function AnalyseDoc({
   openDocsVisible,
   setModelos,
+  tool,
   modelos,
   selectedModel,
   setSelectedModel,
@@ -13,8 +15,8 @@ export function AnalyseDoc({
   setEtapaAtual,
   selectedTags,
   setSelectedTags,
-  file,
-  setFile,
+  files,
+  setFiles,
   erroArquivo,
   isEtapaDisabled,
   tremer,
@@ -22,8 +24,6 @@ export function AnalyseDoc({
   closeAlert,
   setCloseAlert,
   user,
-  alertSuccess,
-  alertError,
   showAlert,
   docSelecionado,
   setDocSelecionado,
@@ -38,9 +38,9 @@ export function AnalyseDoc({
   pastas,
   handleScrollTo,
 }) {
-
   const goToEtapa = (targetId) => {
-    if (targetId === 3 && !file) {
+    // <--- ALTERADO: Verifica se o array existe e se tem itens
+    if (targetId === 3 && files.length < 1) {
       triggerShake();
       return;
     }
@@ -49,10 +49,6 @@ export function AnalyseDoc({
 
   return (
     <>
-      {/* Alertas globais */}
-      {alertSuccess && <Alerts type={3} />}
-      {alertError && <Alerts type={4} />}
-
       <AnalisarArquivos
         openDocsVisible={openDocsVisible}
         setModelos={setModelos}
@@ -64,8 +60,8 @@ export function AnalyseDoc({
         setEtapaAtual={goToEtapa}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        file={file}
-        setFile={setFile}
+        files={files} // <--- ALTERADO: Passando o array para AnalysisPage
+        setFiles={setFiles} // <--- ALTERADO: Passando a função para AnalysisPage
         erroArquivo={erroArquivo}
         onBlocked={triggerShake}
         tremer={tremer}
@@ -79,7 +75,7 @@ export function AnalyseDoc({
         setDocSelecionado={setDocSelecionado}
         onVoltar={onVoltar}
         isEtapaDisabled={isEtapaDisabled}
-        handleClick={goToEtapa}
+        goToEtapa={goToEtapa}
         showAlert={showAlert}
         setTool={setTool}
         setTags={setTags}

@@ -35,7 +35,7 @@ export const login = async (req, res) => {
     const { email, password, rememberMe } = req.body;
     const user = await models.User.findOne({ where: { email } });
 
-    if (!user) return res.status(400).json({ error: "Credenciais inválidas" });
+    if (!user) return res.status(400).json({ error: "Credenciais inválidas" }); // não possui usuário com esse email
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
@@ -96,7 +96,6 @@ export const me = async (req, res) => {
     });
     if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
     
-    // ✨ LÓGICA DE FAVORITOS ADICIONADA AQUI ✨
     // 1. Busca os modelos favoritos deste usuário
     const favoritos = await user.getFavoriteModels({ attributes: ['id'] });
     // 2. Transforma o array de objetos em um array de IDs

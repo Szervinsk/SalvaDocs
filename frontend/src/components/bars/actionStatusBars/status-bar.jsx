@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Icons } from "../../../constants/icons";
 import { ETAPAS } from "../../../constants/constants";
 
@@ -7,16 +7,16 @@ function StatusBar({
   setSelectedModel,
   etapaAtual,
   setEtapaAtual,
-  file,
+  files,
   triggerShake,
   docSelecionado,
   setSelectedTags,
-  tool,
 }) {
 
   const handleProxima = () => {
-    if (etapaAtual === 2 && !file) {
+    if (etapaAtual === 2 && files.length < 1) {
       triggerShake();
+      return;
     } else {
       setEtapaAtual((prev) => Math.min(prev + 1, ETAPAS.length));
     }
@@ -39,12 +39,7 @@ function StatusBar({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedModel, etapaAtual, file, docSelecionado]); // Adicionado docSelecionado
-
-  // Não renderiza a barra em certas condições
-  if (docSelecionado || ![2, 3].includes(tool)) {
-    return null;
-  }
+  }, [selectedModel, etapaAtual, files, docSelecionado]); // Adicionado docSelecionado
 
   return (
     <div className="status-bar">

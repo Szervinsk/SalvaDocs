@@ -1,71 +1,85 @@
 import { Icons } from "../../../../constants/icons";
 import { useEffect, useState } from "react";
-import axios from "axios"; // Importe o axios
+import axios from "axios";
 
 function EditAnalise({
   etapas,
   etapaAtual,
   onClose,
   selectedTags,
-  file,
+  files, // ALTERADO: Recebe o array de arquivos
   selectedModel,
   tags,
-  fileName,
+  // fileName,  <-- REMOVIDO (agora está dentro de filesConfig)
+  // selectedFolder, <-- REMOVIDO (agora está dentro de filesConfig)
+  filesConfig, // NOVO: Recebe as configurações individuais (nomes e pastas)
   setDocumentos,
   setDocSelecionado,
   showAlert,
   setTool,
-  selectedFolder,
 }) {
   const [loading, setLoading] = useState(false);
 
   // --- FUNÇÃO PRINCIPAL PARA CONECTAR COM O BACK-END ---
   const handleSubmit = async () => {
-    // 1. Validação: Verifica se existe um arquivo
-    if (!file) {
+    // 1. Validação básica
+    if (!files || files.length === 0) {
       showAlert("error", "Nenhum arquivo selecionado para análise.");
+      return;
+    }
+
+    // 2. Validação: Verifica se TODOS os arquivos têm uma pasta definida
+    const missingFolder = files.some((_, index) => !filesConfig[index]?.folderId);
+    if (missingFolder) {
+      showAlert("warning", "Por favor, selecione uma pasta de destino para todos os arquivos na etapa anterior.");
       return;
     }
 
     setLoading(true);
 
-    // 2. Monta o FormData para enviar arquivo + dados
-    const formData = new FormData();
-    formData.append("file", file); // O arquivo PDF
-    formData.append("model", selectedModel.name); // O nome do modelo
-    formData.append("tags", JSON.stringify(selectedTags)); // Os IDs das tags (em formato JSON string)
-    formData.append("templateName", fileName || file.name); // O nome final do arquivo
-    formData.append("folderId", selectedFolder.id);
-
     try {
-      // 3. Faz a requisição POST para a sua API
-      const response = await axios.post("documents/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // 3. Cria um array de Promessas (requisições) para enviar tudo junto
+      const uploadPromises = files.map((file, index) => {
+        const config = filesConfig[index];
+        
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("model", selectedModel.name);
+        formData.append("tags", JSON.stringify(selectedTags));
+        // Usa o nome configurado ou o original
+        formData.append("templateName", config.alterName ? config.fileName : file.name);
+        formData.append("folderId", config.folderId); // ID da pasta individual
+
+        // Retorna a promessa da requisição axios
+        return axios.post("documents/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       });
 
-      // 4. Lida com a resposta de sucesso
-      const { document: novoDocumento } = response.data;
+      // 4. Aguarda TODAS as requisições terminarem
+      const responses = await Promise.all(uploadPromises);
 
-      // Adiciona o novo documento à lista de documentos existente
-      setDocumentos((prevDocumentos) => [novoDocumento, ...prevDocumentos]);
+      // 5. Processa os resultados
+      const novosDocumentos = responses.map(res => res.data.document);
 
-      showAlert("success", "Documento analisado com sucesso!");
+      // Adiciona todos os novos documentos à lista
+      setDocumentos((prev) => [...novosDocumentos, ...prev]);
 
-      // Abre o documento recém-criado no painel OpenDocs
-      setDocSelecionado(novoDocumento);
+      showAlert("success", `${novosDocumentos.length} documento(s) analisado(s) com sucesso!`);
 
-      // Opcional: Redireciona para a tela Home (tool 1) após o sucesso
-      setTool(1);
+      // Abre o primeiro documento criado para visualização
+      if (novosDocumentos.length > 0) {
+        setDocSelecionado(novosDocumentos[0]);
+      }
+
+      setTool(1); // Volta para a Home
 
     } catch (error) {
-      // 5. Lida com erros da API
-      console.error("Erro ao analisar o documento:", error);
-      const errorMessage = error.response?.data?.error || "Falha ao analisar o documento.";
+      console.error("Erro na análise em lote:", error);
+      // Tenta pegar a mensagem de erro específica ou usa uma genérica
+      const errorMessage = error.response?.data?.error || "Falha ao analisar um ou mais documentos.";
       showAlert("error", errorMessage);
     } finally {
-      // 6. Finaliza o estado de loading
       setLoading(false);
     }
   };
@@ -91,7 +105,7 @@ function EditAnalise({
       </header>
 
       <p className="page-description">
-        Confira o resumo da sua solicitação. Se tudo estiver correto, clique em "Analisar documento" para iniciar a extração.
+        Confira o resumo da sua solicitação. Se tudo estiver correto, clique em "Analisar documentos" para iniciar a extração em lote.
       </p>
 
       <div className="summary-card">
@@ -100,18 +114,18 @@ function EditAnalise({
             <dt><Icons.Model size={16} /> Modelo Utilizado</dt>
             <dd>{selectedModel?.name || "-"}</dd>
           </div>
+          
+          {/* RESUMO ATUALIZADO PARA MÚLTIPLOS ARQUIVOS */}
           <div className="summary-item">
-            <dt><Icons.FileText size={16} /> Arquivo de Entrada</dt>
-            <dd>{file?.name || "Nenhum"}</dd>
+            <dt><Icons.FileText size={16} /> Arquivos</dt>
+            <dd>{files.length} arquivo(s) selecionado(s)</dd>
           </div>
+
           <div className="summary-item">
-            <dt><Icons.EditNote size={16} /> Nome do Arquivo de Saída</dt>
-            <dd>{fileName || file?.name || "Não definido"}</dd>
+            <dt><Icons.Folder size={16} /> Destino</dt>
+            <dd>Configurado individualmente</dd>
           </div>
-          <div className="summary-item">
-            <dt><Icons.Folder size={16} /> Pasta de saída</dt>
-            <dd>{selectedFolder ? selectedFolder.name : "Não definido"}</dd>
-          </div>
+
           <div className="summary-item">
             <dt><Icons.Tags size={16} /> Tags Selecionadas ({selectedTags.length})</dt>
             <dd className="summary-tag-list">
@@ -134,7 +148,7 @@ function EditAnalise({
           ) : (
             <>
               <Icons.Send size={16} />
-              Analisar documento
+              Analisar documentos
             </>
           )}
         </button>
