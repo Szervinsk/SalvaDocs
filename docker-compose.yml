@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # --- Serviço do Backend ---
+  backend:
+    build: ./backend
+    container_name: salvadocs-backend
+    ports:
+      - "5000:5000"
+    
+    # Carrega todas as variáveis (JWT_SECRET, GEMINI_API_KEY, etc.) direto do arquivo
+    env_file:
+      - ./backend/.env
+
+    environment:
+      - PORT=5000
+      - DB_STORAGE_PATH=/app/data/database.sqlite
+      # As variáveis JWT_SECRET e GEMINI_API_KEY são injetadas automaticamente via env_file
+
+    volumes:
+      - ./backend:/app              # Espelha o código para Hot Reload
+      - /app/node_modules            # Evita que o node_modules local sobrescreva o do container
+      - salvadocs-data:/app/data    # Persistência do banco SQLite
+    
+    networks:
+      - salvadocs-net
+
+  # --- Serviço do Frontend ---
+  frontend:
+    build: ./frontend
+    container_name: salvadocs-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      # O frontend acessa o backend via localhost no navegador do usuário
+      - REACT_APP_API_BASE_URL=http://localhost:5000/api
+      - CHOKIDAR_USEPOLLING=true # Melhora o Hot Reload em sistemas Windows
+    depends_on:
+      - backend
+    networks:
+      - salvadocs-net
+
+# Define o volume para o banco de dados não sumir ao reiniciar
+volumes:
+  salvadocs-data:
+
+# Define a rede interna entre os containers
+networks:
+  salvadocs-net:
+    driver: bridge
