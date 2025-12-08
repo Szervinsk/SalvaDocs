@@ -1,6 +1,6 @@
 import express from "express";
 import { authMiddleware } from "../middleware/auth.js";
-import { updateUser, deleteUser, dismissWelcome, resetWelcome } from "../controllers/userController.js";
+import { updateUser, deleteUser, dismissWelcome, resetWelcome, changePassword } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -15,6 +15,9 @@ router.put("/welcome", dismissWelcome);
 
 // Rota para resetar o status do welcome
 router.put("/welcome/reset", resetWelcome);
+
+// Rota para trocar a senha quando estiver logado
+router.put("/changepassword", changePassword) 
 
 // Deleta o usuário logado
 router.delete("/", deleteUser);

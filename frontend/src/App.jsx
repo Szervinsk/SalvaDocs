@@ -243,20 +243,34 @@ function App() {
     }
   };
 
-  // Funções de Login e Cadastro que serão passadas para o AuthForm
-  const handleLogin = async (credentials) => {
-    const { data } = await axios.post(`/auth/login`, credentials, { withCredentials: true });
+
+const handleLogin = async (credentials) => {
+  try {
+    // Faz a requisição
+    const { data } = await axios.post(`/auth/login`, credentials);
+    
+    // Sucesso: Salva e atualiza estado
     localStorage.setItem("accessToken", data.accessToken);
     setUser(data.user);
     setIsLogged(true);
     showAlert("success", `Bem-vindo de volta, ${data.user.username}!`);
-  };
+  
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || "Não foi possível fazer login.";
+    throw new Error(errorMessage);
+  }
+};
 
-  const handleSignup = async (details) => {
+const handleSignup = async (details) => {
+  try {
     await axios.post(`/auth/register`, details);
     showAlert("success", "Cadastro realizado! Fazendo login...");
     await handleLogin({ email: details.email, password: details.password });
-  };
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || "Erro ao cadastrar.";
+    throw new Error(errorMessage);
+  }
+};
 
   if (loading) {
     return <div className="loading-container">Carregando SalvaDocs...</div>;
