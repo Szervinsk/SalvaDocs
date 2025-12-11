@@ -56,59 +56,75 @@ const BarChart = ({ title, data, color }) => {
   );
 };
 
-// --- Gráfico de Pizza ---
 const PieChart = ({ title, data }) => {
   const COLORS = ["#0d6efd", "#198754", "#ffc107", "#dc3545", "#6f42c1"];
-  const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
-  let cumulativePercent = 0;
+
+  const radius = 16;
+  const circumference = 2 * Math.PI * radius;
+  
+  // Garante que seja número para evitar erros de soma
+  const total = data.reduce((s, i) => s + Number(i.value), 0);
+
+  let accumulated = 0;
 
   return (
     <div className="chart-card chart-pie">
       <h4>{title}</h4>
+
       <div className="pie-chart-container">
         <svg viewBox="0 0 42 42" className="pie-chart">
-          {data.length > 0 ? (
-            data.map((item, index) => {
-              const percent = total > 0 ? (item.value / total) * 100 : 0;
-              // Ajuste matemático para o offset
-              const offset = 25 - cumulativePercent;
-              cumulativePercent += percent;
+          {/* Círculo base (fundo cinza do anel) */}
+          <circle
+            cx="21"
+            cy="21"
+            r={radius}
+            fill="none"
+            stroke="var(--color-border)" 
+            strokeWidth="6"
+          />
 
-              return (
-                <circle
-                  key={item.label}
-                  className="pie-chart__slice"
-                  r="4" // Raio para viewBox de 36
-                  cx="18"
-                  cy="18"
-                  fill="none"
-                  stroke={COLORS[index % COLORS.length]}
-                  strokeWidth="2" // Largura da "borda"
-                  strokeDasharray={`${percent} ${100 - percent}px`}
-                  strokeDashoffset={offset} // Offset corrigido
-                />
-              );
-            })
-          ) : (
-            // Círculo cinza se não houver dados
-            <circle cx="9" cy="9" r="4" fill="var(--color-surface)" stroke="var(--color-border)" strokeWidth="2" />
-          )}
+          {data.map((item, index) => {
+            const percent = total > 0 ? item.value / total : 0;
+            const strokeLength = percent * circumference;
+            
+            // CORREÇÃO 1: Offset negativo é mais preciso para empilhar sentido horário
+            const offset = -(accumulated * circumference);
+
+            // Atualiza o acumulado para o próximo item
+            accumulated += percent;
+
+            return (
+              <circle
+                key={item.label}
+                cx="21"
+                cy="21"
+                r={radius}
+                fill="none"
+                stroke={COLORS[index % COLORS.length]}
+                strokeWidth="6"
+                strokeDasharray={`${strokeLength} ${circumference}`}
+                strokeDashoffset={offset}
+                
+                // CORREÇÃO 2: Use "butt". "round" cria sobreposição de cores nas pontas.
+                strokeLinecap="butt" 
+                
+                transform="rotate(-90 21 21)"
+              />
+            );
+          })}
         </svg>
+
         <div className="legend-list">
-          {data.length > 0 ? (
-            data.map((item, index) => (
-              <div key={item.label} className="legend-item">
-                <div
-                  className="legend-color"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                ></div>
-                <span className="legend-label">{item.label}</span>
-                <span className="legend-value">{item.value}</span>
-              </div>
-            ))
-          ) : (
-            <p className="empty-text">Sem dados.</p>
-          )}
+          {data.map((item, index) => (
+            <div key={item.label} className="legend-item">
+              <div
+                className="legend-color"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              ></div>
+              <span className="legend-label">{item.label}</span>
+              <span className="legend-value">{item.value}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -130,6 +146,7 @@ const Dashboard = ({ tags, modelos, documentos, setArea, pastas }) => {
     const tagsByType = [
       { label: "IA", value: tags.filter((t) => t.type === "IA").length },
       { label: "Regex", value: tags.filter((t) => t.type === "Regex").length },
+      { label: "Manual", value: tags.filter((t) => t.type === "Manual").length},
     ].filter((item) => item.value > 0);
 
     return { tagsPerModel, tagsByType };
