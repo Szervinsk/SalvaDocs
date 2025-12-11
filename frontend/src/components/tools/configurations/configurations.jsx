@@ -124,29 +124,6 @@ function Configurations({ setDarkMode, darkMode, setPastasAbertas, pastasAbertas
 
         <div className="config-card">
           <div className="config-card__info">
-            <Icons.Pdf_file size={20} />
-            <div>
-              <h3>Painel de visualização de PDF</h3>
-              <p>Exibir ou ocultar o painel lateral de visualização de PDF.</p>
-            </div>
-          </div>
-          <div className="config-card__control">
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={visualizarPDF}
-                onChange={() => {
-                  setVisualizarPDF(!visualizarPDF)
-                  showAlert("success", "Configuração salva com sucesso!")
-                }}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div className="config-card">
-          <div className="config-card__info">
             <Icons.Adjustments size={20} />
             <div>
               <h3>Visualizar ferramentas ocultas</h3>
