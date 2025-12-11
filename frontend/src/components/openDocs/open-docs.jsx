@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState } from "react";
-import { Icons } from "../../constants/icons";
+import { Icons } from "../../constants/icons"; // Ajuste o caminho conforme seu projeto
 import { motion } from "framer-motion";
 import "./open-docs.css";
 import axios from "axios";
@@ -19,6 +19,7 @@ const useTagCategorization = (tags = []) => {
     if (!tags) return categorized;
 
     for (const tag of tags) {
+      // Pula tags vazias que não são do tipo 'data'
       if (!tag.value && tag.displayCategory !== "data") continue;
 
       switch (tag.displayCategory) {
@@ -45,9 +46,8 @@ const useTagCategorization = (tags = []) => {
 };
 
 // ==========================================================================
-// SUB-COMPONENTES DE ITENS (DataTag, TextBlock, etc.)
+// SUB-COMPONENTES DE VISUALIZAÇÃO (READ-ONLY)
 // ==========================================================================
-// ... (Mantive os componentes pequenos iguais, apenas organizados) ...
 
 const DataTagItem = ({
   tag,
@@ -98,7 +98,7 @@ const DataTagItem = ({
             onClick={(e) => {
               e.stopPropagation();
               onMarkError(tag.id);
-              showAlert("error", "Tag marcado com erro!");
+              if (!isMarkedAsError) showAlert("error", "Tag marcada com erro!");
             }}
             title="Marcar erro"
           >
@@ -205,10 +205,10 @@ const SignatoriesSection = ({ tag }) => {
 };
 
 // ==========================================================================
-// COMPONENTES DE VIEW (VIEWS PRINCIPAIS)
+// VIEWS (DATA, STATS, PDF, EDIT)
 // ==========================================================================
 
-// 1. View: Visualização de Dados
+// 1. View: Visualização de Dados (Leitura)
 const ViewData = ({ doc, onCopy, showAlert, onMarkError, markedErrorTags }) => {
   const { titleTag, summaryTags, signatoryTag, listTags, dataTags } =
     useTagCategorization(doc?.tags);
@@ -250,7 +250,153 @@ const ViewData = ({ doc, onCopy, showAlert, onMarkError, markedErrorTags }) => {
   );
 };
 
-// 2. View: Estatísticas
+// 2. View: Edição de Dados (Formulário)
+const EditViewData = ({ doc, onSave, onCancel }) => {
+  // Inicializa com as tags do documento ATUAL
+  const [localTags, setLocalTags] = useState(doc?.tags || []);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // IMPORTANTE: Atualiza o estado local se o documento mudar (prop doc mudar)
+  useEffect(() => {
+    setLocalTags(doc?.tags || []);
+  }, [doc]);
+
+  const { titleTag, summaryTags, signatoryTag, listTags, dataTags } =
+    useTagCategorization(localTags);
+
+  const handleTagChange = (id, newValue) => {
+    setLocalTags((prevTags) =>
+      prevTags.map((tag) => (tag.id === id ? { ...tag, value: newValue } : tag))
+    );
+  };
+
+  const handleSaveClick = async () => {
+    setIsSaving(true);
+    await onSave(localTags);
+    setIsSaving(false);
+  };
+
+  return (
+    <main className="od-main-content edit-mode">
+      <div className="edit-header-actions">
+        <h3>Modo de Edição</h3>
+        <div className="edit-buttons">
+          <button
+            className="od-btn-cancel"
+            onClick={onCancel}
+            disabled={isSaving}
+          >
+            Cancelar
+          </button>
+          <button
+            className="od-btn-save"
+            onClick={handleSaveClick}
+            disabled={isSaving}
+          >
+            {isSaving ? "Salvando..." : "Salvar Alterações"}{" "}
+            {!isSaving && <Icons.Check size={16} />}
+          </button>
+        </div>
+      </div>
+
+      <div className="edit-form-container">
+        {/* Título */}
+        <section className="edit-section">
+          <label className="edit-label">Título do Documento</label>
+          {titleTag ? (
+            <input
+              type="text"
+              className="od-input big-input"
+              value={titleTag.value || ""}
+              onChange={(e) => handleTagChange(titleTag.id, e.target.value)}
+            />
+          ) : (
+            <p className="text-muted">Tag de título não identificada.</p>
+          )}
+        </section>
+
+        {/* Resumos */}
+        {summaryTags.length > 0 && (
+          <section className="edit-section">
+            <h4 className="edit-section-title">Resumos e Textos</h4>
+            {summaryTags.map((tag) => (
+              <div key={tag.id} className="edit-field-group">
+                <label className="edit-label">{tag.name}</label>
+                <textarea
+                  className="od-textarea"
+                  rows={5}
+                  value={tag.value || ""}
+                  onChange={(e) => handleTagChange(tag.id, e.target.value)}
+                />
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* Dados (Grid) */}
+        {dataTags.length > 0 && (
+          <section className="edit-section">
+            <h4 className="edit-section-title">Dados Extraídos</h4>
+            <div className="edit-grid">
+              {dataTags.map((tag) => (
+                <div key={tag.id} className="edit-field-group">
+                  <div className="edit-label-icon">
+                    <Icons.Tags size={12} />
+                    <span>{tag.name}</span>
+                  </div>
+                  <input
+                    type="text"
+                    className="od-input"
+                    value={tag.value || ""}
+                    onChange={(e) => handleTagChange(tag.id, e.target.value)}
+                    placeholder="Vazio"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* JSON/Complexos */}
+        {(listTags.length > 0 || signatoryTag) && (
+          <section className="edit-section">
+            <h4 className="edit-section-title">
+              Dados Complexos (JSON/Listas)
+            </h4>
+            {signatoryTag && (
+              <div className="edit-field-group">
+                <label className="edit-label">
+                  {signatoryTag.name} (Formato JSON)
+                </label>
+                <textarea
+                  className="od-textarea code-font"
+                  rows={4}
+                  value={signatoryTag.value || ""}
+                  onChange={(e) =>
+                    handleTagChange(signatoryTag.id, e.target.value)
+                  }
+                />
+              </div>
+            )}
+            {listTags.map((tag) => (
+              <div key={tag.id} className="edit-field-group">
+                <label className="edit-label">{tag.name}</label>
+                <textarea
+                  className="od-textarea code-font"
+                  rows={3}
+                  value={tag.value || ""}
+                  onChange={(e) => handleTagChange(tag.id, e.target.value)}
+                />
+              </div>
+            ))}
+          </section>
+        )}
+      </div>
+    </main>
+  );
+};
+
+// 3. View: Estatísticas
 const DataStatsView = ({ doc, markedErrorTags }) => {
   const {
     totalTags,
@@ -297,8 +443,8 @@ const DataStatsView = ({ doc, markedErrorTags }) => {
             <span className="stats-card__label">Tags Corretas</span>
           </div>
         </div>
-        {/* Lista de stats simplificada */}
         <div className="stats-list">
+          {/* ... itens da legenda ... */}
           <div className="stats-list-item">
             <span className="stats-list-label">
               <div
@@ -345,7 +491,7 @@ const DataStatsView = ({ doc, markedErrorTags }) => {
   );
 };
 
-// 3. View: PDF
+// 4. View: PDF
 const ViewPDF = ({ url, title }) => (
   <aside className="od-pdf-viewer">
     <div className="od-pdf-frame">
@@ -355,12 +501,19 @@ const ViewPDF = ({ url, title }) => (
 );
 
 // ==========================================================================
-// COMPONENTES DE ESTRUTURA (SIDEBAR E HEADER)
+// HEADER
 // ==========================================================================
 
-const SideBar = ({ option, setOption, onDelete}) => (
-  <aside className="od-sidebar-content">
-    <div className="od-sidebar">
+const Header = ({ doc, onDelete, onClose, option, setOption }) => (
+  <header className="od-header">
+    <div className="od-header__title">
+      <h3>{doc.name || "Documento"}</h3>
+      <div className="id-doc">
+        <h5>ID #{doc.id}</h5>
+      </div>
+    </div>
+
+    <div className="od-header__actions">
       <ul>
         <li
           className={option === 1 ? "active" : ""}
@@ -388,57 +541,47 @@ const SideBar = ({ option, setOption, onDelete}) => (
 
         <li
           className={option === 5 ? "active" : ""}
-          onClick={() => {
-            setOption(5)
-          }}
-          title="Enviar para uma rota"
+          onClick={() => setOption(5)}
+          title="Editar Dados (Manual)"
         >
-          <Icons.Send size={20} />
+          <Icons.EditNote size={20} />
         </li>
 
         <li
           className={option === 4 ? "active" : ""}
           onClick={() => {
-            setOption(4)
-            onDelete()
+            setOption(4);
+            onDelete();
           }}
           title="Apagar documento"
         >
           <Icons.Delete size={20} />
         </li>
+
+        <hr />
+
+        <li className="od-icon-btn" onClick={onClose} title="Fechar (Esc)">
+          <Icons.Close size={20} />
+        </li>
       </ul>
-    </div>
-  </aside>
-);
-
-const Header = ({ doc, onDelete, onClose }) => (
-  <header className="od-header">
-    <div className="od-header__title">
-      <h3>{doc.name || "Documento"}</h3>
-
-      <div className="id-doc">
-        <h5>ID #{doc.id}</h5>
-      </div>
-    </div>
-
-    <div className="od-header__actions">
-      <button className="od-icon-btn" onClick={onClose} title="Fechar (Esc)">
-      <Icons.Close size={22} />
-    </button>
     </div>
   </header>
 );
 
 // ==========================================================================
-// COMPONENTE PRINCIPAL: OpenDocs
+// COMPONENTE PRINCIPAL
 // ==========================================================================
 function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose }) {
   const STATIC_FILE_BASE_URL = "http://localhost:5000";
-  const [option, setOption] = useState(1); // 1: Dados, 2: Stats, 3: PDF
+  const [option, setOption] = useState(1);
   const [markedErrorTags, setMarkedErrorTags] = useState(new Set());
 
-  // Reset ao abrir novo doc
+  // === NOVO ESTADO LOCAL PARA GERENCIAR DADOS DO DOCUMENTO ===
+  const [currentDoc, setCurrentDoc] = useState(docSelecionado);
+
+  // Sincroniza o estado local quando o prop mudar (ex: abrir outro doc)
   useEffect(() => {
+    setCurrentDoc(docSelecionado);
     setMarkedErrorTags(new Set());
     setOption(1);
   }, [docSelecionado]);
@@ -459,11 +602,11 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose }) {
 
   const handleDelete = async () => {
     if (
-      !window.confirm(`Tem certeza que deseja apagar "${docSelecionado.name}"?`)
+      !window.confirm(`Tem certeza que deseja apagar "${currentDoc.name}"?`)
     )
       return;
     try {
-      await axios.delete(`/documents/${docSelecionado.id}`);
+      await axios.delete(`/documents/${currentDoc.id}`);
       showAlert("success", "Documento apagado!");
       onDataChange();
       onClose();
@@ -473,8 +616,34 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose }) {
     }
   };
 
+  const handleSaveChanges = async (updatedTags) => {
+    try {
+      // 1. Envia para o backend
+      await axios.put(`/documents/${currentDoc.id}/tags`, {
+        tags: updatedTags,
+      });
+
+      // 2. ATUALIZAÇÃO OTIMISTA: Atualiza o estado local IMEDIATAMENTE
+      setCurrentDoc((prev) => ({
+        ...prev,
+        tags: updatedTags,
+      }));
+
+      showAlert("success", "Alterações salvas com sucesso!");
+      
+      // 3. Avisa o componente pai para atualizar a lista no fundo (sem pressa)
+      onDataChange(); 
+      
+      // 4. Volta para visualização
+      setOption(1); 
+    } catch (error) {
+      console.error(error);
+      showAlert("error", "Erro ao salvar alterações.");
+    }
+  };
+
   const handleDownload = () => {
-    const downloadUrl = `${axios.defaults.baseURL}/documents/download/${docSelecionado.id}`;
+    const downloadUrl = `${axios.defaults.baseURL}/documents/download/${currentDoc.id}`;
     window.open(downloadUrl, "_blank");
   };
 
@@ -486,59 +655,83 @@ function OpenDocs({ docSelecionado, onDataChange, showAlert, onClose }) {
     });
   };
 
-  if (!docSelecionado) return null;
+  if (!currentDoc) return null;
 
-  const pdfUrl = `${STATIC_FILE_BASE_URL}/${docSelecionado.path.replace(
+  const pdfUrl = `${STATIC_FILE_BASE_URL}/${currentDoc.path.replace(
     /\\/g,
     "/"
   )}`;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <motion.div
-        onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        className="od-container"
-      >
-        <SideBar option={option} setOption={setOption} onDelete={handleDelete}/>
+    <motion.div
+      onClick={(e) => e.stopPropagation()}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="od-container"
+    >
+      <div className="open-docs-modal">
+        {/* Passamos currentDoc ao invés de docSelecionado */}
+        <Header
+          doc={currentDoc}
+          onDelete={handleDelete}
+          onClose={onClose}
+          option={option}
+          setOption={setOption}
+        />
 
-        <div className="open-docs-modal">
-          <Header
-            doc={docSelecionado}
-            onDelete={handleDelete}
-            onClose={onClose}
-          />
-
-          <div className="od-main-content">
-            {option === 1 && (
-              <ViewData
-                doc={docSelecionado}
-                onCopy={handleCopyToClipboard}
-                showAlert={showAlert}
-                onMarkError={handleMarkError}
-                markedErrorTags={markedErrorTags}
-              />
-            )}
-            {option === 2 && (
-              <DataStatsView
-                doc={docSelecionado}
-                markedErrorTags={markedErrorTags}
-              />
-            )}
-            {option === 3 && (
-              <ViewPDF
-                url={pdfUrl}
-                title={docSelecionado.name}
-                onDownload={handleDownload}
-              />
-            )}
-          </div>
+        <div className="od-content-wrapper">
+          {(() => {
+            switch (option) {
+              case 1:
+                return (
+                  <ViewData
+                    doc={currentDoc}
+                    onCopy={handleCopyToClipboard}
+                    showAlert={showAlert}
+                    onMarkError={handleMarkError}
+                    markedErrorTags={markedErrorTags}
+                  />
+                );
+              case 2:
+                return (
+                  <DataStatsView
+                    doc={currentDoc}
+                    markedErrorTags={markedErrorTags}
+                  />
+                );
+              case 3:
+                return (
+                  <ViewPDF
+                    url={pdfUrl}
+                    title={currentDoc.name}
+                    onDownload={handleDownload}
+                  />
+                );
+              case 5:
+                return (
+                  <EditViewData
+                    doc={currentDoc}
+                    onSave={handleSaveChanges}
+                    onCancel={() => setOption(1)}
+                  />
+                );
+              default:
+                return (
+                  <ViewData
+                    doc={currentDoc}
+                    onCopy={handleCopyToClipboard}
+                    showAlert={showAlert}
+                    onMarkError={handleMarkError}
+                    markedErrorTags={markedErrorTags}
+                  />
+                );
+            }
+          })()}
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 

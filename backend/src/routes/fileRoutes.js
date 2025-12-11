@@ -9,6 +9,7 @@ import {
   getAllDocuments,
   downloadDocument,
   deleteDoc,
+  updateDocumentTags,
 } from "../controllers/fileController.js";
 
 const router = express.Router();
@@ -35,5 +36,7 @@ router.get("/", getAllDocuments);
 router.delete("/:id", deleteDoc);
 // GET /api/documents/download/:id -> Baixa o arquivo
 router.get("/download/:id", downloadDocument);
+// PUT /api/documents/:id/tags -> Atualiza as tags do documento
+router.put("/:id/tags", updateDocumentTags);
 
 export default router;
