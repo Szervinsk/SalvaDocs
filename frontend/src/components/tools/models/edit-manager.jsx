@@ -5,7 +5,7 @@ import { Icons } from "../../../constants/icons";
 import { AREA_OPTIONS } from "../../../constants/constants";
 
 // Componentes filhos
-import Tables from "./Tables";
+import Tables from "./tables";
 import ObjectEditor from "./ObjectEditor";
 
 // Componente de navegação superior
