@@ -31,7 +31,11 @@ function App() {
   // Estados de UI e Autenticação
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
-  const [tool, setTool] = useState(1);
+  const [tool, setTool] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const savedTool = parseInt(params.get("aba"));
+    return savedTool || 1; // 1 é o padrão se não tiver nada na URL
+  });
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,12 +55,18 @@ function App() {
   // Estado para aplicar o boas vindas para o usuário
   const [showWelcome, setShowWelcome] = useState(false);
 
+  useEffect(() => {
+    const url = new URL(window.location.search, window.location.origin); // Ajuste seguro para pegar a URL atual
+    url.searchParams.set("aba", tool);
+    window.history.pushState({}, "", url);
+  }, [tool]);
+
   // Efeito para decidir se mostra o welcome
   useEffect(() => {
-    if (isLogged && user && !user.welcomeDismissed) {
+    if (isLogged && user && !user.welcomeDismissed && tool === 1) {
       setShowWelcome(true);
     }
-  }, [isLogged, user]);
+  }, [isLogged, user, tool]);
 
   // Função para marcar o welcome como visto no backend
   const handleFinishWelcome = async () => {

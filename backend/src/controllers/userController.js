@@ -21,6 +21,9 @@ export const updateUser = async (req, res) => {
     await user.save();
 
     const userResponse = user.toJSON();
+
+    userResponse.hasApiKey = !!user.apiKey;
+
     delete userResponse.password;
     delete userResponse.apiKey; // Nunca retorne a chave API completa
 
