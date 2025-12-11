@@ -114,7 +114,7 @@ Você precisará de dois arquivos `.env`: um para o backend e um para o frontend
 2.  **Inicie os Servidores:** A partir da pasta **raiz** do projeto, você pode iniciar ambos os servidores (frontend e backend) com um único comando (recomendado instalar `concurrently`):
     ```bash
     # Se tiver 'concurrently' instalado globalmente ou no projeto
-    npx concurrently "cd backend && npm run dev" "cd frontend && npm run dev"
+    npx concurrently "cd backend && npm run dev" "cd frontend && npm start"
     ```
     Alternativamente, abra dois terminais e execute os comandos separadamente.
 
