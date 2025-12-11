@@ -208,6 +208,29 @@
    ========================================================================== */
 
 /* Remove o estilo padrão do modal que você tinha */
+
+  .modal-overlay {
+    position: fixed; /* Fixa o overlay na viewport (tela) */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ocupa 100% da largura da tela */
+    height: 100vh; /* Ocupa 100% da altura da tela */
+    
+    /* Escurece o fundo: Preto (0, 0, 0) com 50% de transparência (0.5) */
+    background-color: rgba(0, 0, 0, 0.5); 
+    
+    /* Centralização usando Flexbox */
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    
+    /* Garante que o modal fique sobre todos os outros elementos */
+    z-index: 1000; 
+    
+    /* Adiciona um efeito de transição para o overlay (opcional) */
+    transition: opacity 0.3s ease;
+}
+
   .modal-overlay .modal-content {
     background: none;
     border: none;
@@ -221,7 +244,7 @@
     background: var(--color-surface, #fff); /* Fundo branco */
     border-radius: var(--border-radius-lg, 12px);
     padding: var(--spacing-xl, 2.5rem);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     position: relative; /* Para o botão de fechar */
   }
 
