@@ -32,10 +32,18 @@ function AboutPage() {
 
         <div className="about-card developer-card">
           <h3>Desenvolvedor</h3>
-          <div className="developer-info">
-            <span className="developer-name">Matheus Szervinsk</span>
-            <a href="https://github.com/Szervinsk/SalvaDocs" target="_blank" rel="noopener noreferrer" className="github-link">
-              <Icons.Code size={16} /> Ver Repositório no GitHub
+          <div className="developer-row">
+            <div className="names-column">
+              <span className="developer-name">Matheus Szervinsk</span>
+              <span className="developer-name">Augusto Soares</span>
+            </div>
+            <a 
+              href="https://github.com/Szervinsk/SalvaDocs" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="github-link"
+            >
+              <Icons.Code size={16} /> Ver Repositório
             </a>
           </div>
         </div>
