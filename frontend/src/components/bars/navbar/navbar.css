@@ -9,7 +9,8 @@
   background-color: var(--color-background);
   padding: var(--spacing-md) 0;
   flex-shrink: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Impede scroll horizontal durante animação */
+  z-index: 50; /* Garante que fique sobre o conteúdo ao expandir */
 }
 
 .navbar-top {
@@ -18,6 +19,7 @@
   width: 100%;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-bottom: var(--spacing-lg);
 }
 
@@ -36,17 +38,26 @@
 .navbar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  align-content: center;
+  justify-content: space-between; /* Mantém logo alinhado */
   padding: 0 var(--spacing-md);
   margin-bottom: var(--spacing-lg);
   width: 100%;
 }
 
+/* Centraliza o logo quando colapsado */
+.navbar.collapsed .navbar-header {
+  justify-content: center;
+  padding: 0;
+}
+
 .logo-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: center;
+  padding: 0;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .logo-icon {
@@ -55,6 +66,7 @@
   padding: var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   background-color: var(--color-accent);
+  flex-shrink: 0;
 }
 
 .app-title {
@@ -62,10 +74,7 @@
   font-weight: var(--font-weight-bold);
   white-space: nowrap;
   margin: 0;
-}
-
-.navbar.collapsed .app-title {
-  display: none;
+  color: var(--color-text-primary); /* Garante cor do texto */
 }
 
 /* ==========================================================================
@@ -74,29 +83,41 @@
 .navbar-search {
   padding: 0 var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+  min-height: 40px; /* Reserva espaço para evitar layout shift */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-icon-wrapper {
   display: grid;
   place-items: center;
+  width: 40px; /* Quadrado perfeito quando fechado */
   height: 38px;
   background-color: var(--color-background);
   border-radius: 10px;
   border: 2px solid var(--color-border);
   color: var(--color-text-secondary);
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-icon-wrapper:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .navbar__tools {
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 4px; /* Pequeno espaçamento entre itens */
 }
 
 .tool-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* Alinhamento padrão à esquerda */
   width: 100%;
   gap: var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-md);
@@ -107,11 +128,11 @@
   white-space: nowrap;
   background-color: transparent;
   color: var(--color-text-secondary);
+  height: 48px; /* Altura fixa para consistência */
 }
 
 .tool-item:hover {
-  background-color: var(--color-surface); /* Trocado para surface */
-  border-left-color: var(--color-border);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
 }
 
@@ -122,30 +143,23 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Ajustes quando a navbar está fechada */
 .navbar.collapsed .tool-item {
-  justify-content: center;
-  padding: var(--spacing-sm);
+  justify-content: center; /* Centraliza ícone */
+  padding: var(--spacing-sm) 0; /* Remove padding lateral */
+  border-left: 4px solid transparent; /* Mantém a borda invisível para não deslocar */
 }
 
-.tool-item__shortcut {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  opacity: 0;
-  transform: translateX(-5px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+.navbar.collapsed .tool-item.active {
+  border-left-color: transparent; /* Remove borda lateral no modo ícone se preferir */
+  /* Ou mantenha se quiser o indicador visual */
+}
+
+.tool-item__icon {
   display: flex;
   align-items: center;
-  gap: 4px;
-}
-
-.tool-item:hover .tool-item__shortcut {
-  opacity: 1;
-  transform: translateX(0);
+  justify-content: center;
+  min-width: 24px; /* Tamanho fixo para o container do ícone */
 }
 
 /* ==========================================================================
@@ -159,15 +173,27 @@
   flex-shrink: 0;
 }
 
+.navbar.collapsed .navbar-footer {
+  padding: var(--spacing-sm) 0;
+  display: flex;
+  justify-content: center;
+}
+
 .account-info-trigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Espalha imagem e seta */
   width: 100%;
   padding: var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
+  overflow: hidden;
+}
+
+.navbar.collapsed .account-info-trigger {
+  justify-content: center;
+  width: auto;
 }
 
 .account-info-trigger:hover {
@@ -179,6 +205,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .account-img {
@@ -198,6 +225,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0; /* Permite que o texto trunque se necessário */
 }
 
 .user-name {
@@ -220,21 +248,20 @@
   cursor: pointer;
   border-radius: var(--border-radius-sm);
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
 }
-.navbar.collapsed .account-info-trigger {
-  justify-content: center;
-}
-.navbar.collapsed .toggle-btn {
-  transform: rotate(180deg);
+
+.toggle-btn:hover {
+  color: var(--color-text-primary);
 }
 
 /* ==========================================================================
    5. MODAL FLUTUANTE DE OPÇÕES DA CONTA
    ========================================================================== */
-
 .account-modal-popup {
   position: absolute;
-  bottom: 100%;
+  bottom: 100%; /* Aparece acima do footer */
   left: var(--spacing-md);
   right: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
@@ -243,9 +270,10 @@
   border-radius: var(--border-radius-md);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   flex-direction: column;
+  min-width: 220px;
 }
 
 .account-modal-popup__section {
@@ -309,13 +337,12 @@
 }
 
 /* ==========================================================================
-   6. ✨ NOVOS ESTILOS PARA SUBMENU ACORDEÃO ✨
+   6. SUBMENU (ACORDEÃO)
    ========================================================================== */
-
-/* Seta para indicar que há um submenu */
 .tool-item__chevron {
   color: var(--color-text-secondary);
   transition: transform 0.2s ease-in-out;
+  margin-left: auto; /* Empurra a seta para a direita */
 }
 
 .tool-item__chevron.open {
@@ -323,38 +350,36 @@
   color: var(--color-text-primary);
 }
 
-/* Container para a lista de sub-itens */
 .submenu-list {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-surface); /* Fundo ligeiramente diferente */
-  padding-left: calc(
-    var(--spacing-md) + 24px + 10px
-  ); /* Alinha com o texto do item pai */
+  background-color: rgba(0, 0, 0, 0.02); /* Fundo sutil para o submenu */
+  padding-left: calc(var(--spacing-md) + 24px + 10px);
   padding-right: var(--spacing-md);
-  overflow: hidden; /* Necessário para a animação de altura */
+  overflow: hidden;
 }
 
 .submenu-item {
   width: 100%;
-  padding: 6px 12px; /* Menor que o item principal */
-  margin-bottom: var(--spacing-xs);
+  padding: 8px 12px;
+  margin-bottom: 2px;
   border: none;
   background-color: transparent;
   border-radius: var(--border-radius-sm);
   color: var(--color-text-secondary);
   text-align: left;
-  font-size: var(--font-size-sm);
+  font-size: 0.9em;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .submenu-item:hover {
-  background-color: var(--color-background);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
 }
 
 .submenu-item.active {
   color: var(--color-accent);
   font-weight: var(--font-weight-semibold);
+  background-color: rgba(89, 125, 255, 0.05);
 }

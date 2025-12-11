@@ -131,29 +131,46 @@ const ToolItem = ({ item, tool, setTool, isCollapsed, openSubmenu, setOpenSubmen
   );
 };
 
-
 // ==========================================================================
 // COMPONENTE PRINCIPAL DA NAVBAR
 // ==========================================================================
 function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataView, dataView, handleScrollTo }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // 1. Inicia como TRUE (fechado/pequeno)
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [openModalAccount, setOpenModalAccount] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
 
-  const toggleSidebar = () => {
-    setIsCollapsed((prev) => !prev);
-    setOpenSubmenu(null);
-  };
-
+  // Variantes de animação
   const navVariants = {
     expanded: { width: 280 },
     collapsed: { width: 80 },
   };
 
   const textVariants = {
-    hidden: { opacity: 0, x: -10, transition: { duration: 0.2 } },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } },
+    hidden: { opacity: 0, x: -10, display: "none" },
+    visible: { 
+      opacity: 1, 
+      x: 0, 
+      display: "block",
+      transition: { duration: 0.2, delay: 0.1 } 
+    },
+  };
+
+  // Funções de Mouse
+  const handleMouseEnter = () => {
+    setIsCollapsed(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsCollapsed(true);
+    setOpenSubmenu(null); // Fecha submenus ao sair
+    setOpenModalAccount(false); // Opcional: fecha modal de conta ao sair
+  };
+
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => !prev);
+    setOpenSubmenu(null);
   };
 
   const getInitials = (name = "") => {
@@ -174,14 +191,17 @@ function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataV
     return () => window.removeEventListener('click', handleClickOutside);
   }, [openModalAccount]);
 
-
   return (
     <motion.nav
-      className={`navbar ${isCollapsed ? "collapsed" : ""}`}
+      // Adiciona classe collapsed se for true
+      className={`navbar ${isCollapsed ? "collapsed" : ""}`} 
       variants={navVariants}
-      initial="expanded"
+      initial="collapsed" // Estado inicial da animação
       animate={isCollapsed ? "collapsed" : "expanded"}
       transition={{ duration: 0.3, ease: "easeInOut" }}
+      // Eventos de Mouse
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="navbar-top">
         <div className="navbar-header">
@@ -198,15 +218,27 @@ function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataV
         </div>
 
         <div className="navbar-search">
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {!isCollapsed ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={"Buscar ferramentas..."} />
+              <motion.div 
+                key="search-bar"
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+              >
+                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={"Buscar..."} />
               </motion.div>
             ) : (
-              <div className="search-icon-wrapper">
+              <motion.div 
+                key="search-icon"
+                className="search-icon-wrapper"
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+              >
+                {/* Ao clicar na lupa, expande a barra */}
                 <Icons.Search size={20} onClick={() => setIsCollapsed(false)} />
-              </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -247,7 +279,11 @@ function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataV
         <div
           className="account-info-trigger"
           onClick={(e) => {
-            if (isCollapsed) return;
+            // Se estiver fechado, expande primeiro antes de abrir o modal
+            if (isCollapsed) {
+                setIsCollapsed(false);
+                return;
+            }
             e.stopPropagation();
             setOpenModalAccount(prev => !prev);
           }}
@@ -264,9 +300,12 @@ function Navbar({ setTool, tool, user, onLogout, setDarkMode, darkMode, setDataV
             </AnimatePresence>
           </div>
 
-          <button className="toggle-btn" onClick={toggleSidebar} title={isCollapsed ? "Expandir" : "Recolher"}>
-            <Icons.BackIn size={20} />
-          </button>
+          {/* Opcional: Esconder botão de toggle já que o hover faz o trabalho */}
+          {!isCollapsed && (
+             <button className="toggle-btn" onClick={(e) => { e.stopPropagation(); toggleSidebar(); }}>
+               <Icons.BackIn size={20} />
+             </button>
+          )}
         </div>
       </div>
     </motion.nav>

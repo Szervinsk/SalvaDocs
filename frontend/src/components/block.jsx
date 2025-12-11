@@ -240,20 +240,22 @@ function Block({
       />
 
       <div className="middle-area">
-        <div className="main-content">{handleSelectTool(tool)}</div>
-
-        <AnimatePresence>
-          {docSelecionado && (
-            <OpenDocs
-              docSelecionado={docSelecionado}
-              showAlert={showAlert}
-              onClose={() => setDocSelecionado(null)}
-              visualizarPDF={visualizarPDF}
-              onDataChange={onDataChange}
-              baseURL={axios.defaults.baseURL.replace("/api", "")}
-            />
-          )}
-        </AnimatePresence>
+        <div className="main-content">
+          <AnimatePresence>
+            {docSelecionado ? (
+              <OpenDocs
+                docSelecionado={docSelecionado}
+                showAlert={showAlert}
+                onClose={() => setDocSelecionado(null)}
+                visualizarPDF={visualizarPDF}
+                onDataChange={onDataChange}
+                baseURL={axios.defaults.baseURL.replace("/api", "")}
+              />
+            ) : (
+              handleSelectTool(tool)
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       <StatusBar
